@@ -14,8 +14,8 @@ const loginSchema = Yup.object().shape({
   remember: Yup.boolean()
 });
 const initialValues = {
-  email: 'demo@keenthemes.com',
-  password: 'demo1234',
+  email: 'demo@email.com',
+  password: '123456',
   remember: false
 };
 const Login = () => {
@@ -94,8 +94,8 @@ const Login = () => {
         </div>
 
         <Alert variant="primary">
-          Use <span className="font-semibold text-gray-900">demo@keenthemes.com</span> username and{' '}
-          <span className="font-semibold text-gray-900">demo1234</span> password.
+          Use <span className="font-semibold text-gray-900">demo@email.com</span> username and{' '}
+          <span className="font-semibold text-gray-900">123456</span> password.
         </Alert>
 
         {formik.status && <Alert variant="danger">{formik.status}</Alert>}

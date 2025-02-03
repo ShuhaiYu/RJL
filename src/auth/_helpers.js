@@ -27,6 +27,8 @@ const removeAuth = () => {
 };
 export function setupAxios(axios) {
   axios.defaults.headers.Accept = 'application/json';
+  axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+
   axios.interceptors.request.use(config => {
     const auth = getAuth();
     if (auth?.access_token) {
