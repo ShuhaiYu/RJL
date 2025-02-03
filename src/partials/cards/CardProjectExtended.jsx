@@ -4,13 +4,13 @@ import { useLanguage } from '@/i18n';
 import { DropdownCard2 } from '../dropdowns/general';
 import { CommonAvatars } from '../common';
 const CardProjectExtended = ({
-  status,
+  // status,
   logo,
   title,
   description,
-  team,
-  statistics,
-  progress,
+  // team,
+  // statistics,
+  // progress,
   url
 }) => {
   const {
@@ -46,7 +46,7 @@ const CardProjectExtended = ({
         </div>
 
         <div className="flex justify-center mb-2">
-          <img src={toAbsoluteUrl(`/media/brand-logos/${logo}`)} className="min-w-12 shrink-0" alt="" />
+          <img src={logo} className="min-w-12 shrink-0" alt="" />
         </div>
 
         <div className="text-center mb-7">
@@ -57,23 +57,23 @@ const CardProjectExtended = ({
           <div className="text-sm text-gray-700">{description}</div>
         </div>
 
-        <div className="grid justify-center gap-1.5 mb-7.5">
+        {/* <div className="grid justify-center gap-1.5 mb-7.5">
           <span className="text-2xs uppercase text-gray-600 text-center">team</span>
           <CommonAvatars group={team.group} size={team.size} />
-        </div>
+        </div> */}
 
-        <div className="flex items-center justify-center flex-wrap gap-2 lg:gap-5">
+        {/* <div className="flex items-center justify-center flex-wrap gap-2 lg:gap-5">
           {statistics.map((statistic, index) => {
           return renderItem(statistic, index);
         })}
-        </div>
+        </div> */}
       </div>
 
-      <div className={`progress ${progress?.variant}`}>
+      {/* <div className={`progress ${progress?.variant}`}>
         <div className="progress-bar" style={{
         width: `${progress?.value}%`
       }}></div>
-      </div>
+      </div> */}
     </div>;
 };
 export { CardProjectExtended };
