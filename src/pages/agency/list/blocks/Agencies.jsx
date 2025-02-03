@@ -3,7 +3,7 @@ import { KeenIcon } from '@/components';
 import { CardProjectExtended, CardProjectExtendedRow } from '@/partials/cards';
 import axios from 'axios';
 import { useAuthContext } from '@/auth';
-const Projects = () => {
+const Agencies = () => {
   const [activeView, setActiveView] = useState('cards');
   const [agencies, setAgencies] = useState([]);
 
@@ -65,11 +65,11 @@ const Projects = () => {
         })}
           </div>
 
-          <div className="flex grow justify-center pt-5 lg:pt-7.5">
+          {/* <div className="flex grow justify-center pt-5 lg:pt-7.5">
             <a href="#" className="btn btn-link">
               Show more projects
             </a>
-          </div>
+          </div> */}
         </div>}
 
       {activeView === 'list' && <div id="projects_list">
@@ -79,12 +79,12 @@ const Projects = () => {
         })}
           </div>
 
-          <div className="flex grow justify-center pt-5 lg:pt-7.5">
+          {/* <div className="flex grow justify-center pt-5 lg:pt-7.5">
             <a href="#" className="btn btn-link">
               Show more projects
             </a>
-          </div>
+          </div> */}
         </div>}
     </div>;
 };
-export { Projects };
+export { Agencies };

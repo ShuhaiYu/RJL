@@ -3,7 +3,11 @@ import { toAbsoluteUrl } from '@/utils/Assets';
 import { useLanguage } from '@/i18n';
 import { DropdownCard2 } from '../dropdowns/general';
 import { CommonAvatars } from '../common';
+import axios from 'axios';
+import { useAuthContext } from '@/auth';
+import { toast } from 'sonner';
 const CardProjectExtended = ({
+  id,
   // status,
   logo,
   title,
@@ -11,7 +15,8 @@ const CardProjectExtended = ({
   // team,
   // statistics,
   // progress,
-  url
+  url,
+  onRemove
 }) => {
   const {
     isRTL
@@ -22,6 +27,40 @@ const CardProjectExtended = ({
         <span className="text-gray-700 text-xs">{statistic.description}</span>
       </div>;
   };
+
+  // 从 useAuthContext 中取出 token
+  const auth = useAuthContext().auth
+  const token = auth?.accessToken
+
+  // ① 定义删除（关闭）操作的回调
+  const handleDelete = async () => {
+    try {
+      
+      await axios.post(`http://localhost:3000/admin/agencies/${id}/close`,null, {
+        headers: {
+          // Bearer Token形式
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      // alert('Agency closed successfully!');
+      toast('Agency closed successfully!', {
+        appearance: 'success',
+        autoDismiss: true,
+      });
+
+      if (typeof onRemove === 'function') {
+        onRemove(id);
+      }
+    } catch (error) {
+      console.error('Failed to close agency:', error);
+      // alert('Failed to close the agency.');
+      toast('Failed to close the agency.', {
+        appearance: 'error',
+        autoDismiss: true,
+      });
+    }
+  };
+
   return <div className="card overflow-hidden grow justify-between">
       <div className="p-5 mb-5">
         <div className="flex items-center justify-between mb-5">
@@ -40,7 +79,7 @@ const CardProjectExtended = ({
               <MenuToggle className="btn btn-sm btn-icon btn-light btn-clear">
                 <KeenIcon icon="dots-vertical" />
               </MenuToggle>
-              {DropdownCard2()}
+              {DropdownCard2({ onDelete: handleDelete })}
             </MenuItem>
           </Menu>
         </div>

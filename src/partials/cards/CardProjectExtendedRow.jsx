@@ -5,7 +5,7 @@ import { DropdownCard2 } from '../dropdowns/general';
 import { CommonAvatars } from '../common';
 const CardProjectExtendedRow = ({
   // status,
-  // logo,
+  logo,
   title,
   description,
   // team,
@@ -24,9 +24,9 @@ const CardProjectExtendedRow = ({
   return <div className="card p-7.5">
       <div className="flex items-center flex-wrap justify-between gap-5">
         <div className="flex items-center gap-3.5">
-          {/* <div className="flex items-center justify-center min-w-12">
-            <img src={toAbsoluteUrl(`/media/brand-logos/${logo}`)} className="min-w-12 shrink-0" alt="" />
-          </div> */}
+          <div className="flex items-center justify-center min-w-12">
+            <img src={logo} className="min-w-12 shrink-0" alt="" />
+          </div>
 
           <div className="flex flex-col">
             <a href={url} className="text-lg font-medium text-gray-900 hover:text-primary">

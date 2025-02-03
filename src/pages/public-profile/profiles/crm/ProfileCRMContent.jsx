@@ -10,10 +10,10 @@ const ProfileCRMContent = () => {
 
           <ApiCredentials />
 
-          <Tags title="Skills" />
+          {/* <Tags title="Skills" /> */}
         </div>
       </div>
-      <div className="col-span-2">
+      {/* <div className="col-span-2">
         <div className="flex flex-col gap-5 lg:gap-7.5">
           <div className="flex flex-col gap-5 lg:gap-7.5">
             <Deals />
@@ -26,7 +26,7 @@ const ProfileCRMContent = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>;
 };
 export { ProfileCRMContent };

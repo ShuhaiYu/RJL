@@ -24,9 +24,9 @@ const HeaderLogo = () => {
           <KeenIcon icon="menu" />
         </button>
 
-        {megaMenuEnabled && <button type="button" className="btn btn-icon btn-light btn-clear btn-sm" onClick={handleMegaMenuOpen}>
+        {/* {megaMenuEnabled && <button type="button" className="btn btn-icon btn-light btn-clear btn-sm" onClick={handleMegaMenuOpen}>
             <KeenIcon icon="burger-menu-2" />
-          </button>}
+          </button>} */}
       </div>
     </div>;
 };

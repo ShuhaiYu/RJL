@@ -1,5 +1,5 @@
 import { KeenIcon, MenuIcon, MenuItem, MenuLink, MenuSub, MenuTitle } from '@/components';
-const DropdownCard2 = () => {
+const DropdownCard2 = ({ onDelete }) => {
   return <MenuSub className="menu-default" rootClassName="w-full max-w-[200px]">
       <MenuItem path="/account/home/settings-enterprise">
         <MenuLink>
@@ -9,28 +9,17 @@ const DropdownCard2 = () => {
           <MenuTitle>Settings</MenuTitle>
         </MenuLink>
       </MenuItem>
-      <MenuItem path="/account/members/import-members">
+      <MenuItem onClick={(e) => {
+            e.preventDefault(); // 阻止默认跳转
+            if (typeof onDelete === 'function') {
+              onDelete();
+            }
+          }}>
         <MenuLink>
           <MenuIcon>
-            <KeenIcon icon="some-files" />
+            <KeenIcon icon="trash" />
           </MenuIcon>
-          <MenuTitle>Import</MenuTitle>
-        </MenuLink>
-      </MenuItem>
-      <MenuItem path="/account/activity">
-        <MenuLink>
-          <MenuIcon>
-            <KeenIcon icon="cloud-change" />
-          </MenuIcon>
-          <MenuTitle>Activity</MenuTitle>
-        </MenuLink>
-      </MenuItem>
-      <MenuItem path="#">
-        <MenuLink>
-          <MenuIcon>
-            <KeenIcon icon="dislike" />
-          </MenuIcon>
-          <MenuTitle>Report</MenuTitle>
+          <MenuTitle>Delete</MenuTitle>
         </MenuLink>
       </MenuItem>
     </MenuSub>;

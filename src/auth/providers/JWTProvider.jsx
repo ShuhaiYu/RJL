@@ -99,7 +99,7 @@ const AuthProvider = ({
   const refreshToken = async () => {
     try {
       // 假设 auth 中保存了 refresh_token 字段
-      const { data } = await axios.post(REFRESH_URL, { token: auth.refreshToken });
+      const { data } = await axios.post(REFRESH_URL, { refreshToken: auth.refreshToken });
       // 更新 auth 信息（包含新的 access_token 和 refresh_token）
       saveAuth(data);
       return data.access_token;
