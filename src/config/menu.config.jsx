@@ -11,59 +11,17 @@ export const MENU_SIDEBAR = [{
 }, {
   heading: 'User'
 }, {
-  title: 'Public Profile',
+  title: 'Profile',
   icon: 'profile-circle',
   children: [{
-    title: 'Profiles',
-    children: [{
-      title: 'Default',
-      path: '/public-profile/profiles/default'
-    }, {
-      title: 'Creator',
-      path: '/public-profile/profiles/creator'
-    }, {
-      title: 'Company',
-      path: '/public-profile/profiles/company'
-    }, {
-      title: 'NFT',
-      path: '/public-profile/profiles/nft'
-    }, {
-      title: 'Blogger',
-      path: '/public-profile/profiles/blogger'
-    }, {
-      title: 'CRM',
-      path: '/public-profile/profiles/crm'
-    }, {
-      title: 'More',
-      collapse: true,
-      collapseTitle: 'Show less',
-      expandTitle: 'Show 4 more',
-      dropdownProps: {
-        placement: 'right-start'
-      },
-      children: [{
-        title: 'Gamer',
-        path: '/public-profile/profiles/gamer'
-      }, {
-        title: 'Feeds',
-        path: '/public-profile/profiles/feeds'
-      }, {
-        title: 'Plain',
-        path: '/public-profile/profiles/plain'
-      }, {
-        title: 'Modal',
-        path: '/public-profile/profiles/modal'
-      }]
-    }]
+    title: 'Profile',
+    path: '/public-profile/profiles/crm'
   }, {
     title: 'Projects',
-    children: [{
-      title: '3 Columns',
-      path: '/public-profile/projects/3-columns'
-    }, {
-      title: '2 Columns',
-      path: '/public-profile/projects/2-columns'
-    }]
+    path: '/public-profile/projects/projects'
+  }, {
+    title: 'Agency',
+    path: '/public-profile/projects/agency'
   }, {
     title: 'Works',
     path: '/public-profile/works'
@@ -369,16 +327,6 @@ export const MENU_SIDEBAR = [{
 }, {
   title: 'eCommerce',
   icon: 'handcart',
-  disabled: true
-}, {
-  heading: 'Miscellaneous'
-}, {
-  title: 'Modals',
-  icon: 'some-files',
-  disabled: true
-}, {
-  title: 'Wizards',
-  icon: 'note-2',
   disabled: true
 }];
 export const MENU_MEGA = [{

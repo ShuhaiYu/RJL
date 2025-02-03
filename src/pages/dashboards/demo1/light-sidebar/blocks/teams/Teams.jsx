@@ -112,7 +112,7 @@ const Teams = () => {
           }
         });
       }
-      const response = await axios.get(`${import.meta.env.VITE_APP_API_URL}/teams/query?${queryParams.toString()}`);
+      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/teams/query?${queryParams.toString()}`);
       return {
         data: response.data.data,
         // Server response data

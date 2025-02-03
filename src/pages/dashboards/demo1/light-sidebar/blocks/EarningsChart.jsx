@@ -3,7 +3,7 @@ import ApexChart from 'react-apexcharts';
 import axios from 'axios';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 const fetchEarningsChart = () => {
-  return axios.get(`${import.meta.env.VITE_APP_API_URL}/sales/index`);
+  return axios.get(`${import.meta.env.VITE_API_BASE_URL}/sales/index`);
 };
 const EarningsChart = () => {
   const [charData, setCharData] = useState();
