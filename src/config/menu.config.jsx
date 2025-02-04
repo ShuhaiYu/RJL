@@ -73,6 +73,35 @@ export const MENU_SIDEBAR = [
       // },
     ],
   },
+  
+  {
+    title: "Agencies",
+    icon: "users",
+    children: [
+      {
+        title: "My Agencies",
+        path: "/agencies/my-agencies",
+      },
+      {
+        title: "Create Agency",
+        path: "/agencies/create-agency",
+      },
+    ],  
+  },
+  {
+    title: "Properties",
+    icon: "home",
+    children: [
+      {
+        title: "My Properties",
+        path: "/property/my-properties",
+      },
+      {
+        title: "Tasks",
+        path: "/property/tasks",
+      },
+    ],  
+  },
   {
     title: "My Account",
     icon: "setting-2",
@@ -246,21 +275,6 @@ export const MENU_SIDEBAR = [
       // },
     ],
   },
-  {
-    title: "Agencies",
-    icon: "users",
-    children: [
-      {
-        title: "My Agencies",
-        path: "/agencies/my-agencies",
-      },
-      {
-        title: "Create Agency",
-        path: "/agencies/create-agency",
-      },
-    ],  
-  },
-
   // {
   //   title: "Network",
   //   icon: "users",
