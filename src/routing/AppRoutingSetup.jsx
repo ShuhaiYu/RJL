@@ -7,6 +7,8 @@ import { AuthPage } from '@/auth';
 import { RequireAuth } from '@/auth/RequireAuth';
 import { Demo1Layout } from '@/layouts/demo1';
 import { ErrorsRouting } from '@/errors';
+import CreateAgency from '../pages/agency/create/CreateAgency';
+import AgencyDetail from '../pages/agency/detail/AgencyDetail';
 const AppRoutingSetup = () => {
   return <Routes>
       <Route element={<RequireAuth />}>
@@ -14,7 +16,9 @@ const AppRoutingSetup = () => {
           <Route path="/" element={<DefaultPage />} />
           <Route path="/dark-sidebar" element={<Demo1DarkSidebarPage />} />
           <Route path="/public-profile/profiles/crm" element={<ProfileCRMPage />} />
-          <Route path="/agencies/myagencies" element={<AgenciesList />} />
+          <Route path="/agencies/my-agencies" element={<AgenciesList />} />
+          <Route path="/agencies/create-agency" element={<CreateAgency />} />
+          <Route path="/agencies/:id" element={<AgencyDetail/>} />
           <Route path="/account/home/user-profile" element={<AccountUserProfilePage />} />
           <Route path="/account/home/company-profile" element={<AccountCompanyProfilePage />} />
         </Route>

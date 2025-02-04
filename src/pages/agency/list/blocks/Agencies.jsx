@@ -35,10 +35,10 @@ const Agencies = () => {
   };
   
   const renderProject = (project, index) => {
-    return <CardProjectExtended id={project.id} status={project.status} logo={project.logo} title={project.agency_name} description={project.address} team={project.team} statistics={project.statistics} progress={project.progress} url="#" key={index} onRemove={handleRemove}/>;
+    return <CardProjectExtended id={project.id} status={project.status} logo={project.logo} title={project.agency_name} description={project.address} team={project.team} statistics={project.statistics} progress={project.progress} url={`/agencies/${project.id}`} key={index} onRemove={handleRemove}/>;
   };
   const renderItem = (item, index) => {
-    return <CardProjectExtendedRow id={item.id} status={item.status} logo={item.logo} title={item.agency_name} description={item.address} team={item.team} statistics={item.statistics} url="#" key={index} />;
+    return <CardProjectExtendedRow id={item.id} status={item.status} logo={item.logo} title={item.agency_name} description={item.address} team={item.team} statistics={item.statistics} url={`/agencies/${item.id}`} key={index} />;
   };
   return <div className="flex flex-col items-stretch gap-5 lg:gap-7.5">
       <div className="flex flex-wrap items-center gap-5 justify-between">

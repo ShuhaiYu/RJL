@@ -252,7 +252,11 @@ export const MENU_SIDEBAR = [
     children: [
       {
         title: "My Agencies",
-        path: "/agencies/myagencies",
+        path: "/agencies/my-agencies",
+      },
+      {
+        title: "Create Agency",
+        path: "/agencies/create-agency",
       },
     ],  
   },
