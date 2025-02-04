@@ -43,15 +43,29 @@ export default function Tasks() {
               key={task.id}
               className="border p-4 rounded hover:shadow-md transition-shadow"
             >
-              <Link to={`/admin/tasks/${task.id}`}>
-                <h2 className="text-xl font-semibold">{task.task_name}</h2>
-                {task.due_date && (
-                  <p className="text-gray-600">
-                    Due: {new Date(task.due_date).toLocaleString()}
-                  </p>
-                )}
+              <Link to={`/admin/tasks/${task.id}`} className="block">
+                <div className="mb-2">
+                  <h2 className="text-xl font-semibold">{task.task_name}</h2>
+                  {task.due_date && (
+                    <p className="text-gray-600">
+                      Due: {new Date(task.due_date).toLocaleString()}
+                    </p>
+                  )}
+                </div>
                 {task.task_description && (
                   <p className="mt-2 text-gray-700">{task.task_description}</p>
+                )}
+                {/* 如果存在房产信息，则展示 */}
+                {task.property_name && (
+                  <div className="mt-4 p-2 border-t border-gray-200">
+                    <p className="text-gray-800 font-medium">Property:</p>
+                    <p className="text-gray-600">{task.property_name}</p>
+                    {task.property_address && (
+                      <p className="text-gray-500 text-sm">
+                        {task.property_address}
+                      </p>
+                    )}
+                  </div>
                 )}
               </Link>
             </li>
