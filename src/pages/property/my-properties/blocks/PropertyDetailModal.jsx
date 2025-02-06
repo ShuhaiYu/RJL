@@ -23,7 +23,7 @@ export default function PropertyDetailModal({ propertyId, token, onClose }) {
   const [newTaskDesc, setNewTaskDesc] = useState("");
   const [newTaskDue, setNewTaskDue] = useState("");
 
-  useEffect(() => {
+  const fetchPropertyDetail = () => {
     if (!propertyId) return;
     setLoading(true);
     setError("");
@@ -50,6 +50,10 @@ export default function PropertyDetailModal({ propertyId, token, onClose }) {
         );
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    fetchPropertyDetail();
   }, [propertyId, token]);
 
   if (!propertyId) return null;
@@ -106,8 +110,9 @@ export default function PropertyDetailModal({ propertyId, token, onClose }) {
       .then(() => {
         toast("Task created successfully!");
         setShowCreateTask(false);
-        // TODO: 刷新 property detail
-        //   loadPropertyDetail();
+        
+        // 创建成功后刷新property详情
+        fetchPropertyDetail();
       })
       .catch((err) => {
         console.error(err);

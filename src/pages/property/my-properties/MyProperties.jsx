@@ -12,7 +12,7 @@ export default function MyProperties() {
   const { auth } = useAuthContext();
   const token = auth?.accessToken;
 
-  useEffect(() => {
+  const fetchProperties = () => {
     if (!token) return;
     setLoading(true);
     axios
@@ -29,7 +29,14 @@ export default function MyProperties() {
         setError(err.response?.data?.message || 'Failed to fetch properties');
         setLoading(false);
       });
-  }, [token]);
+  };
+
+  useEffect(() => {
+    if (token) {
+      fetchProperties();
+    }
+  }
+  , [token]);
 
   if (loading) return <div>Loading properties...</div>;
   if (error) return <div className="text-red-500">Error: {error}</div>;
@@ -41,6 +48,7 @@ export default function MyProperties() {
 
   const closeModal = () => {
     setSelectedPropertyId(null);
+    fetchProperties(); // 关闭Modal后再次获取最新列表
   };
 
   return (
