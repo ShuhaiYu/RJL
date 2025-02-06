@@ -4,6 +4,9 @@ import axios from "axios";
 import ContactEditForm from "./ContactEditForm";
 import { toast } from "sonner";
 
+import { format } from "date-fns";
+import { toZonedTime, fromZonedTime } from "date-fns-tz";
+
 export default function TaskDetailModal({ taskId, token, onClose }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -26,12 +29,18 @@ export default function TaskDetailModal({ taskId, token, onClose }) {
   // 是否显示 Emails 列表
   const [showEmails, setShowEmails] = useState(false);
 
+  const [repeatFrequency, setRepeatFrequency] = useState("none");
+
+  const userTimeZone = "Australia/Sydney";
+
   useEffect(() => {
     if (!taskId) return;
     loadTask();
   }, [taskId]);
 
   const loadTask = () => {
+    console.log("loadTask: 开始加载任务详情...");
+
     setLoading(true);
     setError("");
     axios
@@ -39,14 +48,32 @@ export default function TaskDetailModal({ taskId, token, onClose }) {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
+        console.log("loadTask: 从服务端获取到的数据：", res.data);
+
         setTaskDetail(res.data);
         setTaskName(res.data.task_name || "");
         setTaskDescription(res.data.task_description || "");
-        setDueDate(
-          res.data.due_date
-            ? new Date(res.data.due_date).toISOString().slice(0, 16)
-            : ""
-        );
+        if (res.data.due_date) {
+          // 先拿到一个真正的 Date 对象（内部是 UTC 时间）
+          const serverUtcDate = new Date(res.data.due_date);
+          console.log(
+            "loadTask: 服务器 due_date 转换为 Date 对象（UTC）：",
+            serverUtcDate
+          );
+
+          // 用 utcToZonedTime() 把它转换到用户所在时区的本地时间
+          const zonedDate = toZonedTime(serverUtcDate, userTimeZone);
+          console.log("loadTask: 转换为本地时区 Date 对象：", zonedDate);
+
+          // 为了配合 <input type="datetime-local" />，需要格式化成 "yyyy-MM-ddTHH:mm" 这种纯本地字符串
+          const displayString = format(zonedDate, "yyyy-MM-dd'T'HH:mm");
+          console.log("loadTask: 格式化后的本地时间字符串：", displayString);
+
+          setDueDate(displayString);
+        } else {
+          setDueDate("");
+        }
+        setRepeatFrequency(res.data.repeat_frequency || "none");
         setLoading(false);
       })
       .catch((err) => {
@@ -58,6 +85,20 @@ export default function TaskDetailModal({ taskId, token, onClose }) {
   if (!taskId) return null;
 
   const handleSaveTask = () => {
+    console.log("handleSaveTask: 开始保存任务...");
+    let dueDateToSave = null;
+    if (dueDate) {
+      console.log("handleSaveTask: 用户输入的本地 dueDate 字符串：", dueDate);
+      // ★ 这里不再转换——直接发送用户在 input 中看到的本地时间字符串
+      dueDateToSave = dueDate;
+      console.log(
+        "handleSaveTask: 最终要保存的 due_date 字符串（未转换）：",
+        dueDateToSave
+      );
+    } else {
+      console.log("handleSaveTask: 用户没有输入 dueDate");
+    }
+
     // PUT update
     axios
       .put(
@@ -65,7 +106,8 @@ export default function TaskDetailModal({ taskId, token, onClose }) {
         {
           task_name: taskName,
           task_description: taskDescription,
-          due_date: dueDate ? new Date(dueDate).toISOString() : null,
+          due_date: dueDateToSave,
+          repeat_frequency: repeatFrequency,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -133,10 +175,10 @@ export default function TaskDetailModal({ taskId, token, onClose }) {
 
   function showEmailInNewWindow() {
     taskDetail.emails.forEach((email) => {
-        const newWindow = window.open('', '_blank');
-        // 用 document.write 或 newWindow.document.body.innerHTML
-        newWindow.document.write(`<html><body>${email.html}</body></html>`);
-        newWindow.document.close();
+      const newWindow = window.open("", "_blank");
+      // 用 document.write 或 newWindow.document.body.innerHTML
+      newWindow.document.write(`<html><body>${email.html}</body></html>`);
+      newWindow.document.close();
     });
   }
 
@@ -192,6 +234,20 @@ export default function TaskDetailModal({ taskId, token, onClose }) {
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
               />
+            </div>
+            <div className="mb-4">
+              <label className="block mb-1 font-medium">Repeat Frequency</label>
+              <select
+                className="border w-full p-2 rounded"
+                name="repeat_frequency"
+                value={repeatFrequency}
+                onChange={(e) => setRepeatFrequency(e.target.value)}
+              >
+                <option value="none">None</option>
+                <option value="monthly">Monthly</option>
+                <option value="quarterly">Quarterly</option>
+                <option value="yearly">Yearly</option>
+              </select>
             </div>
 
             <div className="flex justify-end mb-6">
@@ -278,7 +334,7 @@ export default function TaskDetailModal({ taskId, token, onClose }) {
                 <button
                   className="px-3 py-1 bg-indigo-600 text-white rounded"
                   //   onClick={() => setShowEmails(!showEmails)}
-                    onClick={showEmailInNewWindow}
+                  onClick={showEmailInNewWindow}
                 >
                   {showEmails ? "Hide Emails" : "Show Emails"}
                 </button>
