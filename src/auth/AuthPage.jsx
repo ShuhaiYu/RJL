@@ -7,8 +7,8 @@ const AuthPage = () => <Routes>
     <Route element={<AuthBrandedLayout />}>
       <Route index element={<Login />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} />
-      <Route path="/2fa" element={<TwoFactorAuth />} />
+      {/* <Route path="/signup" element={<Signup />} /> */}
+      {/* <Route path="/2fa" element={<TwoFactorAuth />} /> */}
       <Route path="/check-email" element={<CheckEmail />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/reset-password/enter-email" element={<ResetPasswordEnterEmail />} />
@@ -20,8 +20,8 @@ const AuthPage = () => <Routes>
 
     <Route element={<AuthLayout />}>
       <Route path="/classic/login" element={<Login />} />
-      <Route path="/classic/signup" element={<Signup />} />
-      <Route path="/classic/2fa" element={<TwoFactorAuth />} />
+      {/* <Route path="/classic/signup" element={<Signup />} /> */}
+      {/* <Route path="/classic/2fa" element={<TwoFactorAuth />} /> */}
       <Route path="/classic/check-email" element={<CheckEmail />} />
       <Route path="/classic/reset-password" element={<ResetPassword />} />
       <Route path="/classic/reset-password/enter-email" element={<ResetPasswordEnterEmail />} />

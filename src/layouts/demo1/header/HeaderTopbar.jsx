@@ -1,31 +1,30 @@
-import { useRef, useState } from 'react';
-import { KeenIcon } from '@/components/keenicons';
-import { toAbsoluteUrl } from '@/utils';
-import { Menu, MenuItem, MenuToggle } from '@/components';
-import { DropdownUser } from '@/partials/dropdowns/user';
-import { DropdownNotifications } from '@/partials/dropdowns/notifications';
-import { DropdownApps } from '@/partials/dropdowns/apps';
-import { DropdownChat } from '@/partials/dropdowns/chat';
-import { ModalSearch } from '@/partials/modals/search/ModalSearch';
-import { useLanguage } from '@/i18n';
+import { useRef, useState } from "react";
+import { KeenIcon } from "@/components/keenicons";
+import { toAbsoluteUrl } from "@/utils";
+import { Menu, MenuItem, MenuToggle } from "@/components";
+import { DropdownUser } from "@/partials/dropdowns/user";
+import { DropdownNotifications } from "@/partials/dropdowns/notifications";
+import { DropdownApps } from "@/partials/dropdowns/apps";
+import { DropdownChat } from "@/partials/dropdowns/chat";
+import { ModalSearch } from "@/partials/modals/search/ModalSearch";
+import { useLanguage } from "@/i18n";
 const HeaderTopbar = () => {
-  const {
-    isRTL
-  } = useLanguage();
+  const { isRTL } = useLanguage();
   const itemChatRef = useRef(null);
   const itemAppsRef = useRef(null);
   const itemUserRef = useRef(null);
   const itemNotificationsRef = useRef(null);
   const handleShow = () => {
-    window.dispatchEvent(new Event('resize'));
+    window.dispatchEvent(new Event("resize"));
   };
   const [searchModalOpen, setSearchModalOpen] = useState(false);
   const handleOpen = () => setSearchModalOpen(true);
   const handleClose = () => {
     setSearchModalOpen(false);
   };
-  return <div className="flex items-center gap-2 lg:gap-3.5">
-      <button onClick={handleOpen} className="btn btn-icon btn-icon-lg size-9 rounded-full hover:bg-primary-light hover:text-primary text-gray-500">
+  return (
+    <div className="flex items-center gap-2 lg:gap-3.5">
+      {/* <button onClick={handleOpen} className="btn btn-icon btn-icon-lg size-9 rounded-full hover:bg-primary-light hover:text-primary text-gray-500">
         <KeenIcon icon="magnifier" />
       </button>
       <ModalSearch open={searchModalOpen} onOpenChange={handleClose} />
@@ -85,26 +84,38 @@ const HeaderTopbar = () => {
           menuTtemRef: itemNotificationsRef
         })}
         </MenuItem>
-      </Menu>
+      </Menu> */}
 
       <Menu>
-        <MenuItem ref={itemUserRef} toggle="dropdown" trigger="click" dropdownProps={{
-        placement: isRTL() ? 'bottom-start' : 'bottom-end',
-        modifiers: [{
-          name: 'offset',
-          options: {
-            offset: isRTL() ? [-20, 10] : [20, 10] // [skid, distance]
-          }
-        }]
-      }}>
+        <MenuItem
+          ref={itemUserRef}
+          toggle="dropdown"
+          trigger="click"
+          dropdownProps={{
+            placement: isRTL() ? "bottom-start" : "bottom-end",
+            modifiers: [
+              {
+                name: "offset",
+                options: {
+                  offset: isRTL() ? [-20, 10] : [20, 10], // [skid, distance]
+                },
+              },
+            ],
+          }}
+        >
           <MenuToggle className="btn btn-icon rounded-full">
-            <img className="size-9 rounded-full border-2 border-success shrink-0" src={toAbsoluteUrl('/media/avatars/300-2.png')} alt="" />
+            <img
+              className="size-9 rounded-full border-2 border-success shrink-0"
+              src={toAbsoluteUrl("/media/avatars/300-2.png")}
+              alt=""
+            />
           </MenuToggle>
           {DropdownUser({
-          menuItemRef: itemUserRef
-        })}
+            menuItemRef: itemUserRef,
+          })}
         </MenuItem>
       </Menu>
-    </div>;
+    </div>
+  );
 };
 export { HeaderTopbar };

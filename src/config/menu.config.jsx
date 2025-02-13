@@ -5,61 +5,52 @@ export const MENU_SIDEBAR = [
   {
     title: "Profile",
     icon: "profile-circle",
-    children: [
-      {
-        title: "Profile",
-        path: "/public-profile/profiles/crm",
-      },
-    ],
+    path: "/public-profile/profiles/crm",
   },
   {
-    title: "Agencies",
+    title: "Create User",
+    icon: "profile-circle",
+    path: "/public-profile/profiles/create",
+  },
+  {
+    title: "My Agencies",
     icon: "users",
-    children: [
-      {
-        title: "My Agencies",
-        path: "/agencies/my-agencies",
-      },
-      {
-        title: "Create Agency",
-        path: "/agencies/create-agency",
-        permissions: {
-          agency: ["create"], // 需要 `agency.create` 权限
-        },
-      },
-    ],
+    path: "/agencies/my-agencies",
   },
   {
-    title: "Properties",
+    title: "Create Agency",
+    icon: "users",
+    path: "/agencies/create-agency",
+  },
+  {
+    title: "My Properties",
     icon: "home",
-    children: [
-      {
-        title: "My Properties",
-        path: "/property/my-properties",
-      },
-      {
-        title: "Tasks",
-        path: "/property/tasks",
-        permissions: {
-          contact: ["read"],
-          role: ["create", "read"],
-        },
-      },
-      {
-        title: "Create Property",
-        path: "/property/create",
-        permissions: {
-          property: ["create"],
-        },
-      },
-      {
-        title: "Create Task",
-        path: "/property/tasks/create",
-        permissions: {
-          task: ["create"],
-        },
-      },
-    ],
+    path: "/property/my-properties",
+  },
+  {
+    title: "Tasks",
+    icon: "home",
+    path: "/property/tasks",
+    permissions: {
+      contact: ["read"],
+      role: ["create", "read"],
+    },
+  },
+  {
+    title: "Create Property",
+    icon: "home",
+    path: "/property/create",
+    permissions: {
+      property: ["create"],
+    },
+  },
+  {
+    title: "Create Task",
+    icon: "home",
+    path: "/property/tasks/create",
+    permissions: {
+      task: ["create"],
+    },
   },
 ];
 export const MENU_MEGA = [

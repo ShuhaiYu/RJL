@@ -6,9 +6,7 @@ import { useAuthContext } from '@/auth';
 import { toast } from 'sonner';
 
 export default function CreatePropertyPage() {
-  const [name, setName] = useState('');
   const [address, setAddress] = useState('');
-  const [agencyId, setAgencyId] = useState('');
   const [loading, setLoading] = useState(false);
   const { auth, baseApi } = useAuthContext();
   const token = auth?.accessToken;
@@ -16,7 +14,7 @@ export default function CreatePropertyPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name || !address || !agencyId) {
+    if (!address) {
       toast.error('Please fill in all fields.');
       return;
     }
@@ -24,12 +22,13 @@ export default function CreatePropertyPage() {
     try {
       const response = await axios.post(
         `${baseApi}/properties/create`,
-        { name, address, agency_id: agencyId },
+        { address },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success('Property created successfully!');
       // 跳转到新创建的房产详情页面（例如 /properties/123）
-      navigate(`/properties/${response.data.data.id}`);
+
+      navigate(`/property/${response.data.data.id}`);
     } catch (error) {
       console.error('Create property error:', error);
       toast.error(error.response?.data?.message || 'Failed to create property.');
@@ -46,16 +45,7 @@ export default function CreatePropertyPage() {
         </div>
         <div className="card-body p-5">
           <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label className="block mb-2 font-medium">Property Name</label>
-              <input
-                type="text"
-                className="input input-bordered w-full"
-                placeholder="Enter property name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </div>
+            
             <div>
               <label className="block mb-2 font-medium">Address</label>
               <input
@@ -66,16 +56,7 @@ export default function CreatePropertyPage() {
                 onChange={(e) => setAddress(e.target.value)}
               />
             </div>
-            <div>
-              <label className="block mb-2 font-medium">Agency ID</label>
-              <input
-                type="text"
-                className="input input-bordered w-full"
-                placeholder="Enter agency ID"
-                value={agencyId}
-                onChange={(e) => setAgencyId(e.target.value)}
-              />
-            </div>
+            
             <div>
               <button
                 type="submit"

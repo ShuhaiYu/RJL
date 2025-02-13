@@ -15,6 +15,7 @@ import PropertyDetailPage from '../pages/property/property-page/PeopertyDetailPa
 import TaskDetailPage from '../pages/property/task-page/TaskDetailPage';
 import CreatePropertyPage from '../pages/property/create-property/CreatePropertyPage';
 import CreateTaskPage from '../pages/property/create-task/CreateTaskPage';
+import CreateUserPage from '../pages/user/create-user/CreateUserPage';
 const AppRoutingSetup = () => {
   return <Routes>
       <Route element={<RequireAuth />}>
@@ -22,6 +23,8 @@ const AppRoutingSetup = () => {
           <Route path="/" element={<DefaultPage />} />
           <Route path="/dark-sidebar" element={<Demo1DarkSidebarPage />} />
           <Route path="/public-profile/profiles/crm" element={<ProfileCRMPage />} />
+          <Route path="/public-profile/profiles/create" element={<CreateUserPage />} />
+
           <Route path="/agencies/my-agencies" element={<AgenciesList />} />
           <Route path="/agencies/create-agency" element={<CreateAgency />} />
           <Route path="/agencies/:id" element={<AgencyDetail/>} />

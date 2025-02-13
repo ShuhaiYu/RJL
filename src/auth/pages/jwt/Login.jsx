@@ -13,10 +13,11 @@ const loginSchema = Yup.object().shape({
   password: Yup.string().min(3, 'Minimum 3 symbols').max(50, 'Maximum 50 symbols').required('Password is required'),
   remember: Yup.boolean()
 });
+const savedEmail = localStorage.getItem('email');
 const initialValues = {
-  email: 'demo@email.com',
-  password: '123456',
-  remember: false
+  email: savedEmail || '',
+  password: '',
+  remember: !!savedEmail,
 };
 const Login = () => {
   const [loading, setLoading] = useState(false);
@@ -66,15 +67,15 @@ const Login = () => {
       <form className="card-body flex flex-col gap-5 p-10" onSubmit={formik.handleSubmit} noValidate>
         <div className="text-center mb-2.5">
           <h3 className="text-lg font-semibold text-gray-900 leading-none mb-2.5">Sign in</h3>
-          <div className="flex items-center justify-center font-medium">
+          {/* <div className="flex items-center justify-center font-medium">
             <span className="text-2sm text-gray-600 me-1.5">Need an account?</span>
             <Link to={currentLayout?.name === 'auth-branded' ? '/auth/signup' : '/auth/classic/signup'} className="text-2sm link">
               Sign up
             </Link>
-          </div>
+          </div> */}
         </div>
 
-        <div className="grid grid-cols-2 gap-2.5">
+        {/* <div className="grid grid-cols-2 gap-2.5">
           <a href="#" className="btn btn-light btn-sm justify-center">
             <img src={toAbsoluteUrl('/media/brand-logos/google.svg')} className="size-3.5 shrink-0" />
             Use Google
@@ -85,7 +86,7 @@ const Login = () => {
             <img src={toAbsoluteUrl('/media/brand-logos/apple-white.svg')} className="size-3.5 shrink-0 light:hidden" />
             Use Apple
           </a>
-        </div>
+        </div> */}
 
         <div className="flex items-center gap-2">
           <span className="border-t border-gray-200 w-full"></span>
