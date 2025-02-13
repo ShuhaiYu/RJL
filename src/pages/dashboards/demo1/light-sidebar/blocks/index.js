@@ -4,3 +4,4 @@ export * from './EntryCallout';
 export * from './Highlights';
 export * from './TeamMeeting';
 export * from './teams';
+export * from './SendReminderButton';

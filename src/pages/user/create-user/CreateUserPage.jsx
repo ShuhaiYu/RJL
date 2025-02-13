@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { useAuthContext } from '@/auth'
 import { Button } from '@/components/ui/button'
@@ -6,10 +6,10 @@ import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
 
 export default function CreateUserPage() {
-  const { auth, currentUser } = useAuthContext()
+  const { auth, currentUser, baseApi } = useAuthContext()
   const token = auth?.accessToken
 
-  // 当前登录用户角色 + agency_id
+  // 当前用户角色 + agency_id
   const currentUserRole = currentUser?.role
   const currentUserAgencyId = currentUser?.agency_id
 
@@ -26,19 +26,42 @@ export default function CreateUserPage() {
     createableRole = ''
   }
 
-  // 表单状态
+  // 如果当前用户是 agency-user，无法创建任何用户 -> 直接提示或禁用
+  const canCreate = !!createableRole
+
+  // ---------- 额外新增：获取所有 Agency 列表（仅在 superuser/admin 时用） ----------
+  const [agencies, setAgencies] = useState([])
+  // 选中的 Agency ID（只有 superuser/admin 能选）
+  const [selectedAgencyId, setSelectedAgencyId] = useState(null)
+
+  useEffect(() => {
+    // 只有在 superuser / admin 时才去加载 agencies
+    if (currentUserRole === 'superuser' || currentUserRole === 'admin') {
+      axios
+        .get(`${baseApi}/agencies`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((res) => {
+          setAgencies(res.data || [])
+        })
+        .catch((err) => {
+          console.error('Failed to load agencies', err)
+        })
+    }
+  }, [currentUserRole, token])
+
+  // ---------------------------------------------------------------------
+
   const [form, setForm] = useState({
     email: '',
     password: '',
     confirmPassword: '',
-    name: '', // 如果你要用户输入 name
+    name: '',
   })
-
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-
-  // 如果当前用户是 agency-user，无法创建任何用户 -> 直接提示或禁用
-  const canCreate = !!createableRole
 
   // 处理表单输入
   const handleChange = (e) => {
@@ -46,6 +69,7 @@ export default function CreateUserPage() {
     setForm((prev) => ({ ...prev, [name]: value }))
   }
 
+  // 处理提交
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
@@ -73,24 +97,42 @@ export default function CreateUserPage() {
       return
     }
 
-    // 4) 组装请求数据
+    // 4) 准备 agencyId: 如果 superuser/admin，用 selectedAgencyId；否则用 currentUserAgencyId
+    let finalAgencyId = null
+    if (currentUserRole === 'superuser' || currentUserRole === 'admin') {
+      // 选择器里必须选一个
+      if (!selectedAgencyId) {
+        setError('Please select an Agency.')
+        setLoading(false)
+        return
+      }
+      finalAgencyId = selectedAgencyId
+    } else if (currentUserRole === 'agency-admin') {
+      finalAgencyId = currentUserAgencyId || null
+    }
+
+    // 5) 组装请求数据
     const payload = {
       email: form.email,
       password: form.password,
-      name: form.name, // 若后端没这个字段也可去掉
+      name: form.name,
       role: createableRole,
-      agency_id: currentUserAgencyId || null, // 如果有 agency_id 就传，没有就传 null
+      agency_id: finalAgencyId,
     }
 
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/register`, payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/auth/register`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
       console.log('User created:', response.data)
-
       toast.success('User created successfully!')
+
       // 清空表单
       setForm({
         email: '',
@@ -98,6 +140,10 @@ export default function CreateUserPage() {
         confirmPassword: '',
         name: '',
       })
+      // 重置选中agency
+      if (currentUserRole === 'superuser' || currentUserRole === 'admin') {
+        setSelectedAgencyId(null)
+      }
     } catch (err) {
       console.error('Failed to create user:', err)
       setError(err.response?.data?.message || 'Failed to create user')
@@ -109,7 +155,7 @@ export default function CreateUserPage() {
   return (
     <div className="container mx-auto p-4 max-w-xl">
       <h1 className="text-2xl font-bold mb-6">Create User</h1>
-      
+
       {/* 如果没有权限canCreate，就提示不可创建 */}
       {!canCreate && (
         <p className="text-red-500 mb-4">
@@ -118,6 +164,28 @@ export default function CreateUserPage() {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* 如果是 superuser/admin，就显示一个 agency 下拉 */}
+        {(currentUserRole === 'superuser' || currentUserRole === 'admin') && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Select Agency
+            </label>
+            <select
+              className="form-select block w-full border border-gray-300 rounded-md"
+              value={selectedAgencyId || ''}
+              onChange={(e) => setSelectedAgencyId(e.target.value)}
+              disabled={!canCreate}
+            >
+              <option value="">-- Choose an agency --</option>
+              {agencies.map((agency) => (
+                <option key={agency.id} value={agency.id}>
+                  {agency.agency_name || `Agency #${agency.id}`}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Name (Optional)

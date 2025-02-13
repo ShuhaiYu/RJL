@@ -16,6 +16,9 @@ export const MENU_SIDEBAR = [
     title: "My Agencies",
     icon: "users",
     path: "/agencies/my-agencies",
+    permissions: {
+      agency: ["create"],
+    },
   },
   {
     title: "Create Agency",
