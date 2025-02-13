@@ -1,37 +1,23 @@
 // GeneralInfo.jsx
-import React from 'react';
-
 const GeneralInfo = ({ user }) => {
-  // 构造需要展示的字段数组
-  const fields = [
-    { label: 'Name', value: user.name || 'N/A' },
-    { label: 'Email', value: user.email || 'N/A' },
-    { label: 'Role', value: user.role || 'N/A' },
-  ];
-
-  if (user.role === 'agency') {
-    fields.push({ label: 'Agency Name', value: user.agencyName || 'N/A' });
-    fields.push({ label: 'Agency Phone', value: user.agencyPhone || 'N/A' });
-    fields.push({ label: 'Agency Address', value: user.agencyAddress || 'N/A' });
+  if (!user) {
+    return <div className="bg-white p-5 shadow rounded">Loading...</div>;
   }
 
   return (
-    <div className="card">
-      <div className="card-header">
-        <h3 className="card-title">General Info</h3>
-      </div>
-      <div className="card-body pt-3.5 pb-3.5">
-        <table className="table-auto w-full">
-          <tbody>
-            {fields.map((field, index) => (
-              <tr key={index}>
-                <td className="text-sm text-gray-600 pb-3 pr-4">{field.label}:</td>
-                <td className="text-sm text-gray-900 pb-3">{field.value}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+    <div className="bg-white p-5 shadow rounded">
+      <h2 className="text-2xl font-bold">{user.name}</h2>
+      <p className="mt-2 text-gray-600">Email: {user.email}</p>
+      <p className="mt-1 text-gray-600">Role: {user.role}</p>
+
+      {user.agency && (
+        <div className="mt-4">
+          <h3 className="text-lg font-semibold">Agency</h3>
+          <p className="mt-1">{user.agency.agency_name}</p>
+          <p className="mt-1 text-gray-500">{user.agency.address}</p>
+          <p className="mt-1 text-gray-500">Tel: {user.agency.phone}</p>
+        </div>
+      )}
     </div>
   );
 };

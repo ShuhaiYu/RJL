@@ -4,3 +4,4 @@ export * from './Attributes';
 export * from './Deals';
 export * from './GeneralInfo';
 export * from './RecentInvoices';
+export * from './UserDataTable';

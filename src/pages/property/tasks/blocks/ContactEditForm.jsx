@@ -2,10 +2,10 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
+import { useAuthContext } from '@/auth';
 
 export default function ContactEditForm({
   contactId,
-  token,
   onClose
 }) {
   const [loading, setLoading] = useState(false);
@@ -14,11 +14,14 @@ export default function ContactEditForm({
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
 
+  const { auth, baseApi } = useAuthContext();
+  const token = auth?.accessToken;
+
   useEffect(() => {
     if (!contactId) return;
     setLoading(true);
     axios
-      .get(`${import.meta.env.VITE_API_BASE_URL}/agency/contacts/${contactId}`, {
+      .get(`${baseApi}/agency/contacts/${contactId}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -40,7 +43,7 @@ export default function ContactEditForm({
   const handleSaveContact = () => {
     axios
       .put(
-        `${import.meta.env.VITE_API_BASE_URL}/agency/contacts/${contactId}`,
+        `${baseApi}/contacts/${contactId}`,
         { name, phone, email },
         { headers: { Authorization: `Bearer ${token}` } }
       )

@@ -10,14 +10,14 @@ export default function AgencyDetail() {
   const [error, setError] = useState('');
   
   // 从 useAuthContext 中取 token
-  const { auth } = useAuthContext();
+  const { auth, baseApi } = useAuthContext();
   const token = auth?.accessToken;
 
   useEffect(() => {
     if (!token) return;
 
     axios
-      .get(`${import.meta.env.VITE_API_BASE_URL}/admin/agencies/${id}`, {
+      .get(`${baseApi}/agencies/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

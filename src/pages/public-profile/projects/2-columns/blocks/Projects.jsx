@@ -8,13 +8,13 @@ const Projects = () => {
   const [agencies, setAgencies] = useState([]);
 
   // 从 useAuthContext 中取出 token
-  const auth = useAuthContext().auth
+  const {auth, baseApi} = useAuthContext()
   const token = auth?.accessToken
 
   useEffect(() => {    
     // 发起请求获取 agencies
     axios
-      .get(`${import.meta.env.VITE_API_BASE_URL}/admin/agencies`, {
+      .get(`${baseApi}/agencies`, {
         headers: {
           // Bearer Token形式
           Authorization: `Bearer ${token}`,

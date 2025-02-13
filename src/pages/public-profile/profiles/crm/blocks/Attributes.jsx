@@ -1,50 +1,42 @@
-import { Link } from 'react-router-dom';
-const Attributes = () => {
-  const items = [{
-    label: 'customer_id:',
-    info: 'CUST567'
-  }, {
-    label: 'c_name:',
-    info: 'jenny'
-  }, {
-    label: 'license_id:',
-    info: 'LIC123'
-  }, {
-    label: 'log_id:',
-    info: 'CUST567'
-  }, {
-    label: 'resv_code:',
-    info: 'CS345'
-  }, {
-    label: 'orders_io:',
-    info: 'JENNYTIME '
-  }];
-  const renderItem = (item, index) => {
-    return <tr key={index}>
-        <td className="text-sm text-gray-600 pb-3.5 pe-4 lg:pe-6">{item.label}</td>
-        <td className="text-sm text-gray-900 pb-3">{item.info}</td>
-      </tr>;
-  };
-  return <div className="card">
-      <div className="card-header">
-        <h3 className="card-title">Attributes</h3>
+// Attributes.jsx
+const Attributes = ({ user }) => {
+  if (!user) {
+    return null;
+  }
+
+  return (
+    <div className="bg-white p-5 shadow rounded">
+      <h3 className="text-lg font-semibold mb-3">Attributes</h3>
+      
+      <div>
+        <h4 className="font-semibold">Properties:</h4>
+        {user.properties && user.properties.length > 0 ? (
+          <ul className="list-disc ml-5">
+            {user.properties.map((property) => (
+              <li key={property.id}>{property.address}</li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-gray-500">No properties available.</p>
+        )}
       </div>
 
-      <div className="card-body pt-3.5 pb-1">
-        <table className="table-auto">
-          <tbody>
-            {items.map((item, index) => {
-            return renderItem(item, index);
-          })}
-          </tbody>
-        </table>
+      <div className="mt-4">
+        <h4 className="font-semibold">Tasks:</h4>
+        {user.tasks && user.tasks.length > 0 ? (
+          <ul className="list-disc ml-5">
+            {user.tasks.map((task) => (
+              <li key={task.id}>
+                {task.task_name} - <span className="text-gray-500">{task.status}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-gray-500">No tasks available.</p>
+        )}
       </div>
-
-      <div className="card-footer justify-center">
-        <Link to="/network/user-table/store-clients" className="btn btn-link">
-          All Attributes
-        </Link>
-      </div>
-    </div>;
+    </div>
+  );
 };
+
 export { Attributes };

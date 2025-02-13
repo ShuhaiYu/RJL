@@ -20,7 +20,7 @@ export default function CreateAgency() {
   const [error, setError] = useState('');
 
   // 从 auth context 获取 token
-  const { auth } = useAuthContext();
+  const { auth, baseApi } = useAuthContext();
   const token = auth?.accessToken;
 
   // 处理表单输入变化
@@ -36,7 +36,7 @@ export default function CreateAgency() {
     setError('');
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/admin/agencies/create`,
+        `${baseApi}/agencies/create`,
         form,
         {
           headers: {

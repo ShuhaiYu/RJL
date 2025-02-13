@@ -1,90 +1,117 @@
+// src/pages/Agencies.jsx
 import { useState, useEffect } from 'react';
 import { KeenIcon } from '@/components';
 import { CardProjectExtended, CardProjectExtendedRow } from '@/partials/cards';
 import axios from 'axios';
 import { useAuthContext } from '@/auth';
+
 const Agencies = () => {
   const [activeView, setActiveView] = useState('cards');
   const [agencies, setAgencies] = useState([]);
 
-  // 从 useAuthContext 中取出 token
-  const auth = useAuthContext().auth
-  const token = auth?.accessToken
+  // 从 AuthContext 中获取 token 与基础 API 路径（例如：`${import.meta.env.VITE_API_BASE_URL}/superuser`）
+  const { auth, baseApi } = useAuthContext();
+  const token = auth?.accessToken;
 
-  useEffect(() => {    
-    // 发起请求获取 agencies
+  useEffect(() => {
+    if (!token) return;
+    // 请求 agencies 数据（例如：GET /{role}/agencies）
     axios
-      .get(`${import.meta.env.VITE_API_BASE_URL}/admin/agencies`, {
+      .get(`${baseApi}/agencies`, {
         headers: {
-          // Bearer Token形式
           Authorization: `Bearer ${token}`,
         },
       })
-      .then((response) => {        
-        setAgencies((response.data || []).filter((agency) => agency.is_actived));        
+      .then((response) => {
+        // 根据数据中 is_active 字段过滤，只保留 active 的机构
+        setAgencies((response.data || []).filter((agency) => agency.is_active));
       })
       .catch((err) => {
-        console.error('Failed to fetch agencies:', err)
-      })
-  }, [token])
+        console.error('Failed to fetch agencies:', err);
+      });
+  }, [token, baseApi]);
 
   const handleRemove = (deletedId) => {
     setAgencies((prevAgencies) =>
       prevAgencies.filter((agency) => agency.id !== deletedId)
     );
   };
-  
-  const renderProject = (project, index) => {
-    return <CardProjectExtended id={project.id} status={project.status} logo={project.logo} title={project.agency_name} description={project.address} team={project.team} statistics={project.statistics} progress={project.progress} url={`/agencies/${project.id}`} key={index} onRemove={handleRemove}/>;
+
+  // 使用卡片视图时，传入 id, logo, title（agency_name）, description（address）和 phone
+  const renderProject = (agency, index) => {
+    return (
+      <CardProjectExtended
+        id={agency.id}
+        logo={agency.logo}
+        title={agency.agency_name}
+        description={agency.address}
+        phone={agency.phone}
+        url={`/agencies/${agency.id}`}
+        key={index}
+        onRemove={handleRemove}
+      />
+    );
   };
-  const renderItem = (item, index) => {
-    return <CardProjectExtendedRow id={item.id} status={item.status} logo={item.logo} title={item.agency_name} description={item.address} team={item.team} statistics={item.statistics} url={`/agencies/${item.id}`} key={index} />;
+
+  // 列表视图：使用行卡片展示
+  const renderItem = (agency, index) => {
+    return (
+      <CardProjectExtendedRow
+        id={agency.id}
+        logo={agency.logo}
+        title={agency.agency_name}
+        description={agency.address}
+        phone={agency.phone}
+        url={`/agencies/${agency.id}`}
+        key={index}
+      />
+    );
   };
-  return <div className="flex flex-col items-stretch gap-5 lg:gap-7.5">
+
+  return (
+    <div className="flex flex-col items-stretch gap-5 lg:gap-7.5">
       <div className="flex flex-wrap items-center gap-5 justify-between">
-        <h3 className="text-lg text-gray-900 font-semibold">{agencies.length} Agencies</h3>
+        <h3 className="text-lg text-gray-900 font-semibold">
+          {agencies.length} Agencies
+        </h3>
 
         <div className="btn-tabs" data-tabs="true">
-          <a href="#" className={`btn btn-icon ${activeView === 'cards' ? 'active' : ''}`} data-tab-toggle="#projects_cards" onClick={() => {
-          setActiveView('cards');
-        }}>
+          <a
+            href="#"
+            className={`btn btn-icon ${activeView === 'cards' ? 'active' : ''}`}
+            data-tab-toggle="#projects_cards"
+            onClick={() => setActiveView('cards')}
+          >
             <KeenIcon icon="category" />
           </a>
-          <a href="#" className={`btn btn-icon ${activeView === 'list' ? 'active' : ''}`} data-tab-toggle="#projects_list" onClick={() => {
-          setActiveView('list');
-        }}>
+          <a
+            href="#"
+            className={`btn btn-icon ${activeView === 'list' ? 'active' : ''}`}
+            data-tab-toggle="#projects_list"
+            onClick={() => setActiveView('list')}
+          >
             <KeenIcon icon="row-horizontal" />
           </a>
         </div>
       </div>
 
-      {activeView === 'cards' && <div id="projects_cards">
+      {activeView === 'cards' && (
+        <div id="projects_cards">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-7.5">
-            {agencies.map((project, index) => {
-          return renderProject(project, index);
-        })}
+            {agencies.map((agency, index) => renderProject(agency, index))}
           </div>
+        </div>
+      )}
 
-          {/* <div className="flex grow justify-center pt-5 lg:pt-7.5">
-            <a href="#" className="btn btn-link">
-              Show more projects
-            </a>
-          </div> */}
-        </div>}
-
-      {activeView === 'list' && <div id="projects_list">
+      {activeView === 'list' && (
+        <div id="projects_list">
           <div className="flex flex-col gap-5 lg:gap-7.5">
-            {agencies.map((item, index) => {
-          return renderItem(item, index);
-        })}
+            {agencies.map((agency, index) => renderItem(agency, index))}
           </div>
-
-          {/* <div className="flex grow justify-center pt-5 lg:pt-7.5">
-            <a href="#" className="btn btn-link">
-              Show more projects
-            </a>
-          </div> */}
-        </div>}
-    </div>;
+        </div>
+      )}
+    </div>
+  );
 };
+
 export { Agencies };

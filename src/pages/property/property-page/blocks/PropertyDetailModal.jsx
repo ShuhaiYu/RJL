@@ -2,52 +2,51 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
-import TaskDetailModal from "@/pages/property/tasks/blocks/TaskDetailModal";
+import TaskDetailModal from "@/pages/property/tasks/blocks/TaskDetailModal"; 
+import { useAuthContext } from "@/auth";
 
-export default function PropertyDetailModal({ propertyId, token, onClose }) {
+export default function PropertyDetailModal({ propertyId, onClose }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [propertyDetail, setPropertyDetail] = useState(null);
 
-  // 用于编辑
+  // 编辑属性状态
   const [propertyName, setPropertyName] = useState("");
   const [propertyAddress, setPropertyAddress] = useState("");
   const [agencyId, setAgencyId] = useState("");
 
-  // 控制二级弹窗Task
+  // 控制 Task 详情弹窗
   const [selectedTaskId, setSelectedTaskId] = useState(null);
 
-  // 控制“创建task”的简易弹窗
+  // 控制创建 Task 弹窗
   const [showCreateTask, setShowCreateTask] = useState(false);
   const [newTaskName, setNewTaskName] = useState("");
   const [newTaskDesc, setNewTaskDesc] = useState("");
   const [newTaskDue, setNewTaskDue] = useState("");
 
+  const { baseApi, auth } = useAuthContext();
+  const token = auth?.accessToken;
+
+  // 获取属性详情：使用 Agency Admin 路径
   const fetchPropertyDetail = () => {
     if (!propertyId) return;
     setLoading(true);
     setError("");
     axios
-      .get(
-        `${import.meta.env.VITE_API_BASE_URL}/agency/properties/${propertyId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
+      .get(`${baseApi}/properties/${propertyId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((res) => {
         setPropertyDetail(res.data);
-        // 初始化编辑状态
         setPropertyName(res.data.name || "");
         setPropertyAddress(res.data.address || "");
         setAgencyId(res.data.agency_id || "");
         setLoading(false);
       })
       .catch((err) => {
-        setError(
-          err.response?.data?.message || "Failed to load property detail"
-        );
+        setError(err.response?.data?.message || "Failed to load property detail");
         setLoading(false);
       });
   };
@@ -58,11 +57,11 @@ export default function PropertyDetailModal({ propertyId, token, onClose }) {
 
   if (!propertyId) return null;
 
+  // 更新属性信息
   const handleSave = () => {
-    // 调用后端PUT接口更新property
     axios
       .put(
-        `${import.meta.env.VITE_API_BASE_URL}/agency/properties/${propertyId}`,
+        `${baseApi}/properties/${propertyId}`,
         {
           name: propertyName,
           address: propertyAddress,
@@ -75,16 +74,12 @@ export default function PropertyDetailModal({ propertyId, token, onClose }) {
         }
       )
       .then(() => {
-        // 可在此处再刷新一下详情
-        // 也可以直接更新 state
-        if (propertyDetail) {
-          setPropertyDetail({
-            ...propertyDetail,
-            name: propertyName,
-            address: propertyAddress,
-            agency_id: agencyId,
-          });
-        }
+        setPropertyDetail({
+          ...propertyDetail,
+          name: propertyName,
+          address: propertyAddress,
+          agency_id: agencyId,
+        });
         toast("Property updated successfully!");
       })
       .catch((err) => {
@@ -92,11 +87,11 @@ export default function PropertyDetailModal({ propertyId, token, onClose }) {
       });
   };
 
+  // 创建任务，更新为 Agency Admin 路径
   const handleCreateTask = () => {
-    // POST /agency/tasks
     axios
       .post(
-        `${import.meta.env.VITE_API_BASE_URL}/agency/tasks/create`,
+        `${baseApi}/tasks/create`,
         {
           property_id: propertyId,
           task_name: newTaskName,
@@ -110,8 +105,7 @@ export default function PropertyDetailModal({ propertyId, token, onClose }) {
       .then(() => {
         toast("Task created successfully!");
         setShowCreateTask(false);
-        
-        // 创建成功后刷新property详情
+        // 刷新属性详情以获取最新任务列表
         fetchPropertyDetail();
       })
       .catch((err) => {
@@ -120,19 +114,15 @@ export default function PropertyDetailModal({ propertyId, token, onClose }) {
       });
   };
 
+  // 删除属性：使用 Agency Admin 路径
   const handleDeleteProperty = () => {
-    // DELETE /agency/properties/:id
     axios
-      .delete(
-        `${import.meta.env.VITE_API_BASE_URL}/agency/properties/${propertyId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      )
+      .delete(`${baseApi}/properties/${propertyId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then(() => {
         toast("Property deleted successfully!");
-        onClose(); // 关闭当前弹窗
-        // 父页面最好再刷新 property 列表
+        onClose();
       })
       .catch((err) => {
         console.error(err);
@@ -150,8 +140,8 @@ export default function PropertyDetailModal({ propertyId, token, onClose }) {
 
   const closeTaskModal = () => {
     setSelectedTaskId(null);
-    // 可考虑重新加载propertyDetail来刷新task的最新数据
-    // handleRefreshPropertyDetail();
+    // 可选：刷新详情以更新任务数据
+    fetchPropertyDetail();
   };
 
   return (
@@ -218,7 +208,7 @@ export default function PropertyDetailModal({ propertyId, token, onClose }) {
               </button>
             </div>
 
-            {/* Tasks 列表 */}
+            {/* 显示任务列表 */}
             {propertyDetail.tasks && propertyDetail.tasks.length > 0 ? (
               <div className="bg-gray-50 p-4 rounded">
                 <h4 className="font-semibold mb-2">Tasks for this Property:</h4>
@@ -247,7 +237,7 @@ export default function PropertyDetailModal({ propertyId, token, onClose }) {
           <div>No data</div>
         )}
 
-        {/* 二级弹窗: TaskDetailModal */}
+        {/* 二级弹窗：TaskDetailModal */}
         {selectedTaskId && (
           <TaskDetailModal
             taskId={selectedTaskId}
@@ -264,7 +254,6 @@ export default function PropertyDetailModal({ propertyId, token, onClose }) {
           >
             Create Task
           </button>
-
           <button
             onClick={handleDeleteProperty}
             className="px-4 py-2 bg-red-600 text-white rounded"
@@ -273,7 +262,7 @@ export default function PropertyDetailModal({ propertyId, token, onClose }) {
           </button>
         </div>
 
-        {/* 简易 Create Task mini-form (可用Modal或inline) */}
+        {/* 简易 Create Task 弹窗 */}
         {showCreateTask && (
           <div
             className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50"
@@ -320,6 +309,7 @@ export default function PropertyDetailModal({ propertyId, token, onClose }) {
             </div>
           </div>
         )}
+
       </div>
     </div>
   );
