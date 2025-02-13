@@ -20,10 +20,9 @@ export default function TaskDetailPage() {
     if (!taskId || !token) return;
     setLoading(true);
     try {
-      const response = await axios.get(
-        `${baseApi}/tasks/${taskId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const response = await axios.get(`${baseApi}/tasks/${taskId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setTask(response.data);
       setLoading(false);
     } catch (err) {
@@ -77,6 +76,20 @@ export default function TaskDetailPage() {
             <span className="font-medium">Status: </span>
             {task.status}
           </p>
+          <p className="mt-1 text-gray-600">
+            <span className="font-medium">Type: </span>
+            {task.type}
+          </p>
+          <p className="mt-1 text-gray-600">
+            <span className="font-medium">Repeat Frequency: </span>
+            {task.repeat_frequency}
+          </p>
+
+          <p className="mt-1 text-gray-600">
+            <span className="font-medium">Description: </span>
+            {task.task_description}
+          </p>
+          
         </div>
         <div className="mt-4 md:mt-0">
           <button

@@ -1,41 +1,70 @@
-// src/pages/CreateTaskPage.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '@/auth';
 import { toast } from 'sonner';
 
 export default function CreateTaskPage() {
-  const [propertyId, setPropertyId] = useState('');
-  const [taskName, setTaskName] = useState('');
-  const [taskDescription, setTaskDescription] = useState('');
-  const [dueDate, setDueDate] = useState('');
-  const [repeatFrequency, setRepeatFrequency] = useState('none');
-  const [loading, setLoading] = useState(false);
   const { auth, baseApi } = useAuthContext();
   const token = auth?.accessToken;
   const navigate = useNavigate();
 
+  // 1) 获取 property 列表并存储
+  const [properties, setProperties] = useState([]);
+  const [selectedPropertyId, setSelectedPropertyId] = useState('');
+
+  const [taskName, setTaskName] = useState('');
+  const [taskDescription, setTaskDescription] = useState('');
+  const [dueDate, setDueDate] = useState('');
+  const [repeatFrequency, setRepeatFrequency] = useState('none');
+
+  // 新增字段
+  const [taskType, setTaskType] = useState(''); 
+  const [status, setStatus] = useState('unknown'); 
+
+  const [loading, setLoading] = useState(false);
+
+  // 2) 加载 property 列表
+  useEffect(() => {
+    if (!token) return;
+    axios
+      .get(`${baseApi}/properties`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        setProperties(res.data || []);
+      })
+      .catch((err) => {
+        console.error('Failed to load properties:', err);
+      });
+  }, [token, baseApi]);
+
+  // 3) 提交
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!propertyId || !taskName) {
-      toast.error('Please fill in all required fields (Property ID and Task Name).');
+    if (!selectedPropertyId || !taskName) {
+      toast.error('Please select a property and enter a task name.');
       return;
     }
     setLoading(true);
     try {
       const payload = {
-        property_id: propertyId,
+        property_id: selectedPropertyId,
         task_name: taskName,
         task_description: taskDescription,
         due_date: dueDate || null,
         repeat_frequency: repeatFrequency,
+        // 新增
+        type: taskType,
+        status: status,
       };
+
       const response = await axios.post(
         `${baseApi}/tasks/create`,
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
+
       toast.success('Task created successfully!');
       // 跳转到新创建任务的详情页面（例如 /task/123）
       navigate(`/task/${response.data.data.id}`);
@@ -55,16 +84,24 @@ export default function CreateTaskPage() {
         </div>
         <div className="card-body p-5">
           <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Property 下拉选择 */}
             <div>
-              <label className="block mb-2 font-medium">Property ID</label>
-              <input
-                type="text"
-                className="input input-bordered w-full"
-                placeholder="Enter associated property ID"
-                value={propertyId}
-                onChange={(e) => setPropertyId(e.target.value)}
-              />
+              <label className="block mb-2 font-medium">Select Property</label>
+              <select
+                className="select select-bordered w-full"
+                value={selectedPropertyId}
+                onChange={(e) => setSelectedPropertyId(e.target.value)}
+              >
+                <option value="">-- Please choose --</option>
+                {properties.map((prop) => (
+                  <option key={prop.id} value={prop.id}>
+                    {prop.address}
+                  </option>
+                ))}
+              </select>
             </div>
+
+            {/* Task Name */}
             <div>
               <label className="block mb-2 font-medium">Task Name</label>
               <input
@@ -75,6 +112,8 @@ export default function CreateTaskPage() {
                 onChange={(e) => setTaskName(e.target.value)}
               />
             </div>
+
+            {/* Task Description */}
             <div>
               <label className="block mb-2 font-medium">Task Description</label>
               <textarea
@@ -85,6 +124,35 @@ export default function CreateTaskPage() {
                 onChange={(e) => setTaskDescription(e.target.value)}
               />
             </div>
+
+            {/* Type */}
+            <div>
+              <label className="block mb-2 font-medium">Task Type</label>
+              <input
+                type="text"
+                className="input input-bordered w-full"
+                placeholder="Enter task type"
+                value={taskType}
+                onChange={(e) => setTaskType(e.target.value)}
+              />
+            </div>
+
+            {/* Status */}
+            <div>
+              <label className="block mb-2 font-medium">Status</label>
+              <select
+                className="select select-bordered w-full"
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+              >
+                <option value="unknown">unknown</option>
+                <option value="undo">undo</option>
+                <option value="doing">doing</option>
+                <option value="done">done</option>
+              </select>
+            </div>
+
+            {/* Due Date */}
             <div>
               <label className="block mb-2 font-medium">Due Date</label>
               <input
@@ -94,6 +162,8 @@ export default function CreateTaskPage() {
                 onChange={(e) => setDueDate(e.target.value)}
               />
             </div>
+
+            {/* Repeat Frequency */}
             <div>
               <label className="block mb-2 font-medium">Repeat Frequency</label>
               <select
@@ -107,6 +177,8 @@ export default function CreateTaskPage() {
                 <option value="yearly">Yearly</option>
               </select>
             </div>
+
+            {/* Submit Button */}
             <div>
               <button
                 type="submit"

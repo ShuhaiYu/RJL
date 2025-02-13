@@ -4,6 +4,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import TaskDetailModal from "@/pages/property/tasks/blocks/TaskDetailModal"; 
 import { useAuthContext } from "@/auth";
+import TasksDataTable from "../../tasks/blocks/TasksDataTable";
 
 export default function PropertyDetailModal({ propertyId, onClose }) {
   const [loading, setLoading] = useState(false);
@@ -210,25 +211,7 @@ export default function PropertyDetailModal({ propertyId, onClose }) {
 
             {/* 显示任务列表 */}
             {propertyDetail.tasks && propertyDetail.tasks.length > 0 ? (
-              <div className="bg-gray-50 p-4 rounded">
-                <h4 className="font-semibold mb-2">Tasks for this Property:</h4>
-                <ul className="space-y-2">
-                  {propertyDetail.tasks.map((task) => (
-                    <li
-                      key={task.id}
-                      className="p-3 border rounded hover:shadow cursor-pointer"
-                      onClick={() => handleTaskClick(task.id)}
-                    >
-                      <p className="font-medium">{task.task_name}</p>
-                      {task.due_date && (
-                        <p className="text-sm text-gray-500">
-                          Due: {new Date(task.due_date).toLocaleString()}
-                        </p>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <TasksDataTable tasks={propertyDetail.tasks} onTaskClick={handleTaskClick} />
             ) : (
               <p>No tasks found for this property.</p>
             )}

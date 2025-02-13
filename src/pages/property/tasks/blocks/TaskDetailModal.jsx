@@ -9,13 +9,19 @@ import { useAuthContext } from "@/auth";
 export default function TaskDetailModal({ task, onClose }) {
   // 直接使用从父组件传入的 task 数据，不再重新请求 API
   const [taskName, setTaskName] = useState(task.task_name || "");
-  const [taskDescription, setTaskDescription] = useState(task.task_description || "");
+  const [taskDescription, setTaskDescription] = useState(
+    task.task_description || ""
+  );
   const [dueDate, setDueDate] = useState("");
-  const [repeatFrequency, setRepeatFrequency] = useState(task.repeat_frequency || "none");
+  const [status, setStatus] = useState(task.status || "unknown");
+  const [type, setType] = useState(task.type || "unknown");
+  const [repeatFrequency, setRepeatFrequency] = useState(
+    task.repeat_frequency || "none"
+  );
 
   const { auth, baseApi } = useAuthContext();
   const token = auth?.accessToken;
-  
+
   const userTimeZone = "Australia/Sydney"; // 可根据实际情况调整
 
   // 初始化 dueDate 输入框：如果 task.due_date 存在，则格式化成 "yyyy-MM-ddTHH:mm"
@@ -39,6 +45,8 @@ export default function TaskDetailModal({ task, onClose }) {
           task_name: taskName,
           task_description: taskDescription,
           due_date: dueDate || null,
+          status: status,
+          type: type,
           repeat_frequency: repeatFrequency,
         },
         {
@@ -98,6 +106,28 @@ export default function TaskDetailModal({ task, onClose }) {
             className="border w-full p-2 rounded"
             value={dueDate}
             onChange={(e) => setDueDate(e.target.value)}
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block mb-1 font-medium">Status</label>
+          <select
+            className="border w-full p-2 rounded"
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+          >
+            <option value="unknown">unknown</option>
+            <option value="undo">undo</option>
+            <option value="doing">doing</option>
+            <option value="done">done</option>
+          </select>
+        </div>
+        <div className="mb-4">
+          <label className="block mb-1 font-medium">Type</label>
+          <input
+            type="text"
+            className="border w-full p-2 rounded"
+            value={type}
+            onChange={(e) => setType(e.target.value)}
           />
         </div>
         <div className="mb-4">

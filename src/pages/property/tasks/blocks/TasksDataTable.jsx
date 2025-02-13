@@ -5,17 +5,12 @@ import { useMemo } from "react";
 import {
   DataGrid,
   DataGridColumnHeader,
-  DataGridRowSelect,
-  DataGridRowSelectAll,
+
 } from "@/components/data-grid";
 import { Input } from "@/components/ui/input";
 
 export default function TasksDataTable({ tasks, onTaskClick }) {
-  const statusFilterOptions = [
-    { value: "unknown", label: "Unknown" },
-    { value: "completed", label: "Completed" },
-    { value: "in_progress", label: "In Progress" },
-  ];
+
   const ColumnInputFilter = ({ column }) => {
     return (
       <Input
