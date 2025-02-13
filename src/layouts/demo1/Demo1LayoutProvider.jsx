@@ -8,10 +8,21 @@ import { useMenus } from '@/providers';
 import { useLayout } from '@/providers';
 import { deepMerge } from '@/utils';
 import { demo1LayoutConfig } from './';
+import { AuthContext } from '@/auth/providers/JWTProvider';
 
-// Interface defining the structure for layout provider properties
+// 判断用户是否有权限
+const hasPermission = (userPermissions, menuPermissions) => {
+  if (!menuPermissions) return true;
 
-// Initial layout properties with default values
+  return Object.entries(menuPermissions).some(([scope, actions]) => {
+    return (
+      userPermissions[scope] &&
+      actions.some((action) => userPermissions[scope].includes(action))
+    );
+  });
+};
+
+// 初始化 Layout 配置
 const initalLayoutProps = {
   layout: demo1LayoutConfig,
   // Default layout configuration
@@ -52,26 +63,35 @@ const Demo1LayoutContext = createContext(initalLayoutProps);
 const useDemo1Layout = () => useContext(Demo1LayoutContext);
 
 // Layout provider component that wraps the application
-const Demo1LayoutProvider = ({
-  children
-}) => {
-  const {
-    pathname
-  } = useLocation(); // Gets the current path
-  const {
-    setMenuConfig
-  } = useMenus(); // Accesses menu configuration methods
-  const secondaryMenu = useMenuChildren(pathname, MENU_SIDEBAR, 0); // Retrieves the secondary menu
+const Demo1LayoutProvider = ({ children }) => {
+  const { pathname } = useLocation();
+  const { setMenuConfig } = useMenus();
+  const { currentUser, loading } = useContext(AuthContext); // 获取当前用户信息
+  const { getLayout, updateLayout, setCurrentLayout } = useLayout();
 
-  // Sets the primary and secondary menu configurations
-  setMenuConfig('primary', MENU_SIDEBAR);
-  setMenuConfig('secondary', secondaryMenu);
-  const {
-    getLayout,
-    updateLayout,
-    setCurrentLayout
-  } = useLayout(); // Layout management methods
+  // **1. 确保 userPermissions 存在，且等 loading 完成**
+  useEffect(() => {
+    if (loading || !currentUser) return; // **如果还在加载，先不更新菜单**
 
+    const userPermissions = currentUser.permissions || {};
+
+    // **2. 过滤菜单**
+    const filteredMenu = MENU_SIDEBAR.map((item) => ({
+      ...item,
+      children: item.children
+        ? item.children.filter((child) => hasPermission(userPermissions, child.permissions))
+        : undefined,
+    })).filter((item) => !item.children || item.children.length > 0);
+
+    // **3. 处理 secondaryMenu**
+    const secondaryMenu = useMenuChildren(pathname, filteredMenu, 0);
+
+    // **4. 更新菜单**
+    setMenuConfig('primary', filteredMenu);
+    setMenuConfig('secondary', secondaryMenu);
+  }, [currentUser, loading, pathname]);
+
+  // 获取 Layout 配置
   // Merges the default layout with the current one
   const getLayoutConfig = () => {
     return deepMerge(demo1LayoutConfig, getLayout(demo1LayoutConfig.name));
@@ -81,7 +101,7 @@ const Demo1LayoutProvider = ({
   // Updates the current layout when the layout state changes
   useEffect(() => {
     setCurrentLayout(layout);
-  });
+  }, [layout]);
   const [megaMenuEnabled, setMegaMenuEnabled] = useState(false); // State for mega menu toggle
 
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false); // State for mobile sidebar
