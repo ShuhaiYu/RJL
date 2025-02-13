@@ -100,6 +100,14 @@ export const MENU_SIDEBAR = [
         title: "Tasks",
         path: "/property/tasks",
       },
+      {
+        title: "Create Property",
+        path: "/property/create",
+      },
+      {
+        title: "Create Task",
+        path: "/property/tasks/create",
+      },
     ],
   },
   // {

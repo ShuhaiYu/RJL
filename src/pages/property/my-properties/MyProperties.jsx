@@ -1,8 +1,8 @@
 // src/pages/MyProperties.jsx
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { useAuthContext } from '@/auth';
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useAuthContext } from "@/auth";
 
 function PropertiesDataTable({ properties, onPropertyClick }) {
   return (
@@ -14,11 +14,25 @@ function PropertiesDataTable({ properties, onPropertyClick }) {
         </div>
         <div className="card-body">
           <div className="scrollable-x-auto">
-            <table className="table table-auto table-border" data-datatable-table="true">
+            <table
+              className="table table-auto table-border"
+              data-datatable-table="true"
+            >
               <thead>
                 <tr>
-                  <th className="w-[100px] text-center">ID</th>
-                  <th className="min-w-[185px]">Address</th>
+                  <th className="w-[100px] text-center">
+                    <span className="sort">
+                      <span className="sort-label">ID</span>
+                      <span className="sort-icon"></span>
+                    </span>
+                  </th>
+                  <th className="min-w-[185px]">
+                    <span className="sort">
+                      <span className="sort-label">Address</span>
+                      <span className="sort-icon"></span>
+                    </span>
+                  </th>
+
                   <th className="w-[100px] text-center">Actions</th>
                 </tr>
               </thead>
@@ -39,7 +53,7 @@ function PropertiesDataTable({ properties, onPropertyClick }) {
                           onPropertyClick(prop.id);
                         }}
                       >
-                        <i className="ki-outline ki-notepad-edit"></i>
+                        <i className="ki-outline ki-notepad-edit"></i>Edit
                       </button>
                       {/* 如需添加删除按钮，可在此处处理 */}
                     </td>
@@ -58,7 +72,7 @@ function PropertiesDataTable({ properties, onPropertyClick }) {
 export default function MyProperties() {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const { auth, baseApi } = useAuthContext();
   const token = auth?.accessToken;
   const navigate = useNavigate();
@@ -78,7 +92,7 @@ export default function MyProperties() {
         setLoading(false);
       })
       .catch((err) => {
-        setError(err.response?.data?.message || 'Failed to fetch properties');
+        setError(err.response?.data?.message || "Failed to fetch properties");
         setLoading(false);
       });
   };
@@ -105,7 +119,10 @@ export default function MyProperties() {
           <p>No properties found.</p>
         </div>
       ) : (
-        <PropertiesDataTable properties={properties} onPropertyClick={handlePropertyClick} />
+        <PropertiesDataTable
+          properties={properties}
+          onPropertyClick={handlePropertyClick}
+        />
       )}
     </div>
   );

@@ -13,6 +13,8 @@ import MyProperties from '../pages/property/my-properties/MyProperties';
 import Tasks from '../pages/property/tasks/Tasks';
 import PropertyDetailPage from '../pages/property/property-page/PeopertyDetailPage';
 import TaskDetailPage from '../pages/property/task-page/TaskDetailPage';
+import CreatePropertyPage from '../pages/property/create-property/CreatePropertyPage';
+import CreateTaskPage from '../pages/property/create-task/CreateTaskPage';
 const AppRoutingSetup = () => {
   return <Routes>
       <Route element={<RequireAuth />}>
@@ -25,9 +27,12 @@ const AppRoutingSetup = () => {
           <Route path="/agencies/:id" element={<AgencyDetail/>} />
           <Route path="/property/my-properties" element={<MyProperties/>} />
           <Route path="/property/:id" element={<PropertyDetailPage />} />
+          <Route path="/property/create" element={<CreatePropertyPage />} />
+
 
           <Route path="/property/tasks" element={<Tasks />} />
           <Route path="/property/tasks/:id" element={<TaskDetailPage />} />
+          <Route path="/property/tasks/create" element={<CreateTaskPage />} />
 
 
 

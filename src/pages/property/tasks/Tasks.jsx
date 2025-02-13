@@ -13,17 +13,38 @@ function TasksDataTable({ tasks, onTaskClick }) {
           {/* 可在此处添加刷新、过滤等操作 */}
         </div>
         <div className="card-body">
-          <div className="scrollable-x-auto">
+          {/* 这里建议加上 data-datatable 属性（如果需要插件自动初始化） */}
+          <div data-datatable="true" data-datatable-page-size="5" data-datatable-state-save="true" className="scrollable-x-auto">
             <table
               className="table table-auto table-border"
               data-datatable-table="true"
             >
               <thead>
                 <tr>
-                  <th className="w-[100px] text-center">ID</th>
-                  <th className="min-w-[185px]">Task Name</th>
-                  <th className="w-[185px]">Status</th>
-                  <th className="w-[150px]">Due Date</th>
+                  <th className="w-[100px] text-center">
+                    <span className="sort">
+                      <span className="sort-label">ID</span>
+                      <span className="sort-icon"></span>
+                    </span>
+                  </th>
+                  <th className="min-w-[185px]">
+                    <span className="sort">
+                      <span className="sort-label">Task Name</span>
+                      <span className="sort-icon"></span>
+                    </span>
+                  </th>
+                  <th className="w-[185px]">
+                    <span className="sort">
+                      <span className="sort-label">Status</span>
+                      <span className="sort-icon"></span>
+                    </span>
+                  </th>
+                  <th className="w-[150px]">
+                    <span className="sort">
+                      <span className="sort-label">Due Date</span>
+                      <span className="sort-icon"></span>
+                    </span>
+                  </th>
                   <th className="w-[60px] text-center">Actions</th>
                 </tr>
               </thead>
@@ -77,6 +98,7 @@ function TasksDataTable({ tasks, onTaskClick }) {
     </div>
   );
 }
+
 
 export default function Tasks() {
   const [tasks, setTasks] = useState([]);
