@@ -5,7 +5,7 @@ import axios from 'axios'
 import { useAuthContext } from '@/auth'
 import { useNavigate } from 'react-router-dom'
 import Select from 'react-select'
-import TasksDataTable from './blocks/TasksDataTable' // 根据你的实际存放路径修改
+import TasksDataTable from './blocks/TasksDataTable'
 
 export default function Tasks() {
   const [tasks, setTasks] = useState([])
@@ -22,8 +22,9 @@ export default function Tasks() {
   // 假设你要筛选的状态
   const statusOptions = [
     { value: 'unknown', label: 'Unknown' },
-    { value: 'completed', label: 'Completed' },
-    { value: 'in_progress', label: 'In Progress' },
+    { value: 'undo', label: 'Undo' },
+    { value: 'doing', label: 'Doing' },
+    { value: 'done', label: 'Done' },
   ]
 
   // 假设你要筛选的类型
@@ -87,6 +88,16 @@ export default function Tasks() {
     return <div className="text-red-500">Error: {error}</div>
   }
 
+  // 当某行任务状态更新成功后
+  const handleStatusUpdated = (taskId, newStatus) => {
+    setTasks((prev) => prev.map((t) => {
+      if(t.id === taskId) {
+        return { ...t, status: newStatus };
+      }
+      return t;
+    }));
+  };
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">Tasks</h1>
@@ -121,7 +132,7 @@ export default function Tasks() {
           <p>No tasks found.</p>
         </div>
       ) : (
-        <TasksDataTable tasks={filteredTasks} onTaskClick={handleTaskClick} />
+        <TasksDataTable tasks={filteredTasks} onTaskClick={handleTaskClick} onStatusUpdated={handleStatusUpdated}/>
       )}
     </div>
   )

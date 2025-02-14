@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import { useAuthContext } from "@/auth";
@@ -54,6 +54,10 @@ function StatusSelectCell({ task, onStatusUpdated }) {
 
   // 选择框的样式 - 根据当前status显示背景色
   const colorClass = statusColorClasses[status] || "bg-gray-100 text-gray-700";
+
+  useEffect(() => {
+    onStatusUpdated?.(task.id, status);
+    }, [status]);
 
   return (
     <select

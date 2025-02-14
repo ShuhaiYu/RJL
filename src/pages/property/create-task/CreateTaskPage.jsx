@@ -128,13 +128,15 @@ export default function CreateTaskPage() {
             {/* Type */}
             <div>
               <label className="block mb-2 font-medium">Task Type</label>
-              <input
-                type="text"
-                className="input input-bordered w-full"
-                placeholder="Enter task type"
+              <select
+                className="select select-bordered w-full"
                 value={taskType}
                 onChange={(e) => setTaskType(e.target.value)}
-              />
+              >
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+              </select>
             </div>
 
             {/* Status */}
