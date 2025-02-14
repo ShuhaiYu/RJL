@@ -8,6 +8,7 @@ import {
 
 } from "@/components/data-grid";
 import { Input } from "@/components/ui/input";
+import StatusSelectCell from "./StatusSelectCell";
 
 export default function TasksDataTable({ tasks, onTaskClick }) {
 
@@ -35,15 +36,20 @@ export default function TasksDataTable({ tasks, onTaskClick }) {
         ),
         enableSorting: true,   // 列启用排序
       },
+      // 新的 status 列
       {
-        accessorKey: "status",
-        header: ({ header }) => (
-          <DataGridColumnHeader
-            column={header.column}
-            title="Status"
-            filter={<ColumnInputFilter column={header.column} />}
-          />
-        ),
+        accessorKey: "status", // 其实在 data 里
+        header: "Status",      // 也可以像上面那样 DataGridColumnHeader + filter
+        cell: ({ row }) => {
+          const task = row.original;
+          return (
+            <StatusSelectCell
+              task={task}
+              // 若想在修改成功后刷新表格 => onStatusUpdated={() => ...}
+              // onStatusUpdated={(id, newStatus) => { ...some refresh... }}
+            />
+          );
+        },
       },
       {
         accessorKey: "due_date",
