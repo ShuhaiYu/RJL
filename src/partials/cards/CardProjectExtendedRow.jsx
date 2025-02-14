@@ -3,6 +3,7 @@ import { toAbsoluteUrl } from '@/utils/Assets';
 import { useLanguage } from '@/i18n';
 import { DropdownCard2 } from '../dropdowns/general';
 import { CommonAvatars } from '../common';
+import { Link } from 'react-router-dom';
 const CardProjectExtendedRow = ({
   // status,
   logo,
@@ -21,7 +22,8 @@ const CardProjectExtendedRow = ({
   //       <span className="text-gray-600 text-xs font-medium">{statistic.description}</span>
   //     </div>;
   // };
-  return <div className="card p-7.5">
+  return <Link to={url} className="card p-7.5">
+
       <div className="flex items-center flex-wrap justify-between gap-5">
         <div className="flex items-center gap-3.5">
           <div className="flex items-center justify-center min-w-12">
@@ -76,6 +78,6 @@ const CardProjectExtendedRow = ({
           </div>
         </div> */}
       </div>
-    </div>;
+    </Link>;
 };
 export { CardProjectExtendedRow };

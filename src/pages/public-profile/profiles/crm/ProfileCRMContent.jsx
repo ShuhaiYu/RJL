@@ -11,7 +11,7 @@ const ProfileCRMContent = ({ user }) => {
           <GeneralInfo user={user} />
         </div>
       </div>
-      {/* 右侧：其他扩展信息（可根据实际需求扩展） */}
+      {/* 右侧：其他扩展信息（可根据实际需求扩展）
       <div className="col-span-2">
         <div className="bg-white p-5 shadow rounded">
         <UserDataTable 
@@ -19,7 +19,7 @@ const ProfileCRMContent = ({ user }) => {
           properties={user?.properties || []} 
         />
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

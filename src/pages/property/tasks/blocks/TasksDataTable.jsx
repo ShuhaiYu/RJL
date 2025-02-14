@@ -25,25 +25,6 @@ export default function TasksDataTable({ tasks, onTaskClick }) {
   const columns = useMemo(() => {
     return [
       {
-        accessorKey: "id",
-        header: ({ header }) => (
-          <DataGridColumnHeader column={header.column} title="Id" />
-        ),
-        // 假设你想点击行时跳转，可以在 cell 里自定义事件：
-        cell: ({ row }) => {
-          const { id } = row.original;
-          return (
-            <div
-              className="cursor-pointer text-blue-600 underline"
-              onClick={() => onTaskClick?.(id)}
-            >
-              {id}
-            </div>
-          );
-        },
-        enableSorting: true,   // 列启用排序
-      },
-      {
         accessorKey: "task_name",
         header: ({ header }) => (
           <DataGridColumnHeader
@@ -108,13 +89,15 @@ export default function TasksDataTable({ tasks, onTaskClick }) {
           const task = row.original;
           return (
             <button
-              className="btn btn-sm btn-icon btn-clear btn-light"
+              className="btn btn-sm btn-clear btn-light"
               onClick={(e) => {
                 e.stopPropagation();
                 onTaskClick?.(task.id);
               }}
             >
-              <i className="ki-outline ki-notepad-edit"></i>
+              <span className="flex gap-1 items-center"><i className="ki-outline ki-notepad-edit"></i>
+              Edit</span>
+              
             </button>
           );
         },
