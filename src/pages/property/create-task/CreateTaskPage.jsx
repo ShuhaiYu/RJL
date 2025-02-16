@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '@/auth';
+import { Button } from '@/components/ui/button'
 import { toast } from 'sonner';
 
 export default function CreateTaskPage() {
@@ -19,8 +20,8 @@ export default function CreateTaskPage() {
   const [repeatFrequency, setRepeatFrequency] = useState('none');
 
   // 新增字段
-  const [taskType, setTaskType] = useState(''); 
-  const [status, setStatus] = useState('unknown'); 
+  const [taskType, setTaskType] = useState('');
+  const [status, setStatus] = useState('unknown');
 
   const [loading, setLoading] = useState(false);
 
@@ -78,7 +79,6 @@ export default function CreateTaskPage() {
 
   return (
     <div className="container mx-auto p-4">
-      <div className="card card-grid min-w-full">
         <div className="card-header py-5">
           <h3 className="card-title text-xl font-bold">Create New Task</h3>
         </div>
@@ -182,17 +182,16 @@ export default function CreateTaskPage() {
 
             {/* Submit Button */}
             <div>
-              <button
+              <Button
                 type="submit"
-                className={`btn btn-primary w-full ${loading ? 'loading' : ''}`}
+                className={`btn btn-primary ${loading ? 'loading' : ''}`}
                 disabled={loading}
               >
                 {loading ? 'Creating...' : 'Create Task'}
-              </button>
+              </Button>
             </div>
           </form>
         </div>
-      </div>
     </div>
   );
 }

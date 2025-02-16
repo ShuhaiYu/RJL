@@ -11,6 +11,9 @@ export const MENU_SIDEBAR = [
     title: "Create User",
     icon: "profile-circle",
     path: "/public-profile/profiles/create",
+    permissions: {
+      user: ["create"],
+    },
   },
   {
     title: "My Agencies",
@@ -35,8 +38,7 @@ export const MENU_SIDEBAR = [
     icon: "home",
     path: "/property/tasks",
     permissions: {
-      contact: ["read"],
-      role: ["create", "read"],
+      task: ["create"],
     },
   },
   {

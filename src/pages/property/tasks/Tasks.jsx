@@ -132,7 +132,7 @@ export default function Tasks() {
           <p>No tasks found.</p>
         </div>
       ) : (
-        <TasksDataTable tasks={filteredTasks} onTaskClick={handleTaskClick} onStatusUpdated={handleStatusUpdated}/>
+        <TasksDataTable tasks={filteredTasks} onTaskClick={handleTaskClick}/>
       )}
     </div>
   )

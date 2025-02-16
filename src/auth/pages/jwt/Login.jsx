@@ -88,11 +88,11 @@ const Login = () => {
           </a>
         </div> */}
 
-        <div className="flex items-center gap-2">
-          <span className="border-t border-gray-200 w-full"></span>
-          <span className="text-2xs text-gray-500 font-medium uppercase">Or</span>
-          <span className="border-t border-gray-200 w-full"></span>
-        </div>
+        {/*<div className="flex items-center gap-2">*/}
+        {/*  <span className="border-t border-gray-200 w-full"></span>*/}
+        {/*  <span className="text-2xs text-gray-500 font-medium uppercase">Or</span>*/}
+        {/*  <span className="border-t border-gray-200 w-full"></span>*/}
+        {/*</div>*/}
 
         <Alert variant="primary">
           Use <span className="font-semibold text-gray-900">demo@email.com</span> username and{' '}

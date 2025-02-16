@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
-import TaskDetailModal from "@/pages/property/tasks/blocks/TaskDetailModal"; 
+import TaskDetailModal from "@/pages/property/tasks/blocks/TaskDetailModal";
 import { useAuthContext } from "@/auth";
 import TasksDataTable from "../../tasks/blocks/TasksDataTable";
 
@@ -172,15 +172,15 @@ export default function PropertyDetailModal({ propertyId, onClose }) {
         ) : propertyDetail ? (
           <>
             {/* 编辑表单 */}
-            <div className="mb-4">
-              <label className="block mb-1 font-medium">Property Name</label>
-              <input
-                type="text"
-                className="border w-full p-2 rounded"
-                value={propertyName}
-                onChange={(e) => setPropertyName(e.target.value)}
-              />
-            </div>
+            {/*<div className="mb-4">*/}
+            {/*  <label className="block mb-1 font-medium">Property Name</label>*/}
+            {/*  <input*/}
+            {/*    type="text"*/}
+            {/*    className="border w-full p-2 rounded"*/}
+            {/*    value={propertyName}*/}
+            {/*    onChange={(e) => setPropertyName(e.target.value)}*/}
+            {/*  />*/}
+            {/*</div>*/}
             <div className="mb-4">
               <label className="block mb-1 font-medium">Address</label>
               <input
@@ -190,15 +190,15 @@ export default function PropertyDetailModal({ propertyId, onClose }) {
                 onChange={(e) => setPropertyAddress(e.target.value)}
               />
             </div>
-            <div className="mb-4">
-              <label className="block mb-1 font-medium">Agency ID</label>
-              <input
-                type="number"
-                className="border w-full p-2 rounded"
-                value={agencyId}
-                onChange={(e) => setAgencyId(e.target.value)}
-              />
-            </div>
+            {/*<div className="mb-4">*/}
+            {/*  <label className="block mb-1 font-medium">Agency ID</label>*/}
+            {/*  <input*/}
+            {/*    type="number"*/}
+            {/*    className="border w-full p-2 rounded"*/}
+            {/*    value={agencyId}*/}
+            {/*    onChange={(e) => setAgencyId(e.target.value)}*/}
+            {/*  />*/}
+            {/*</div>*/}
 
             <div className="flex justify-end mb-6">
               <button

@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button'
 import { useAuthContext } from '@/auth';
 import { toast } from 'sonner';
 
@@ -38,14 +39,13 @@ export default function CreatePropertyPage() {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="card card-grid min-w-full">
+    <div className="container mx-auto p-4 max-w-xl">
         <div className="card-header py-5">
           <h3 className="card-title text-xl font-bold">Create New Property</h3>
         </div>
         <div className="card-body p-5">
           <form onSubmit={handleSubmit} className="space-y-5">
-            
+
             <div>
               <label className="block mb-2 font-medium">Address</label>
               <input
@@ -56,19 +56,18 @@ export default function CreatePropertyPage() {
                 onChange={(e) => setAddress(e.target.value)}
               />
             </div>
-            
+
             <div>
-              <button
+              <Button
                 type="submit"
-                className={`btn btn-primary w-full ${loading ? 'loading' : ''}`}
+                className={`btn btn-primary ${loading ? 'loading' : ''}`}
                 disabled={loading}
               >
                 {loading ? 'Creating...' : 'Create Property'}
-              </button>
+              </Button>
             </div>
           </form>
         </div>
-      </div>
     </div>
   );
 }
