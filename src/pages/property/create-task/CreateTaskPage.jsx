@@ -28,7 +28,7 @@ export default function CreateTaskPage() {
 
   const location = useLocation();
   const originalTask = location.state?.originalTask;
-  const [emailIds, setEmailIds] = useState([]);
+  const [emailId, setEmailId] = useState(null);
 
   // 2) 加载 property 列表
   useEffect(() => {
@@ -64,8 +64,7 @@ export default function CreateTaskPage() {
       setStatus(originalTask.status || 'unknown');
       
       // 收集邮件ID
-      const emails = originalTask.emails || [];
-      setEmailIds(emails.map(email => email.id));
+      setEmailId(originalTask.email_id || null);
     }
   }, [originalTask]);
 
@@ -87,7 +86,7 @@ export default function CreateTaskPage() {
         // 新增
         type: taskType,
         status: status,
-        email_ids: emailIds,
+        email_id: emailId,
       };
 
       const response = await axios.post(
@@ -98,7 +97,7 @@ export default function CreateTaskPage() {
 
       toast.success('Task created successfully!');
       // 跳转到新创建任务的详情页面（例如 /task/123）
-      navigate(`/task/${response.data.data.id}`);
+      navigate(`/property/tasks/${response.data.data.id}`);
     } catch (error) {
       console.error('Create task error:', error);
       toast.error(error.response?.data?.message || 'Failed to create task.');
@@ -163,9 +162,9 @@ export default function CreateTaskPage() {
                 value={taskType}
                 onChange={(e) => setTaskType(e.target.value)}
               >
-                <option value="A">A</option>
-                <option value="B">B</option>
-                <option value="C">C</option>
+                <option value="gas">Gas</option>
+                <option value="electricity">Electricity</option>
+                <option value="smoke alarm">Smoke Alarm</option>
               </select>
             </div>
 
