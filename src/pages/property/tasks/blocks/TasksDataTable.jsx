@@ -50,7 +50,7 @@ export default function TasksDataTable({ tasks, onTaskClick, onStatusUpdated }) 
       },
       // 新的 status 列
       {
-        accessorKey: "status", // 其实在 data 里
+        accessorKey: "status",
         header: ({ header }) => (
           <DataGridColumnHeader
             column={header.column}
@@ -66,6 +66,33 @@ export default function TasksDataTable({ tasks, onTaskClick, onStatusUpdated }) 
               // 刷新
               onStatusUpdated={onStatusUpdated}
             />
+          );
+        },
+        enableSorting: true, 
+      },
+      {
+        accessorKey: "type",
+        header: ({ header }) => (
+          <DataGridColumnHeader column={header.column} title="Type" filter={<ColumnInputFilter column={header.column} />}/>
+        ),
+        cell: ({ row }) => {
+          const task = row.original;
+          // 取出 type 字段
+          const { type } = task;
+          
+          // 根据不同 type 设置颜色类
+          const typeColorClasses = {
+            "gas": "bg-blue-100 text-blue-700",
+            "electricity": "bg-yellow-100 text-yellow-700",
+            "smoke alarm": "bg-green-100 text-green-700",
+          };
+          // 如果 type 不在 [A,B,C], 给一个默认颜色
+          const colorClass = typeColorClasses[type] || "bg-gray-100 text-gray-700";
+      
+          return (
+            <span className={`rounded px-2 py-1 ${colorClass}`}>
+              {type}
+            </span>
           );
         },
       },
@@ -97,32 +124,6 @@ export default function TasksDataTable({ tasks, onTaskClick, onStatusUpdated }) 
         cell: ({ getValue }) => {
           const val = getValue();
           return val ? new Date(val).toLocaleString() : "-";
-        },
-      },
-      {
-        accessorKey: "type",
-        header: ({ header }) => (
-          <DataGridColumnHeader column={header.column} title="Type" filter={<ColumnInputFilter column={header.column} />}/>
-        ),
-        cell: ({ row }) => {
-          const task = row.original;
-          // 取出 type 字段
-          const { type } = task;
-          
-          // 根据不同 type 设置颜色类
-          const typeColorClasses = {
-            A: "bg-blue-100 text-blue-700",
-            B: "bg-yellow-100 text-yellow-700",
-            C: "bg-green-100 text-green-700",
-          };
-          // 如果 type 不在 [A,B,C], 给一个默认颜色
-          const colorClass = typeColorClasses[type] || "bg-gray-100 text-gray-700";
-      
-          return (
-            <span className={`rounded px-2 py-1 ${colorClass}`}>
-              {type}
-            </span>
-          );
         },
       },
       // 如果你想放一个操作列，就再加一个

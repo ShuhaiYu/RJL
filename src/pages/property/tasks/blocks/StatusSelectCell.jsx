@@ -19,10 +19,20 @@ function StatusSelectCell({ task, onStatusUpdated }) {
 
   // 不同状态对应不同样式
   const statusColorClasses = {
-    unknown: "bg-gray-100 text-gray-700",
-    undo: "bg-red-100 text-red-700",
-    doing: "bg-blue-100 text-blue-700",
-    done: "bg-green-100 text-green-700",
+    // UNKNOWN: 使用柔和的黄色，表示需要关注和处理
+    unknown: "bg-amber-50 text-amber-700 border-amber-200",
+
+    // UNDO: 使用醒目的橙色，表示需要重点关注和行动
+    undo: "bg-orange-50 text-orange-700 border-orange-200",
+
+    // DOING: 使用温和的蓝色，表示正在进行中但不需要立即关注
+    doing: "bg-sky-50 text-sky-700 border-sky-200",
+
+    // DONE: 使用清新的绿色，表示已完成
+    done: "bg-emerald-50 text-emerald-700 border-emerald-200",
+
+    // CANCEL: 使用中性的灰色，表示已取消
+    cancel: "bg-gray-100 text-gray-500 border-gray-200",
   };
 
   const handleChange = async (e) => {
@@ -57,7 +67,7 @@ function StatusSelectCell({ task, onStatusUpdated }) {
 
   useEffect(() => {
     onStatusUpdated?.(task.id, status);
-    }, [status]);
+  }, [status]);
 
   return (
     <select
@@ -69,6 +79,7 @@ function StatusSelectCell({ task, onStatusUpdated }) {
       <option value="undo">undo</option>
       <option value="doing">doing</option>
       <option value="done">done</option>
+      <option value="cancel">cancel</option>
     </select>
   );
 }

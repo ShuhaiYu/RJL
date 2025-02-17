@@ -68,6 +68,13 @@ export default function PropertyDetailPage() {
   // 只读展示房产详情（顶部区域）及任务列表（下方区域）
   return (
     <div className="container mx-auto p-4">
+      {/* Back Button */}
+      <button
+        className="btn btn-secondary mb-6"
+        onClick={() => navigate("/property/my-properties")}
+      >
+        Back <i className="ki-filled ki-arrow-left"></i>
+      </button>
       {/* 顶部区域 */}
       <div className="flex flex-col md:flex-row items-center justify-between bg-white p-6 shadow rounded mb-6">
         <div>

@@ -4,8 +4,11 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { useAuthContext } from "@/auth";
 import TaskDetailModal from "../tasks/blocks/TaskDetailModal";
+import { useNavigate } from "react-router-dom";
 
 export default function TaskDetailPage() {
+  const navigate = useNavigate();
+
   const { id: taskId } = useParams();
   const { auth, baseApi } = useAuthContext();
   const token = auth?.accessToken;
@@ -42,6 +45,10 @@ export default function TaskDetailPage() {
     newWindow.document.close();
   };
 
+  const handleCopyTask = () => {
+    navigate("/property/tasks/create", { state: { originalTask: task } });
+  };
+
   if (loading) {
     return <div className="container mx-auto p-4">Loading task details...</div>;
   }
@@ -60,6 +67,13 @@ export default function TaskDetailPage() {
 
   return (
     <div className="container mx-auto p-4">
+      {/* Back Button */}
+      <button
+        className="btn btn-secondary mb-6"
+        onClick={() => navigate("/property/tasks")}
+      >
+        Back <i className="ki-filled ki-arrow-left"></i>
+      </button>
       {/* 顶部区域 */}
       <div className="flex flex-col md:flex-row items-center justify-between bg-white p-6 shadow rounded mb-6">
         <div>
@@ -89,7 +103,6 @@ export default function TaskDetailPage() {
             <span className="font-medium">Description: </span>
             {task.task_description}
           </p>
-          
         </div>
         <div className="mt-4 md:mt-0">
           <button
@@ -97,6 +110,9 @@ export default function TaskDetailPage() {
             onClick={() => setShowEditModal(true)}
           >
             Edit
+          </button>
+          <button className="btn btn-secondary" onClick={handleCopyTask}>
+            Copy Task
           </button>
         </div>
       </div>
@@ -171,7 +187,7 @@ export default function TaskDetailPage() {
                           className="btn btn-sm btn-icon btn-clear btn-light"
                           onClick={() => handleOpenEmail(email.html)}
                         >
-                          <i className="ki-outline ki-envelope"></i>
+                          <i className="ki-outline ki-exit-right-corner"></i>
                         </button>
                       </td>
                     </tr>

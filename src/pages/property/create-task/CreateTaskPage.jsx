@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '@/auth';
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner';
+import { useLocation } from 'react-router-dom';
 
 export default function CreateTaskPage() {
   const { auth, baseApi } = useAuthContext();
@@ -25,6 +26,10 @@ export default function CreateTaskPage() {
 
   const [loading, setLoading] = useState(false);
 
+  const location = useLocation();
+  const originalTask = location.state?.originalTask;
+  const [emailIds, setEmailIds] = useState([]);
+
   // 2) 加载 property 列表
   useEffect(() => {
     if (!token) return;
@@ -39,6 +44,30 @@ export default function CreateTaskPage() {
         console.error('Failed to load properties:', err);
       });
   }, [token, baseApi]);
+
+  useEffect(() => {
+    if (originalTask) {
+      // 填充表单字段
+      setSelectedPropertyId(originalTask.property_id || '');
+      setTaskName(originalTask.task_name || '');
+      setTaskDescription(originalTask.task_description || '');
+      
+      // 处理日期格式
+      if (originalTask.due_date) {
+        const dueDate = new Date(originalTask.due_date);
+        const formattedDueDate = dueDate.toISOString().slice(0, 16);
+        setDueDate(formattedDueDate);
+      }
+      
+      setRepeatFrequency(originalTask.repeat_frequency || 'none');
+      setTaskType(originalTask.type || '');
+      setStatus(originalTask.status || 'unknown');
+      
+      // 收集邮件ID
+      const emails = originalTask.emails || [];
+      setEmailIds(emails.map(email => email.id));
+    }
+  }, [originalTask]);
 
   // 3) 提交
   const handleSubmit = async (e) => {
@@ -58,6 +87,7 @@ export default function CreateTaskPage() {
         // 新增
         type: taskType,
         status: status,
+        email_ids: emailIds,
       };
 
       const response = await axios.post(

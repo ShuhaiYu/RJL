@@ -119,16 +119,21 @@ export default function TaskDetailModal({ task, onClose }) {
             <option value="undo">undo</option>
             <option value="doing">doing</option>
             <option value="done">done</option>
+            <option value="cancel">cancel</option>
           </select>
         </div>
         <div className="mb-4">
           <label className="block mb-1 font-medium">Type</label>
-          <input
-            type="text"
+          <select
             className="border w-full p-2 rounded"
             value={type}
             onChange={(e) => setType(e.target.value)}
-          />
+          >
+            <option value="gas">gas</option>
+            <option value="electricity">electricity</option>
+            <option value="smoke alarm">smoke alarm</option>
+            <option value="">-</option>
+          </select>
         </div>
         <div className="mb-4">
           <label className="block mb-1 font-medium">Repeat Frequency</label>
