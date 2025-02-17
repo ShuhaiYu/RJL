@@ -19,6 +19,7 @@ import TaskDetailPage from "../pages/property/task-page/TaskDetailPage";
 import CreatePropertyPage from "../pages/property/create-property/CreatePropertyPage";
 import CreateTaskPage from "../pages/property/create-task/CreateTaskPage";
 import CreateUserPage from "../pages/user/create-user/CreateUserPage";
+import Emails from "../pages/email/Emails";
 const AppRoutingSetup = () => {
   return (
     <Routes>
@@ -58,6 +59,7 @@ const AppRoutingSetup = () => {
             path="/account/home/company-profile"
             element={<AccountCompanyProfilePage />}
           />
+          <Route path="/emails" element={<Emails/>} />
         </Route>
       </Route>
       <Route path="error/*" element={<ErrorsRouting />} />

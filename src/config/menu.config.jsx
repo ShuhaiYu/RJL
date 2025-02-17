@@ -42,6 +42,12 @@ export const MENU_SIDEBAR = [
     },
   },
   {
+    title: "Emails",
+    icon: "home",
+    path: "/emails",
+
+  },
+  {
     title: "Create Property",
     icon: "home",
     path: "/property/create",
