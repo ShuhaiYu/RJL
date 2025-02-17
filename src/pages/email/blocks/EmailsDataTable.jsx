@@ -57,11 +57,14 @@ export default function EmailsDataTable({ emails }) {
       enableSorting: true,
       cell: ({ getValue }) => {
         const dateStr = getValue();
-        const date = new Date(dateStr);
-        // 使用澳大利亚格式（en-AU），显示中等日期格式
-        return date.toLocaleString("en-AU", {
-          dateStyle: "medium",
-        });
+        // if not null 
+        if (dateStr) {
+          const date = new Date(dateStr);
+                  // 使用澳大利亚格式（en-AU），显示中等日期格式
+          return date.toLocaleString("en-AU", {
+            dateStyle: "medium",
+          });
+        }
       },
     },
     {
