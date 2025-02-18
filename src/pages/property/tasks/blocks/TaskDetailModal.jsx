@@ -118,7 +118,7 @@ export default function TaskDetailModal({ task, onClose }) {
             <option value="unknown">unknown</option>
             <option value="undo">undo</option>
             <option value="doing">doing</option>
-            <option value="done">done</option>
+            {/* <option value="done">done</option> */}
             <option value="cancel">cancel</option>
           </select>
         </div>
