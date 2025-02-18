@@ -7,7 +7,7 @@ import {
   ModalTitle,
   ModalBody,
   ModalContent,
-} from "@/components/Modal";
+} from "@/components/modal";
 import { EditContactForm } from "./blocks/EditContactForm";
 import { Button } from "@/components/ui/button";
 import { DataGrid, DataGridColumnHeader } from "@/components/data-grid";
