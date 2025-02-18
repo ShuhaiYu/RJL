@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import TaskDetailModal from "@/pages/property/tasks/blocks/TaskDetailModal";
 import { useAuthContext } from "@/auth";
 import TasksDataTable from "../../tasks/blocks/TasksDataTable";
+import { useNavigate } from "react-router-dom";
 
 export default function PropertyDetailModal({ propertyId, onClose }) {
   const [loading, setLoading] = useState(false);
@@ -27,6 +28,8 @@ export default function PropertyDetailModal({ propertyId, onClose }) {
 
   const { baseApi, auth } = useAuthContext();
   const token = auth?.accessToken;
+
+  const navigate = useNavigate();
 
   // 获取属性详情：使用 Agency Admin 路径
   const fetchPropertyDetail = () => {
@@ -88,31 +91,14 @@ export default function PropertyDetailModal({ propertyId, onClose }) {
       });
   };
 
-  // 创建任务，更新为 Agency Admin 路径
   const handleCreateTask = () => {
-    axios
-      .post(
-        `${baseApi}/tasks/create`,
-        {
+    navigate(`/property/tasks/create`, {
+      state: {
+        originalTask: {
           property_id: propertyId,
-          task_name: newTaskName,
-          task_description: newTaskDesc,
-          due_date: newTaskDue ? new Date(newTaskDue).toISOString() : null,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      )
-      .then(() => {
-        toast("Task created successfully!");
-        setShowCreateTask(false);
-        // 刷新属性详情以获取最新任务列表
-        fetchPropertyDetail();
-      })
-      .catch((err) => {
-        console.error(err);
-        toast("Failed to create task");
-      });
+        }, 
+      },
+    });
   };
 
   // 删除属性：使用 Agency Admin 路径
@@ -136,14 +122,15 @@ export default function PropertyDetailModal({ propertyId, onClose }) {
   };
 
   const handleTaskClick = (taskId) => {
-    setSelectedTaskId(taskId);
+    // setSelectedTaskId(taskId);
+    navigate(`/property/tasks/${taskId}`);
   };
 
-  const closeTaskModal = () => {
-    setSelectedTaskId(null);
-    // 可选：刷新详情以更新任务数据
-    fetchPropertyDetail();
-  };
+  // const closeTaskModal = () => {
+  //   setSelectedTaskId(null);
+  //   // 可选：刷新详情以更新任务数据
+  //   fetchPropertyDetail();
+  // };
 
   return (
     <div
@@ -221,18 +208,18 @@ export default function PropertyDetailModal({ propertyId, onClose }) {
         )}
 
         {/* 二级弹窗：TaskDetailModal */}
-        {selectedTaskId && (
+        {/* {selectedTaskId && (
           <TaskDetailModal
             taskId={selectedTaskId}
             token={token}
             onClose={closeTaskModal}
           />
-        )}
+        )} */}
 
         {/* Footer: Create Task & Delete Property */}
         <div className="flex justify-between items-center mt-4 pt-4 border-t">
           <button
-            onClick={() => setShowCreateTask(true)}
+            onClick={handleCreateTask}
             className="px-4 py-2 bg-green-600 text-white rounded"
           >
             Create Task
@@ -246,7 +233,7 @@ export default function PropertyDetailModal({ propertyId, onClose }) {
         </div>
 
         {/* 简易 Create Task 弹窗 */}
-        {showCreateTask && (
+        {/* {showCreateTask && (
           <div
             className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50"
             onClick={() => setShowCreateTask(false)}
@@ -291,7 +278,7 @@ export default function PropertyDetailModal({ propertyId, onClose }) {
               </div>
             </div>
           </div>
-        )}
+        )} */}
 
       </div>
     </div>
