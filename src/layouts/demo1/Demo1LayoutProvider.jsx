@@ -74,14 +74,33 @@ const Demo1LayoutProvider = ({ children }) => {
     if (loading || !currentUser) return; // **如果还在加载，先不更新菜单**
 
     const userPermissions = currentUser.permissions || {};
+    console.log('userPermissions:', userPermissions);
+    
 
     // **2. 过滤菜单**
-    const filteredMenu = MENU_SIDEBAR.map((item) => ({
-      ...item,
-      children: item.children
-        ? item.children.filter((child) => hasPermission(userPermissions, child.permissions))
-        : undefined,
-    })).filter((item) => !item.children || item.children.length > 0);
+    const filteredMenu = MENU_SIDEBAR
+  .map((item) => {
+    // 如果存在 children，则先对子菜单项进行过滤
+    if (item.children && Array.isArray(item.children)) {
+      const filteredChildren = item.children.filter((child) =>
+        child.permissions ? hasPermission(userPermissions, child.permissions) : true
+      );
+      return { ...item, children: filteredChildren };
+    }
+    return item;
+  })
+  .filter((item) => {
+    // 如果当前菜单项本身有权限限制，则检查是否符合要求
+    if (item.permissions) {
+      return hasPermission(userPermissions, item.permissions);
+    }
+    // 如果存在 children，则只有子菜单有内容时才保留
+    if (item.children) {
+      return item.children.length > 0;
+    }
+    // 没有权限限制的项默认保留（例如仅为 heading 的菜单项）
+    return true;
+  });
 
     // **3. 处理 secondaryMenu**
     const secondaryMenu = useMenuChildren(pathname, filteredMenu, 0);

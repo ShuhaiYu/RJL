@@ -73,6 +73,7 @@ function StatusSelectCell({ task, onStatusUpdated }) {
     <select
       value={status}
       onChange={handleChange}
+      disabled={task.status === "done"}
       className={`rounded px-2 py-1 ${colorClass}`}
     >
       <option value="unknown">unknown</option>

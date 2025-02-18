@@ -3,9 +3,22 @@ export const MENU_SIDEBAR = [
     heading: "User",
   },
   {
-    title: "Profile",
+    title: "Dashboard",
+    icon: "profile-circle",
+    path: "/",
+  },
+  {
+    title: "My Profile",
     icon: "profile-circle",
     path: "/public-profile/profiles/crm",
+  },
+  {
+    title: "Create Agency",
+    icon: "users",
+    path: "/agencies/create-agency",
+    permissions: {
+      agency: ["create"],
+    },
   },
   {
     title: "Create User",
@@ -14,38 +27,6 @@ export const MENU_SIDEBAR = [
     permissions: {
       user: ["create"],
     },
-  },
-  {
-    title: "My Agencies",
-    icon: "users",
-    path: "/agencies/my-agencies",
-    permissions: {
-      agency: ["create"],
-    },
-  },
-  {
-    title: "Create Agency",
-    icon: "users",
-    path: "/agencies/create-agency",
-  },
-  {
-    title: "My Properties",
-    icon: "home",
-    path: "/property/my-properties",
-  },
-  {
-    title: "Tasks",
-    icon: "home",
-    path: "/property/tasks",
-    permissions: {
-      task: ["create"],
-    },
-  },
-  {
-    title: "Emails",
-    icon: "home",
-    path: "/emails",
-
   },
   {
     title: "Create Property",
@@ -62,6 +43,34 @@ export const MENU_SIDEBAR = [
     permissions: {
       task: ["create"],
     },
+  },
+  {
+    title: "Agencies",
+    icon: "users",
+    path: "/agencies/my-agencies",
+    permissions: {
+      agency: ["create"],
+    },
+  },
+
+  {
+    title: "Properties",
+    icon: "home",
+    path: "/property/my-properties",
+    permissions: {
+      property: ["read"],
+    },
+  },
+  {
+    title: "Tasks",
+    icon: "home",
+    path: "/property/tasks",
+    
+  },
+  {
+    title: "Emails",
+    icon: "home",
+    path: "/emails",
   },
 ];
 export const MENU_MEGA = [
