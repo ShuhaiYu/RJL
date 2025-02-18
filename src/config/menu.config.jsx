@@ -45,6 +45,14 @@ export const MENU_SIDEBAR = [
     },
   },
   {
+    title: "Create Contact",
+    icon: "home",
+    path: "/contacts/create",
+    permissions: {
+      contact: ["create"],
+    },
+  },
+  {
     title: "Agencies",
     icon: "users",
     path: "/agencies/my-agencies",
@@ -72,6 +80,11 @@ export const MENU_SIDEBAR = [
     icon: "home",
     path: "/emails",
   },
+  {
+    title: "Contacts",
+    icon: "home",
+    path: "/contacts",
+  }
 ];
 export const MENU_MEGA = [
   {

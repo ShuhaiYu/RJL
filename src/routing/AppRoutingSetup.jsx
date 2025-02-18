@@ -20,6 +20,9 @@ import CreatePropertyPage from "../pages/property/create-property/CreateProperty
 import CreateTaskPage from "../pages/property/create-task/CreateTaskPage";
 import CreateUserPage from "../pages/user/create-user/CreateUserPage";
 import Emails from "../pages/email/Emails";
+import { ContactPage } from "../pages/contact/ContactPage";
+import { CreateContactPage } from "../pages/contact/CreateContactPage";
+
 const AppRoutingSetup = () => {
   return (
     <Routes>
@@ -59,7 +62,9 @@ const AppRoutingSetup = () => {
             path="/account/home/company-profile"
             element={<AccountCompanyProfilePage />}
           />
-          <Route path="/emails" element={<Emails/>} />
+          <Route path="/emails" element={<Emails />} />
+          <Route path="/contacts" element={<ContactPage />} />
+          <Route path="/contacts/create" element={<CreateContactPage />} />
         </Route>
       </Route>
       <Route path="error/*" element={<ErrorsRouting />} />

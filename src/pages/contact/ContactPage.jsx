@@ -1,0 +1,118 @@
+import { useState, useEffect, useMemo } from "react";
+import axios from "axios";
+import { useAuthContext } from "@/auth";
+import {
+  Modal,
+  ModalHeader,
+  ModalTitle,
+  ModalBody,
+  ModalContent,
+} from "@/components/Modal";
+import { EditContactForm } from "./blocks/EditContactForm";
+import { Button } from "@/components/ui/button";
+import { DataGrid, DataGridColumnHeader } from "@/components/data-grid";
+
+export const ContactPage = () => {
+  const { auth, baseApi } = useAuthContext();
+  const token = auth?.accessToken;
+
+  const [contacts, setContacts] = useState([]);
+  const [selectedContactId, setSelectedContactId] = useState(null);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+
+  const fetchContacts = async () => {
+    try {
+      const response = await axios.get(`${baseApi}/contacts`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setContacts(response.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    if (token) {
+      fetchContacts();
+    }
+  }, [token]);
+
+  const columns = useMemo(() => {
+    return [
+      {
+        accessorKey: "name",
+        header: ({ header }) => (
+          <DataGridColumnHeader column={header.column} title="Name" />
+        ),
+        enableSorting: true,
+      },
+      {
+        accessorKey: "phone",
+        header: ({ header }) => (
+          <DataGridColumnHeader column={header.column} title="Phone" />
+        ),
+        enableSorting: true,
+      },
+      {
+        accessorKey: "email",
+        header: ({ header }) => (
+          <DataGridColumnHeader column={header.column} title="Email" />
+        ),
+        enableSorting: true,
+      },
+      {
+        accessorKey: "id",
+        header: ({ header }) => (
+          <DataGridColumnHeader column={header.column} title="Action" />
+        ),
+        cell: ({ row }) => {
+          const contact = row.original;
+          return (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setSelectedContactId(contact.id);
+                setEditModalOpen(true);
+              }}
+            >
+              Edit
+            </Button>
+          );
+        },
+      },
+    ];
+  }, []);
+
+  return (
+    <div style={{ height: 600, width: "100%", padding: 20 }}>
+      <h1 className="text-3xl font-bold mb-6">Contacts</h1>
+
+      <DataGrid
+        data={contacts}
+        columns={columns}
+        serverSide={false} // 前端分页、排序
+        rowSelection={false} // 不需要多选行
+      />
+
+      <Modal open={editModalOpen} onClose={() => setEditModalOpen(false)}>
+        <ModalContent>
+          <ModalHeader>
+            <ModalTitle>Edit Contact</ModalTitle>
+          </ModalHeader>
+          <ModalBody>
+            {selectedContactId && (
+              <EditContactForm
+                contactId={selectedContactId}
+                onSuccess={() => {
+                  setEditModalOpen(false);
+                  fetchContacts();
+                }}
+              />
+            )}
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+    </div>
+  );
+};
