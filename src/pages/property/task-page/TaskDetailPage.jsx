@@ -179,6 +179,7 @@ export default function TaskDetailPage() {
           <button
             className="btn btn-primary"
             onClick={() => setShowEditModal(true)}
+            disabled={task.status === "done"}
           >
             Edit
           </button>
