@@ -102,6 +102,12 @@ export default function PropertyDetailPage() {
           >
             Create Task
           </Button>
+          <Button
+            variant="view"
+            onClick={() => (window.location.href = 'https://rjl.vercel.app/contacts/create')}
+          >
+            Create Task
+          </Button>
         </div>
       </div>
 
