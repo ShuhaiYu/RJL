@@ -12,7 +12,12 @@ const buttonVariants = cva('inline-flex items-center justify-center gap-2 whites
       ghost: 'hover:bg-accent hover:text-accent-foreground',
       link: 'text-primary underline-offset-4 hover:underline',
       // Metronic variants
-      light: 'btn btn-light'
+      light: 'btn btn-light',
+      // 统一的按钮颜色变体
+      create: 'bg-primary text-primary-inverse hover:bg-primary-active',
+      delete: 'bg-danger text-danger-inverse hover:bg-danger-active',
+      edit: 'bg-success text-success-inverse hover:bg-success-active',
+      view: 'bg-warning text-warning-inverse hover:bg-warning-active',
     },
     size: {
       default: 'text-sm h-10 rounded-md px-4 py-2',

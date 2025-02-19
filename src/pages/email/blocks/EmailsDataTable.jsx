@@ -84,7 +84,7 @@ export default function EmailsDataTable({ emails }) {
         const email = row.original;
         return (
           <Button
-            variant="outline"
+            variant="view"
             size="sm"
             onClick={(e) => {
               e.stopPropagation();

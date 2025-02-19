@@ -3,6 +3,7 @@
 import { useMemo } from 'react'
 // 假设你有一个封装好的 DataGrid
 import { DataGrid } from '@/components/data-grid'  
+import { Button } from '../../../../components/ui/button'
 
 export default function MyPropertiesDataTable({ properties, onEdit }) {
   // 定义 DataGrid 的列
@@ -23,12 +24,12 @@ export default function MyPropertiesDataTable({ properties, onEdit }) {
       cell: ({ row }) => {
         const property = row.original
         return (
-          <button
-            className="btn btn-sm btn-icon btn-clear btn-light"
+          <Button
+            variant="view"
             onClick={() => onEdit(property.id)}
           >
-            <i className="ki-outline ki-notepad-edit"></i> Edit
-          </button>
+            View
+          </Button>
         )
       },
     },

@@ -5,6 +5,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { useAuthContext } from "@/auth";
 import TaskDetailModal from "../tasks/blocks/TaskDetailModal";
+import { Button } from "../../../components/ui/button";
 
 export default function TaskDetailPage() {
   const navigate = useNavigate();
@@ -171,21 +172,27 @@ export default function TaskDetailPage() {
             {task.repeat_frequency}
           </p>
           <p className="mt-1 text-gray-600">
+            <span className="font-medium">Next Reminder: </span>
+            {task.next_reminder
+              ? new Date(task.next_reminder).toLocaleString()
+              : "N/A"}
+          </p>
+          <p className="mt-1 text-gray-600">
             <span className="font-medium">Description: </span>
             {task.task_description}
           </p>
         </div>
         <div className="mt-4 md:mt-0 flex flex-col gap-2">
-          <button
-            className="btn btn-primary"
+          <Button
+            variant="edit"
             onClick={() => setShowEditModal(true)}
             disabled={task.status === "done"}
           >
             Edit
-          </button>
-          <button className="btn btn-secondary" onClick={handleCopyTask}>
+          </Button>
+          <Button className="btn btn-secondary" onClick={handleCopyTask}>
             Copy Task
-          </button>
+          </Button>
           {/* 如果当前任务未完成，则显示“完成并创建下个任务”的按钮 */}
           {task.status !== "done" && (
             <button
@@ -271,7 +278,8 @@ export default function TaskDetailPage() {
                           className="btn btn-sm btn-icon btn-clear btn-light"
                           onClick={() => handleOpenEmail(email.html)}
                         >
-                          <i className="ki-outline ki-exit-right-corner"></i>
+                          
+                          View
                         </button>
                       </td>
                     </tr>

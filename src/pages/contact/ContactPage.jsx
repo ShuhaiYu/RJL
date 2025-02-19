@@ -69,7 +69,7 @@ export const ContactPage = () => {
           const contact = row.original;
           return (
             <Button
-              variant="outline"
+              variant="edit"
               size="sm"
               onClick={() => {
                 setSelectedContactId(contact.id);

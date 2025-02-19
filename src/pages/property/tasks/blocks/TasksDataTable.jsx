@@ -2,16 +2,16 @@
 
 import { useMemo } from "react";
 // 假设你的 DataGrid 封装在同目录下或其它位置，请根据实际情况修改导入
-import {
-  DataGrid,
-  DataGridColumnHeader,
-
-} from "@/components/data-grid";
+import { DataGrid, DataGridColumnHeader } from "@/components/data-grid";
 import { Input } from "@/components/ui/input";
 import StatusSelectCell from "./StatusSelectCell";
+import { Button } from "../../../../components/ui/button";
 
-export default function TasksDataTable({ tasks, onTaskClick, onStatusUpdated }) {
-
+export default function TasksDataTable({
+  tasks,
+  onTaskClick,
+  onStatusUpdated,
+}) {
   const ColumnInputFilter = ({ column }) => {
     return (
       <Input
@@ -46,7 +46,7 @@ export default function TasksDataTable({ tasks, onTaskClick, onStatusUpdated }) 
             filter={<ColumnInputFilter column={header.column} />}
           />
         ),
-        enableSorting: true,   // 列启用排序
+        enableSorting: true, // 列启用排序
       },
       // 新的 status 列
       {
@@ -68,38 +68,45 @@ export default function TasksDataTable({ tasks, onTaskClick, onStatusUpdated }) 
             />
           );
         },
-        enableSorting: true, 
+        enableSorting: true,
       },
       {
         accessorKey: "type",
         header: ({ header }) => (
-          <DataGridColumnHeader column={header.column} title="Type" filter={<ColumnInputFilter column={header.column} />}/>
+          <DataGridColumnHeader
+            column={header.column}
+            title="Type"
+            filter={<ColumnInputFilter column={header.column} />}
+          />
         ),
         cell: ({ row }) => {
           const task = row.original;
           // 取出 type 字段
           const { type } = task;
-          
+
           // 根据不同 type 设置颜色类
           const typeColorClasses = {
-            "gas": "bg-blue-100 text-blue-700",
-            "electricity": "bg-yellow-100 text-yellow-700",
+            gas: "bg-blue-100 text-blue-700",
+            electricity: "bg-yellow-100 text-yellow-700",
             "smoke alarm": "bg-green-100 text-green-700",
           };
           // 如果 type 不在 [A,B,C], 给一个默认颜色
-          const colorClass = typeColorClasses[type] || "bg-gray-100 text-gray-700";
-      
+          const colorClass =
+            typeColorClasses[type] || "bg-gray-100 text-gray-700";
+
           return (
-            <span className={`rounded px-2 py-1 ${colorClass}`}>
-              {type}
-            </span>
+            <span className={`rounded px-2 py-1 ${colorClass}`}>{type}</span>
           );
         },
       },
       {
         accessorKey: "due_date",
         header: ({ header }) => (
-          <DataGridColumnHeader column={header.column} title="Due Date" filter={<ColumnInputFilter column={header.column} />}/>
+          <DataGridColumnHeader
+            column={header.column}
+            title="Due Date"
+            filter={<ColumnInputFilter column={header.column} />}
+          />
         ),
         cell: ({ getValue }) => {
           const val = getValue();
@@ -119,7 +126,11 @@ export default function TasksDataTable({ tasks, onTaskClick, onStatusUpdated }) 
       {
         accessorKey: "next_reminder",
         header: ({ header }) => (
-          <DataGridColumnHeader column={header.column} title="Next Reminder" filter={<ColumnInputFilter column={header.column} />}/>
+          <DataGridColumnHeader
+            column={header.column}
+            title="Next Reminder"
+            filter={<ColumnInputFilter column={header.column} />}
+          />
         ),
         cell: ({ getValue }) => {
           const val = getValue();
@@ -133,16 +144,14 @@ export default function TasksDataTable({ tasks, onTaskClick, onStatusUpdated }) 
         cell: ({ row }) => {
           const task = row.original;
           return (
-            <button
-              className="btn btn-sm btn-clear btn-light"
+            <Button
+              variant="view"
               onClick={() => {
                 onTaskClick(task.id);
               }}
             >
-              <span className="flex gap-1 items-center"><i className="ki-outline ki-notepad-edit"></i>
-              Edit</span>
-              
-            </button>
+              <span className="flex gap-1 items-center">View</span>
+            </Button>
           );
         },
       },

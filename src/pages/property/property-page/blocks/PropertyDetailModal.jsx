@@ -6,6 +6,7 @@ import TaskDetailModal from "@/pages/property/tasks/blocks/TaskDetailModal";
 import { useAuthContext } from "@/auth";
 import TasksDataTable from "../../tasks/blocks/TasksDataTable";
 import { useNavigate } from "react-router-dom";
+import { Button } from "../../../../components/ui/button";
 
 export default function PropertyDetailModal({ propertyId, onClose }) {
   const [loading, setLoading] = useState(false);
@@ -50,7 +51,9 @@ export default function PropertyDetailModal({ propertyId, onClose }) {
         setLoading(false);
       })
       .catch((err) => {
-        setError(err.response?.data?.message || "Failed to load property detail");
+        setError(
+          err.response?.data?.message || "Failed to load property detail"
+        );
         setLoading(false);
       });
   };
@@ -96,7 +99,7 @@ export default function PropertyDetailModal({ propertyId, onClose }) {
       state: {
         originalTask: {
           property_id: propertyId,
-        }, 
+        },
       },
     });
   };
@@ -188,17 +191,17 @@ export default function PropertyDetailModal({ propertyId, onClose }) {
             {/*</div>*/}
 
             <div className="flex justify-end mb-6">
-              <button
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                onClick={handleSave}
-              >
+              <Button variant="edit" onClick={handleSave}>
                 Save
-              </button>
+              </Button>
             </div>
 
             {/* 显示任务列表 */}
             {propertyDetail.tasks && propertyDetail.tasks.length > 0 ? (
-              <TasksDataTable tasks={propertyDetail.tasks} onTaskClick={handleTaskClick} />
+              <TasksDataTable
+                tasks={propertyDetail.tasks}
+                onTaskClick={handleTaskClick}
+              />
             ) : (
               <p>No tasks found for this property.</p>
             )}
@@ -218,18 +221,12 @@ export default function PropertyDetailModal({ propertyId, onClose }) {
 
         {/* Footer: Create Task & Delete Property */}
         <div className="flex justify-between items-center mt-4 pt-4 border-t">
-          <button
-            onClick={handleCreateTask}
-            className="px-4 py-2 bg-green-600 text-white rounded"
-          >
+          <Button onClick={handleCreateTask} variant="create">
             Create Task
-          </button>
-          <button
-            onClick={handleDeleteProperty}
-            className="px-4 py-2 bg-red-600 text-white rounded"
-          >
+          </Button>
+          <Button onClick={handleDeleteProperty} variant="delete">
             Delete Property
-          </button>
+          </Button>
         </div>
 
         {/* 简易 Create Task 弹窗 */}
@@ -279,7 +276,6 @@ export default function PropertyDetailModal({ propertyId, onClose }) {
             </div>
           </div>
         )} */}
-
       </div>
     </div>
   );

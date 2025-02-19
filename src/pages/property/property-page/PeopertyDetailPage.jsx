@@ -7,6 +7,7 @@ import PropertyDetailModal from "./blocks/PropertyDetailModal";
 import CreateTaskModal from "./blocks/CreateTaskModal";
 import TasksDataTable from "../tasks/blocks/TasksDataTable";
 import { useNavigate } from "react-router-dom";
+import { Button } from "../../../components/ui/button";
 
 export default function PropertyDetailPage() {
   const { id: propertyId } = useParams();
@@ -88,19 +89,19 @@ export default function PropertyDetailPage() {
             {property.agency_name || "N/A"}
           </p>
         </div>
-        <div className="mt-4 md:mt-0">
-          <button
-            className="btn btn-primary"
+        <div className="flex mt-4 md:mt-0 gap-2">
+          <Button
+            variant="edit"
             onClick={() => setShowEditModal(true)}
           >
             Edit
-          </button>
-          <button
-            className="btn btn-secondary"
+          </Button>
+          <Button
+            variant="create"
             onClick={() => setShowCreateTaskModal(true)}
           >
             Create Task
-          </button>
+          </Button>
         </div>
       </div>
 
