@@ -26,7 +26,7 @@ const Layout = () => {
         <div className="lg:rounded-xl lg:border lg:border-gray-200 lg:m-5 order-1 lg:order-2 bg-top xxl:bg-center xl:bg-cover bg-no-repeat branded-bg">
           <div className="flex flex-col p-8 lg:p-16 gap-4">
             <Link to="/">
-              <img src={toAbsoluteUrl('/media/app/mini-logo.svg')} className="h-[28px] max-w-none" alt="" />
+              <img src={toAbsoluteUrl('/media/app/RJL.png')} className="h-[28px] max-w-none" alt="" />
             </Link>
 
             <div className="flex flex-col gap-3">
