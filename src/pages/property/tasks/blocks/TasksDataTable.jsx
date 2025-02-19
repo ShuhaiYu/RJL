@@ -165,6 +165,7 @@ export default function TasksDataTable({
       data={tasks} // 这里传入的 tasks 就是你外部筛选后的数组
       serverSide={false} // 前端分页、排序
       rowSelection={false} // 不需要多选行
+      pagination={{ size: 100 }}
     />
   );
 }

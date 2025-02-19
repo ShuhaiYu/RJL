@@ -11,6 +11,7 @@ import {
 import { EditContactForm } from "./blocks/EditContactForm";
 import { Button } from "@/components/ui/button";
 import { DataGrid, DataGridColumnHeader } from "@/components/data-grid";
+import { Input } from "@/components/ui/input";
 
 export const ContactPage = () => {
   const { auth, baseApi } = useAuthContext();
@@ -37,26 +38,49 @@ export const ContactPage = () => {
     }
   }, [token]);
 
+  const ColumnInputFilter = ({ column }) => {
+    return (
+      <Input
+        placeholder="Filter..."
+        value={column.getFilterValue() ?? ""}
+        onChange={(event) => column.setFilterValue(event.target.value)}
+        className="h-9 w-full max-w-40"
+      />
+    );
+  };
+
   const columns = useMemo(() => {
     return [
       {
         accessorKey: "name",
         header: ({ header }) => (
-          <DataGridColumnHeader column={header.column} title="Name" />
+          <DataGridColumnHeader
+            column={header.column}
+            title="Name"
+            filter={<ColumnInputFilter column={header.column} />}
+          />
         ),
         enableSorting: true,
       },
       {
         accessorKey: "phone",
         header: ({ header }) => (
-          <DataGridColumnHeader column={header.column} title="Phone" />
+          <DataGridColumnHeader
+            column={header.column}
+            title="Phone"
+            filter={<ColumnInputFilter column={header.column} />}
+          />
         ),
         enableSorting: true,
       },
       {
         accessorKey: "email",
         header: ({ header }) => (
-          <DataGridColumnHeader column={header.column} title="Email" />
+          <DataGridColumnHeader
+            column={header.column}
+            title="Email"
+            filter={<ColumnInputFilter column={header.column} />}
+          />
         ),
         enableSorting: true,
       },
@@ -93,6 +117,7 @@ export const ContactPage = () => {
         columns={columns}
         serverSide={false} // 前端分页、排序
         rowSelection={false} // 不需要多选行
+        pagination={{ size: 100 }}
       />
 
       <Modal open={editModalOpen} onClose={() => setEditModalOpen(false)}>
