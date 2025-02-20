@@ -37,7 +37,7 @@ export const CreateContactPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${baseApi}/contacts/create`, formData, {
+      const response = await axios.post(`${baseApi}/contacts`, formData, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${auth?.accessToken}`,

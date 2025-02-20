@@ -105,7 +105,7 @@ export default function TaskDetailPage() {
         status: "undo",
       };
 
-      await axios.post(`${baseApi}/tasks/create`, newTaskPayload, {
+      await axios.post(`${baseApi}/tasks`, newTaskPayload, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

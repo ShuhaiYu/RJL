@@ -1,5 +1,5 @@
 // src/pages/blocks/EmailsDataTable.jsx
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 // 根据你的实际情况修改 DataGrid 导入路径
 import { DataGrid, DataGridColumnHeader } from "@/components/data-grid";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,8 @@ const handleViewEmail = (emailHtml) => {
 };
 
 export default function EmailsDataTable({ emails }) {
+  const [filteredCount, setFilteredCount] = useState(emails.length);
+
   const ColumnInputFilter = ({ column }) => {
     return (
       <Input
@@ -114,12 +116,18 @@ export default function EmailsDataTable({ emails }) {
   );
 
   return (
-    <DataGrid
-      columns={columns}
-      data={emails}
-      serverSide={false} // 前端分页、排序
-      rowSelection={false}
-      pagination={{ size: 100 }}
-    />
+    <div>
+      <p className="text-sm text-gray-500 mb-4">
+        Showing {filteredCount} of {emails.length} emails
+      </p>
+      <DataGrid
+        columns={columns}
+        data={emails}
+        serverSide={false} // 前端分页、排序
+        rowSelection={false}
+        pagination={{ size: 100 }}
+        onFilteredDataChange={(count) => setFilteredCount(count)}
+      />
+    </div>
   );
 }

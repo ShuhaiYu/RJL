@@ -1,12 +1,13 @@
 // src/pages/MyPropertiesDataTable.jsx
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 // 假设你有一个封装好的 DataGrid
 import { DataGrid, DataGridColumnHeader } from "@/components/data-grid";
 import { Button } from "../../../../components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export default function MyPropertiesDataTable({ properties, onEdit }) {
+  const [filteredCount, setFilteredCount] = useState(properties.length);
   const ColumnInputFilter = ({ column }) => {
     return (
       <Input
@@ -59,13 +60,21 @@ export default function MyPropertiesDataTable({ properties, onEdit }) {
   );
 
   return (
-    <DataGrid
+    <div>
+      <p className="text-sm text-gray-500 mb-4">
+        Showing {filteredCount} of {properties.length} properties
+      </p>
+      <DataGrid
       columns={columns}
       data={properties}
       serverSide={false} // 前端分页/排序
       rowSelection={false} // 不需要选择行
       // 其它 DataGrid 配置，如 toolbar, pagination, etc.
       pagination={{ size: 100 }}
+      onFilteredDataChange={(count) => setFilteredCount(count)}
+
     />
+    </div>
+    
   );
 }

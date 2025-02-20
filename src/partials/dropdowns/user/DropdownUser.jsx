@@ -27,7 +27,6 @@ const DropdownUser = ({
       themeMode: newThemeMode
     });
   };
-  console.log(currentUser);
   
   const buildHeader = () => {
     return <div className="flex items-center justify-between px-5 py-1.5 gap-1.5">

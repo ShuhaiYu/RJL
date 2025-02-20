@@ -68,7 +68,7 @@ export default function CreateAgency() {
 
     try {
       const { confirmPassword: _, ...payload } = form; // 去掉 confirmPassword
-      await axios.post(`${baseApi}/agencies/create`, payload, {
+      await axios.post(`${baseApi}/agencies`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
       toast.success("Agency created successfully");

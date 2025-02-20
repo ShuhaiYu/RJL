@@ -90,21 +90,23 @@ export default function PropertyDetailPage() {
           </p>
         </div>
         <div className="flex mt-4 md:mt-0 gap-2">
-          <Button
-            variant="edit"
-            onClick={() => setShowEditModal(true)}
-          >
+          <Button variant="edit" onClick={() => setShowEditModal(true)}>
             Edit
           </Button>
-          <Button
-            variant="create"
-            onClick={() => setShowCreateTaskModal(true)}
-          >
+          <Button variant="create" onClick={() => setShowCreateTaskModal(true)}>
             Create Task
           </Button>
           <Button
             variant="view"
-            onClick={() => (window.location.href = 'https://rjl.vercel.app/contacts/create')}
+            onClick={() =>
+              navigate(`/property/tasks/create`, {
+                state: {
+                  originalTask: {
+                    property_id: propertyId,
+                  },
+                },
+              })
+            }
           >
             Create Task
           </Button>

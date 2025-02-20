@@ -1,6 +1,6 @@
 // src/components/TasksDataTable.jsx
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 // 假设你的 DataGrid 封装在同目录下或其它位置，请根据实际情况修改导入
 import { DataGrid, DataGridColumnHeader } from "@/components/data-grid";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,8 @@ export default function TasksDataTable({
   onTaskClick,
   onStatusUpdated,
 }) {
+  const [filteredCount, setFilteredCount] = useState(tasks.length);
+
   const ColumnInputFilter = ({ column }) => {
     return (
       <Input
@@ -160,12 +162,19 @@ export default function TasksDataTable({
 
   // 渲染 DataGrid
   return (
-    <DataGrid
-      columns={columns}
-      data={tasks} // 这里传入的 tasks 就是你外部筛选后的数组
-      serverSide={false} // 前端分页、排序
-      rowSelection={false} // 不需要多选行
-      pagination={{ size: 100 }}
-    />
+    <div>
+      <p className="text-sm text-gray-500 mb-4">
+        Showing {filteredCount} of {tasks.length} tasks
+      </p>
+      <DataGrid
+        columns={columns}
+        data={tasks} // 这里传入的是所有任务数据
+        serverSide={false}
+        rowSelection={false}
+        pagination={{ size: 100 }}
+        // 将 onFilteredDataChange 回调传递给 DataGrid
+        onFilteredDataChange={(count) => setFilteredCount(count)}
+      />
+    </div>
   );
 }

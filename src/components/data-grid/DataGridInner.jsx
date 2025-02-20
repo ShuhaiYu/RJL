@@ -1,11 +1,21 @@
 import { cn } from '@/lib/utils';
 import { useDataGrid, DataGridLoader, DataGridTable, DataGridPagination } from '.';
+import { useEffect } from 'react';
+
 const DataGridInner = () => {
   const {
     props,
     table,
     loading
   } = useDataGrid();
+  useEffect(() => {
+    // 如果外部传入了 onFilteredDataChange 回调，则传递当前过滤后的行数
+    if (props.onFilteredDataChange) {
+      const filteredCount = table.getRowModel().rows.length;
+      props.onFilteredDataChange(filteredCount);
+    }
+  }, [table.getRowModel().rows.length, props]);
+
   return <div className={cn('grid', props.layout?.card && `
         card
         [&>[data-container]]:border-x-0

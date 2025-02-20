@@ -22,7 +22,7 @@ export default function CreatePropertyPage() {
     setLoading(true);
     try {
       const response = await axios.post(
-        `${baseApi}/properties/create`,
+        `${baseApi}/properties`,
         { address },
         { headers: { Authorization: `Bearer ${token}` } }
       );

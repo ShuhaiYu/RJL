@@ -92,7 +92,7 @@ export default function CreateTaskPage() {
       };
 
       const response = await axios.post(
-        `${baseApi}/tasks/create`,
+        `${baseApi}/tasks`,
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );

@@ -13,6 +13,21 @@ export const REFRESH_URL = `${API_URL}/refresh`;
 
 const AuthContext = createContext(null);
 
+// 用于处理刷新Token的队列和状态
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
 const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   // 从本地存储中获取已保存的 auth 信息
@@ -25,8 +40,6 @@ const AuthProvider = ({ children }) => {
    * @returns {Promise<Object>} - 返回用户信息对象
    */
   const getUser = async (token) => {
-
-
     try {
       const response = await axios.get(GET_USER_URL, {
         headers: {
@@ -44,18 +57,32 @@ const AuthProvider = ({ children }) => {
    * 验证当前是否有有效的 token，并获取用户信息
    */
   const verify = async () => {
-    if (auth && auth.accessToken) {
-      try {
-        const user = await getUser(auth.accessToken);
-        setCurrentUser(user);
-      } catch (error) {
-        console.error('verify error:', error);
-        // 出现错误时清除 auth 信息
-        saveAuth(undefined);
-        setCurrentUser(undefined);
-      }
+    if (!auth?.accessToken) {
+      setCurrentUser(undefined);
+      return;
+    }
+
+    try {
+      const user = await getUser(auth.accessToken);
+      setCurrentUser(user);
+    } catch (error) {
+      // if (error.response?.status === 401 && auth.refreshToken) {
+      //   try {
+      //     const newAuth = await refreshToken();
+      //     const user = await getUser(newAuth.accessToken);
+      //     setCurrentUser(user);
+      //   } catch (refreshError) {
+      //     console.error('Refresh failed:', refreshError);
+      //     logout();
+      //   }
+      // } else {
+      //   logout();
+      // }
+      console.log('verify error:', error);
+      logout();
     }
   };
+  
 
   /**
    * 保存 auth 信息到 state 及 localStorage（或其他存储方式）
@@ -145,65 +172,37 @@ const AuthProvider = ({ children }) => {
    * @returns {Promise<string>} - 返回新的 accessToken
    */
   const refreshToken = async () => {
+    if (isRefreshing) {
+      return new Promise((resolve, reject) => {
+        failedQueue.push({ resolve, reject });
+      });
+    }
+
+    isRefreshing = true;
     try {
-      // auth 中包含 refreshToken 字段
-      const { data } = await axios.post(REFRESH_URL, { refreshToken: auth.refreshToken }
-      )
-      // 更新 auth 信息（包括新的 accessToken 和 refreshToken）
-      saveAuth(data);
-      return data.accessToken;
+      const { data } = await axios.post(REFRESH_URL, { 
+        refreshToken: auth?.refreshToken 
+      });
+      
+      const newAuth = {
+        ...auth,
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken // 确保更新refreshToken
+      };
+      
+      saveAuth(newAuth);
+      processQueue(null, newAuth.accessToken);
+      return newAuth;
     } catch (error) {
+      processQueue(error, null);
       logout();
       throw error;
+    } finally {
+      isRefreshing = false;
     }
   };
 
-  /**
-   * Axios 拦截器：当遇到 401 错误时自动刷新 token 并重试原请求
-   */
-  useEffect(() => {
-    const interceptor = axios.interceptors.response.use(
-      (response) => response,
-      async (error) => {
-        const originalRequest = error.config;
-        if (error.response && error.response.status === 401 && !originalRequest._retry) {
-          originalRequest._retry = true;
-          try {
-            const newAccessToken = await refreshToken();
-            axios.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
-            originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
-            return axios(originalRequest);
-          } catch (err) {
-            return Promise.reject(err);
-          }
-        }
-        return Promise.reject(error);
-      }
-    );
-    // 在组件卸载或 auth 变化时移除拦截器，防止重复添加
-    return () => {
-      axios.interceptors.response.eject(interceptor);
-    };
-  }, [auth]);
-
-  // 计算基础 API 路径，根据 currentUser.role 返回一个 base URL 字符串
-  const baseApi = useMemo(() => {
-    if (currentUser && currentUser.role) {
-      switch (currentUser.role) {
-        case "superuser":
-          return `${import.meta.env.VITE_API_BASE_URL}/superuser`;
-        case "admin":
-          return `${import.meta.env.VITE_API_BASE_URL}/admin`;
-        case "agency-admin":
-          return `${import.meta.env.VITE_API_BASE_URL}/agency/admin`;
-        case "agency-user":
-          return `${import.meta.env.VITE_API_BASE_URL}/agency/user`;
-        default:
-          return `${import.meta.env.VITE_API_BASE_URL}`;
-      }
-    }
-    return `${import.meta.env.VITE_API_BASE_URL}`;
-  }, [currentUser]);
+  const baseApi = `${import.meta.env.VITE_API_BASE_URL}/api`;
 
   return (
     <AuthContext.Provider

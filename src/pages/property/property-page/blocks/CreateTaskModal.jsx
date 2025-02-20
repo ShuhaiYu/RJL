@@ -43,7 +43,7 @@ export default function CreateTaskModal({
         repeat_frequency: repeatFrequency,
       }
 
-      await axios.post(`${baseApi}/tasks/create`, payload, {
+      await axios.post(`${baseApi}/tasks`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       })
 

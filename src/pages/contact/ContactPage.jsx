@@ -21,6 +21,8 @@ export const ContactPage = () => {
   const [selectedContactId, setSelectedContactId] = useState(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
 
+  const [filteredCount, setFilteredCount] = useState(0);
+
   const fetchContacts = async () => {
     try {
       const response = await axios.get(`${baseApi}/contacts`, {
@@ -112,12 +114,18 @@ export const ContactPage = () => {
     <div style={{ height: 600, width: "100%", padding: 20 }}>
       <h1 className="text-3xl font-bold mb-6">Contacts</h1>
 
+      <p className="text-sm text-gray-500 mb-4">
+        Showing {filteredCount} of {contacts.length} contacts
+      </p>
+
       <DataGrid
         data={contacts}
         columns={columns}
         serverSide={false} // 前端分页、排序
         rowSelection={false} // 不需要多选行
         pagination={{ size: 100 }}
+        onFilteredDataChange={(count) => setFilteredCount(count)}
+
       />
 
       <Modal open={editModalOpen} onClose={() => setEditModalOpen(false)}>
