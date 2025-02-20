@@ -1,109 +1,173 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button, TextField, Box, Typography, MenuItem, CircularProgress } from '@mui/material';
-import axios from 'axios';
-import { useAuthContext } from '@/auth';
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Box, CircularProgress } from "@mui/material";
+import axios from "axios";
+import { useAuthContext } from "@/auth";
+import { Button } from '@/components/ui/button';
+import { toast } from "sonner";
 
 export const CreateContactPage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { auth, baseApi } = useAuthContext();
+  const token = auth?.accessToken;
+
+  // 如果从页面导航中传入了 propertyId，则预填充 formData.property_id
+  const propertyIdFromState = location.state?.propertyId;
+
   const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    property_id: '' // 修改字段名称
+    name: "",
+    phone: "",
+    email: "",
+    property_id: propertyIdFromState || "",
   });
   const [properties, setProperties] = useState([]);
   const [loadingProperties, setLoadingProperties] = useState(true);
-
-  const navigate = useNavigate();
-  const { auth, baseApi } = useAuthContext();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchProperties = async () => {
       try {
         const response = await axios.get(`${baseApi}/properties`, {
-          headers: { Authorization: `Bearer ${auth?.accessToken}` }
+          headers: { Authorization: `Bearer ${token}` },
         });
         setProperties(response.data);
-        setLoadingProperties(false);
       } catch (error) {
-        console.error('Error fetching properties:', error);
+        console.error("Error fetching properties:", error);
+      } finally {
         setLoadingProperties(false);
       }
     };
 
-    fetchProperties();
-  }, [auth, baseApi]);
+    if (token) {
+      fetchProperties();
+    }
+  }, [token, baseApi]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    if (
+      !formData.name ||
+      !formData.phone ||
+      !formData.email ||
+      !formData.property_id
+    ) {
+      toast.error("Please fill in all fields");
+      setLoading(false);
+      return;
+    }
+
     try {
-      const response = await axios.post(`${baseApi}/contacts`, formData, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${auth?.accessToken}`,
-        },
-      });
+      const response = await axios.post(
+        `${baseApi}/contacts`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       if (response.status === 201) {
-        navigate('/contacts');
+        navigate("/contacts");
       }
     } catch (error) {
-      console.error('Create failed:', error);
+      console.error("Create failed:", error);
     }
+    setLoading(false);
   };
 
   if (loadingProperties) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+      <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
         <CircularProgress />
       </Box>
     );
   }
 
   return (
-    <Box sx={{ maxWidth: 500, mx: 'auto', p: 3 }}>
-      <Typography variant="h6" gutterBottom>
-        Create Contact
-      </Typography>
-      <form onSubmit={handleSubmit}>
-        <TextField
-          fullWidth
-          label="Name"
-          margin="normal"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-        />
-        <TextField
-          fullWidth
-          label="Phone"
-          margin="normal"
-          value={formData.phone}
-          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-        />
-        <TextField
-          fullWidth
-          label="Email"
-          margin="normal"
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-        />
-        <TextField
-          select
-          fullWidth
-          label="Property"
-          margin="normal"
-          value={formData.property_id}
-          onChange={(e) => setFormData({ ...formData, property_id: e.target.value })}
-        >
-          {properties.map((property) => (
-            <MenuItem key={property.id} value={property.id}>
-              {property.address}
-            </MenuItem>
-          ))}
-        </TextField>
-        <Button type="submit" variant="contained" sx={{ mt: 2 }}>
-          Create
-        </Button>
-      </form>
-    </Box>
+    <div className="container mx-auto p-4 max-w-xl">
+      <div className="card-header py-5">
+        <h3 className="card-title text-xl font-bold">Create New Contact</h3>
+      </div>
+      <div className="card-body p-5">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label className="block mb-2 font-medium" htmlFor="name">
+              Name
+            </label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              className="input input-bordered w-full"
+              placeholder="Enter contact name"
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
+            />
+          </div>
+          <div>
+            <label className="block mb-2 font-medium" htmlFor="phone">
+              Phone
+            </label>
+            <input
+              type="text"
+              id="phone"
+              name="phone"
+              value={formData.phone}
+              className="input input-bordered w-full"
+              placeholder="Enter phone number"
+              onChange={(e) =>
+                setFormData({ ...formData, phone: e.target.value })
+              }
+            />
+          </div>
+          <div>
+            <label className="block mb-2 font-medium" htmlFor="email">
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              className="input input-bordered w-full"
+              placeholder="Enter email address"
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
+            />
+          </div>
+          <div>
+            <label className="block mb-2 font-medium" htmlFor="property_id">
+              Select Property
+            </label>
+            <select
+              id="property_id"
+              name="property_id"
+              value={formData.property_id}
+              disabled={!!propertyIdFromState}
+              className="select select-bordered w-full"
+              onChange={(e) =>
+                setFormData({ ...formData, property_id: e.target.value })
+              }
+            >
+              <option value="">-- Please choose --</option>
+              {properties.map((prop) => (
+                <option key={prop.id} value={prop.id}>
+                  {prop.address}
+                </option>
+              ))}
+            </select>
+          </div>
+          <Button type="submit" className="btn btn-primary">
+            {loading ? "Creating..." : "Create Contact"}
+          </Button>
+        </form>
+      </div>
+    </div>
   );
 };

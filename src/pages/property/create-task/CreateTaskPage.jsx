@@ -109,7 +109,7 @@ export default function CreateTaskPage() {
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 max-w-xl">
         <div className="card-header py-5">
           <h3 className="card-title text-xl font-bold">Create New Task</h3>
         </div>

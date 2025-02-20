@@ -6,6 +6,8 @@ import { toast } from "sonner";
 import { useAuthContext } from "@/auth";
 import TaskDetailModal from "../tasks/blocks/TaskDetailModal";
 import { Button } from "../../../components/ui/button";
+import ContactDataTable from "../../contact/blocks/ContactDataTable";
+import EmailsDataTable from "../../email/blocks/EmailsDataTable";
 
 export default function TaskDetailPage() {
   const navigate = useNavigate();
@@ -155,9 +157,7 @@ export default function TaskDetailPage() {
           </p>
           <p className="mt-1 text-gray-600">
             <span className="font-medium">Due Date: </span>
-            {task.due_date
-              ? new Date(task.due_date).toLocaleString()
-              : "N/A"}
+            {task.due_date ? new Date(task.due_date).toLocaleString() : "N/A"}
           </p>
           <p className="mt-1 text-gray-600">
             <span className="font-medium">Status: </span>
@@ -209,95 +209,26 @@ export default function TaskDetailPage() {
       </div>
 
       {/* 下方区域：Contacts DataTable */}
-      <div className="card card-grid min-w-full mb-6">
-        <div className="card-header py-5 flex items-center justify-between">
-          <h3 className="card-title text-xl font-bold">Contacts</h3>
+      <div className="mb-6">
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-bold mb-4">Contacts</h2>
+          <Button
+            variant="create"
+            className="mb-4"
+            onClick={() => navigate("/contacts/create", { state: { propertyId: task.property_id } })}
+          >
+            Add Contact
+          </Button>
         </div>
-        <div className="card-body">
-          <div className="scrollable-x-auto">
-            <table className="table table-auto table-border">
-              <thead>
-                <tr>
-                  <th className="w-[50px] text-center">ID</th>
-                  <th className="min-w-[150px]">Name</th>
-                  <th className="min-w-[150px]">Phone</th>
-                  <th className="min-w-[150px]">Email</th>
-                </tr>
-              </thead>
-              <tbody>
-                {task.contacts && task.contacts.length > 0 ? (
-                  task.contacts.map((contact) => (
-                    <tr key={contact.id} className="border-b hover:bg-gray-50">
-                      <td className="px-4 py-2 text-center">{contact.id}</td>
-                      <td className="px-4 py-2">{contact.name}</td>
-                      <td className="px-4 py-2">{contact.phone}</td>
-                      <td className="px-4 py-2">{contact.email}</td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td
-                      colSpan="4"
-                      className="px-4 py-2 text-center text-gray-500"
-                    >
-                      No contacts found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <ContactDataTable contacts={task.contacts} />
       </div>
 
       {/* 下方区域： Emails DataTable */}
-      <div className="card card-grid min-w-full mb-6">
-        <div className="card-header py-5 flex items-center justify-between">
-          <h3 className="card-title text-xl font-bold">Emails</h3>
+      <div className="mb-6">
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-bold mb-4">Emails</h2>
         </div>
-        <div className="card-body">
-          <div className="scrollable-x-auto">
-            <table className="table table-auto table-border">
-              <thead>
-                <tr>
-                  <th className="w-[50px] text-center">ID</th>
-                  <th className="min-w-[200px]">Subject</th>
-                  <th className="min-w-[150px]">Sender</th>
-                  <th className="w-[100px] text-center">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {task.emails && task.emails.length > 0 ? (
-                  task.emails.map((email) => (
-                    <tr key={email.id} className="border-b hover:bg-gray-50">
-                      <td className="px-4 py-2 text-center">{email.id}</td>
-                      <td className="px-4 py-2">{email.subject}</td>
-                      <td className="px-4 py-2">{email.sender}</td>
-                      <td className="px-4 py-2 text-center">
-                        <button
-                          className="btn btn-sm btn-icon btn-clear btn-light"
-                          onClick={() => handleOpenEmail(email.html)}
-                        >
-                          
-                          View
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td
-                      colSpan="4"
-                      className="px-4 py-2 text-center text-gray-500"
-                    >
-                      No emails found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <EmailsDataTable emails={task.emails} />
       </div>
 
       {/* 编辑弹窗：点击 Edit 按钮后打开 TaskDetailModal */}

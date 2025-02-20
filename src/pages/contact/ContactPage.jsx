@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuthContext } from "@/auth";
 import {
@@ -9,9 +9,7 @@ import {
   ModalContent,
 } from "@/components/modal";
 import { EditContactForm } from "./blocks/EditContactForm";
-import { Button } from "@/components/ui/button";
-import { DataGrid, DataGridColumnHeader } from "@/components/data-grid";
-import { Input } from "@/components/ui/input";
+import ContactDataTable from "./blocks/ContactDataTable";
 
 export const ContactPage = () => {
   const { auth, baseApi } = useAuthContext();
@@ -40,76 +38,6 @@ export const ContactPage = () => {
     }
   }, [token]);
 
-  const ColumnInputFilter = ({ column }) => {
-    return (
-      <Input
-        placeholder="Filter..."
-        value={column.getFilterValue() ?? ""}
-        onChange={(event) => column.setFilterValue(event.target.value)}
-        className="h-9 w-full max-w-40"
-      />
-    );
-  };
-
-  const columns = useMemo(() => {
-    return [
-      {
-        accessorKey: "name",
-        header: ({ header }) => (
-          <DataGridColumnHeader
-            column={header.column}
-            title="Name"
-            filter={<ColumnInputFilter column={header.column} />}
-          />
-        ),
-        enableSorting: true,
-      },
-      {
-        accessorKey: "phone",
-        header: ({ header }) => (
-          <DataGridColumnHeader
-            column={header.column}
-            title="Phone"
-            filter={<ColumnInputFilter column={header.column} />}
-          />
-        ),
-        enableSorting: true,
-      },
-      {
-        accessorKey: "email",
-        header: ({ header }) => (
-          <DataGridColumnHeader
-            column={header.column}
-            title="Email"
-            filter={<ColumnInputFilter column={header.column} />}
-          />
-        ),
-        enableSorting: true,
-      },
-      {
-        accessorKey: "id",
-        header: ({ header }) => (
-          <DataGridColumnHeader column={header.column} title="Action" />
-        ),
-        cell: ({ row }) => {
-          const contact = row.original;
-          return (
-            <Button
-              variant="edit"
-              size="sm"
-              onClick={() => {
-                setSelectedContactId(contact.id);
-                setEditModalOpen(true);
-              }}
-            >
-              Edit
-            </Button>
-          );
-        },
-      },
-    ];
-  }, []);
-
   return (
     <div style={{ height: 600, width: "100%", padding: 20 }}>
       <h1 className="text-3xl font-bold mb-6">Contacts</h1>
@@ -118,14 +46,13 @@ export const ContactPage = () => {
         Showing {filteredCount} of {contacts.length} contacts
       </p>
 
-      <DataGrid
-        data={contacts}
-        columns={columns}
-        serverSide={false} // 前端分页、排序
-        rowSelection={false} // 不需要多选行
-        pagination={{ size: 100 }}
+      <ContactDataTable
+        contacts={contacts}
+        onEdit={(id) => {
+          setSelectedContactId(id);
+          setEditModalOpen(true);
+        }}
         onFilteredDataChange={(count) => setFilteredCount(count)}
-
       />
 
       <Modal open={editModalOpen} onClose={() => setEditModalOpen(false)}>
