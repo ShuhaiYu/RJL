@@ -119,13 +119,15 @@ export const AllUsersPage = () => {
               >
                 Delete
               </Button>
-              <Button
-                className="btn btn-secondary"
-                size="sm"
-                onClick={() => navigate(`/users/${user.id}/permissions`)}
-              >
-                Permissions
-              </Button>
+              {user.id !== currentUser.id && (
+                <Button
+                  className="btn btn-secondary btn-sm"
+                  size="sm"
+                  onClick={() => navigate(`/users/${user.id}/permissions`)}
+                >
+                  Permissions
+                </Button>
+                )}
             </div>
           );
         },

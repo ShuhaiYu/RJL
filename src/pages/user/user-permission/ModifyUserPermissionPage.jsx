@@ -1,5 +1,3 @@
-'use client';
-
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
@@ -10,7 +8,6 @@ import { Checkbox } from "@/components/ui/checkbox"; // Using the provided Check
 
 // Define available permissions per scope
 const permissionOptions = {
-  user: ["create", "read", "update", "delete"],
   agency: ["create", "read", "update", "delete"],
   property: ["create", "read", "update", "delete"],
   task: ["create", "read", "update", "delete"],
@@ -19,8 +16,8 @@ const permissionOptions = {
 };
 
 export const ModifyUserPermissionPage = () => {
-  const { id } = useParams(); // Get user id from route parameters
-  const { auth, baseApi } = useAuthContext();
+  const { id } = useParams(); // Target user id to modify
+  const { auth, baseApi, currentUser } = useAuthContext();
   const token = auth?.accessToken;
   const navigate = useNavigate();
 
@@ -29,33 +26,13 @@ export const ModifyUserPermissionPage = () => {
   const [permissions, setPermissions] = useState({});
   const [loading, setLoading] = useState(false);
 
-  // currentUserRole is the role of the logged in user (who is modifying permissions)
-  const currentUserRole = auth?.role || "";
+  // Get current user's permission object (for all scopes)
+  const currentUserPermissions = currentUser?.permissions || {};
 
-  // Function to decide if a checkbox should be disabled based on current user's role
-  const getCheckboxDisabled = (scope, permission) => {
-    if (currentUserRole === "admin" || currentUserRole === "superuser") {
-      return false; // Full permissions
-    } else if (currentUserRole === "agency-admin") {
-      // Cannot Create or Delete for agency and role
-      if ((scope === "agency" || scope === "role") && (permission === "create" || permission === "delete")) {
-        return true;
-      }
-      return false;
-    } else if (currentUserRole === "agency-user") {
-      // Cannot modify any agency or role permissions, and cannot delete for user scope
-      if (scope === "agency" || scope === "role") {
-        return true;
-      }
-      if (scope === "user" && permission === "delete") {
-        return true;
-      }
-      return false;
-    }
-    return false;
-  };
+  // If a user is trying to edit their own permissions, disallow it.
+  const isEditingSelf = currentUser?.id === Number(id);  
 
-  // Fetch user details and permissions
+  // Fetch target user details and permissions
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -75,6 +52,16 @@ export const ModifyUserPermissionPage = () => {
     }
   }, [token, id, baseApi]);
 
+  // Determine if a checkbox for a given scope and permission should be disabled.
+  // The rule: the current user can only modify permissions within their own permission set.
+  const getCheckboxDisabled = (scope, permission) => {
+    // If editing self, all checkboxes are disabled.
+    if (isEditingSelf) return true;
+    // If current user does not have this permission under the given scope, then disable.
+    const allowed = currentUserPermissions[scope] || [];
+    return !allowed.includes(permission);
+  };
+
   const handleCheckboxChange = (scope, permission, checked) => {
     setPermissions((prev) => {
       const current = prev[scope] || [];
@@ -90,6 +77,10 @@ export const ModifyUserPermissionPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isEditingSelf) {
+      toast.error("You cannot modify your own permissions");
+      return;
+    }
     setLoading(true);
     try {
       // Assume the update API is PUT /users/:id/permissions with body { permissions }
@@ -119,6 +110,13 @@ export const ModifyUserPermissionPage = () => {
   return (
     <div className="container mx-auto p-6 max-w-3xl bg-white shadow rounded-md">
       <h1 className="text-3xl font-bold mb-6">Modify User Permissions</h1>
+      {isEditingSelf && (
+        <div className="mb-4 p-4 bg-gray-100 rounded">
+          <p className="text-red-600 font-semibold">
+            You are not allowed to modify your own permissions.
+          </p>
+        </div>
+      )}
       <div className="mb-6 border-b pb-4">
         <p>
           <strong>Name:</strong> {userData.name}
@@ -161,10 +159,14 @@ export const ModifyUserPermissionPage = () => {
           </div>
         ))}
         <div className="flex gap-4">
-          <Button variant="edit" type="submit" disabled={loading}>
+          <Button variant="edit" type="submit" disabled={loading || isEditingSelf}>
             {loading ? "Saving..." : "Save"}
           </Button>
-          <Button variant="default" type="button" onClick={() => navigate("/users")}>
+          <Button
+            variant="default"
+            type="button"
+            onClick={() => navigate("/users")}
+          >
             Cancel
           </Button>
         </div>
