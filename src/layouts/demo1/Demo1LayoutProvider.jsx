@@ -1,14 +1,14 @@
 /* eslint-disable no-unused-vars */
-import { createContext, useContext, useEffect, useState } from 'react';
-import { useLocation } from 'react-router';
-import { useMenuChildren } from '@/components/menu';
-import { MENU_SIDEBAR } from '@/config/menu.config';
-import { useScrollPosition } from '@/hooks/useScrollPosition';
-import { useMenus } from '@/providers';
-import { useLayout } from '@/providers';
-import { deepMerge } from '@/utils';
-import { demo1LayoutConfig } from './';
-import { AuthContext } from '@/auth/providers/JWTProvider';
+import { createContext, useContext, useEffect, useState } from "react";
+import { useLocation } from "react-router";
+import { useMenuChildren } from "@/components/menu";
+import { MENU_SIDEBAR } from "@/config/menu.config";
+import { useScrollPosition } from "@/hooks/useScrollPosition";
+import { useMenus } from "@/providers";
+import { useLayout } from "@/providers";
+import { deepMerge } from "@/utils";
+import { demo1LayoutConfig } from "./";
+import { AuthContext } from "@/auth/providers/JWTProvider";
 
 // 判断用户是否有权限
 const hasPermission = (userPermissions, menuPermissions) => {
@@ -36,24 +36,24 @@ const initalLayoutProps = {
   // Mobile mega menu is closed by default
   sidebarMouseLeave: false,
   // Sidebar mouse leave is false initially
-  setSidebarMouseLeave: state => {
+  setSidebarMouseLeave: (state) => {
     console.log(`${state}`);
   },
-  setMobileMegaMenuOpen: open => {
+  setMobileMegaMenuOpen: (open) => {
     console.log(`${open}`);
   },
-  setMobileSidebarOpen: open => {
+  setMobileSidebarOpen: (open) => {
     console.log(`${open}`);
   },
-  setMegaMenuEnabled: enabled => {
+  setMegaMenuEnabled: (enabled) => {
     console.log(`${enabled}`);
   },
-  setSidebarCollapse: collapse => {
+  setSidebarCollapse: (collapse) => {
     console.log(`${collapse}`);
   },
-  setSidebarTheme: mode => {
+  setSidebarTheme: (mode) => {
     console.log(`${mode}`);
-  }
+  },
 };
 
 // Creating context for the layout provider with initial properties
@@ -74,40 +74,38 @@ const Demo1LayoutProvider = ({ children }) => {
     if (loading || !currentUser) return; // **如果还在加载，先不更新菜单**
 
     const userPermissions = currentUser.permissions || {};
-    console.log('userPermissions:', userPermissions);
-    
 
     // **2. 过滤菜单**
-    const filteredMenu = MENU_SIDEBAR
-  .map((item) => {
-    // 如果存在 children，则先对子菜单项进行过滤
-    if (item.children && Array.isArray(item.children)) {
-      const filteredChildren = item.children.filter((child) =>
-        child.permissions ? hasPermission(userPermissions, child.permissions) : true
-      );
-      return { ...item, children: filteredChildren };
-    }
-    return item;
-  })
-  .filter((item) => {
-    // 如果当前菜单项本身有权限限制，则检查是否符合要求
-    if (item.permissions) {
-      return hasPermission(userPermissions, item.permissions);
-    }
-    // 如果存在 children，则只有子菜单有内容时才保留
-    if (item.children) {
-      return item.children.length > 0;
-    }
-    // 没有权限限制的项默认保留（例如仅为 heading 的菜单项）
-    return true;
-  });
+    const filteredMenu = MENU_SIDEBAR.map((item) => {
+      // 如果存在 children，则先对子菜单项进行过滤
+      if (item.children && Array.isArray(item.children)) {
+        const filteredChildren = item.children.filter((child) =>
+          child.permissions
+            ? hasPermission(userPermissions, child.permissions)
+            : true
+        );
+        return { ...item, children: filteredChildren };
+      }
+      return item;
+    }).filter((item) => {
+      // 如果当前菜单项本身有权限限制，则检查是否符合要求
+      if (item.permissions) {
+        return hasPermission(userPermissions, item.permissions);
+      }
+      // 如果存在 children，则只有子菜单有内容时才保留
+      if (item.children) {
+        return item.children.length > 0;
+      }
+      // 没有权限限制的项默认保留（例如仅为 heading 的菜单项）
+      return true;
+    });
 
     // **3. 处理 secondaryMenu**
     const secondaryMenu = useMenuChildren(pathname, filteredMenu, 0);
 
     // **4. 更新菜单**
-    setMenuConfig('primary', filteredMenu);
-    setMenuConfig('secondary', secondaryMenu);
+    setMenuConfig("primary", filteredMenu);
+    setMenuConfig("secondary", secondaryMenu);
   }, [currentUser, loading, pathname]);
 
   // 获取 Layout 配置
@@ -134,45 +132,47 @@ const Demo1LayoutProvider = ({ children }) => {
   const headerSticky = scrollPosition > 0; // Makes the header sticky based on scroll
 
   // Function to collapse or expand the sidebar
-  const setSidebarCollapse = collapse => {
+  const setSidebarCollapse = (collapse) => {
     const updatedLayout = {
       options: {
         sidebar: {
-          collapse
-        }
-      }
+          collapse,
+        },
+      },
     };
     updateLayout(demo1LayoutConfig.name, updatedLayout); // Updates the layout with the collapsed state
     setLayout(getLayoutConfig()); // Refreshes the layout configuration
   };
 
   // Function to set the sidebar theme (e.g., light or dark)
-  const setSidebarTheme = mode => {
+  const setSidebarTheme = (mode) => {
     const updatedLayout = {
       options: {
         sidebar: {
-          theme: mode
-        }
-      }
+          theme: mode,
+        },
+      },
     };
     setLayout(deepMerge(layout, updatedLayout)); // Merges and sets the updated layout
   };
   return (
     // Provides the layout configuration and controls via context to the application
-    <Demo1LayoutContext.Provider value={{
-      layout,
-      headerSticky,
-      mobileSidebarOpen,
-      mobileMegaMenuOpen,
-      megaMenuEnabled,
-      sidebarMouseLeave,
-      setMobileSidebarOpen,
-      setMegaMenuEnabled,
-      setSidebarMouseLeave,
-      setMobileMegaMenuOpen,
-      setSidebarCollapse,
-      setSidebarTheme
-    }}>
+    <Demo1LayoutContext.Provider
+      value={{
+        layout,
+        headerSticky,
+        mobileSidebarOpen,
+        mobileMegaMenuOpen,
+        megaMenuEnabled,
+        sidebarMouseLeave,
+        setMobileSidebarOpen,
+        setMegaMenuEnabled,
+        setSidebarMouseLeave,
+        setMobileMegaMenuOpen,
+        setSidebarCollapse,
+        setSidebarTheme,
+      }}
+    >
       {children}
     </Demo1LayoutContext.Provider>
   );

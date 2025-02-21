@@ -10,7 +10,7 @@ const SidebarHeader = React.forwardRef((props, ref) => {
   const { currentUser } = useAuthContext();
   const logoUrl =
     currentUser &&
-    currentUser.agency.logo
+    currentUser.agency?.logo
       ? currentUser.agency.logo
       : toAbsoluteUrl("/media/app/RJL.png");
 

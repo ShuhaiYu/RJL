@@ -10,7 +10,7 @@ const Layout = () => {
   const { currentUser } = useAuthContext();
   const logoUrl =
     currentUser &&
-    currentUser.agency.logo
+    currentUser.agency?.logo
       ? currentUser.agency.logo
       : toAbsoluteUrl("/media/app/RJL.png");
 
