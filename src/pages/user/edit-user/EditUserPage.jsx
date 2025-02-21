@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
@@ -7,9 +9,15 @@ import { toast } from "sonner";
 
 export const EditUserPage = () => {
   const { id } = useParams(); // User ID to edit
-  const { auth, baseApi } = useAuthContext();
+  const { auth, baseApi, currentUser } = useAuthContext();
   const token = auth?.accessToken;
   const navigate = useNavigate();
+
+  // Extract current user's permissions from auth context.
+  // We assume permissions are stored in an object with a "user" key for user operations.
+  const userPermissions = currentUser?.permissions || {};
+  const hasUpdatePermission = userPermissions.user?.includes("update");
+  const hasDeletePermission = userPermissions.user?.includes("delete");
 
   // State to hold user data
   const [userData, setUserData] = useState({
@@ -57,6 +65,10 @@ export const EditUserPage = () => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!hasUpdatePermission) {
+      toast.error("You do not have permission to update this user");
+      return;
+    }
     setSaving(true);
     try {
       const response = await axios.put(`${baseApi}/users/${id}`, userData, {
@@ -77,11 +89,13 @@ export const EditUserPage = () => {
   };
 
   const handleDelete = async () => {
+    if (!hasDeletePermission) {
+      toast.error("You do not have permission to delete this user");
+      return;
+    }
     try {
       const response = await axios.delete(`${baseApi}/users/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       if (response.status === 204) {
         toast.success("User deleted successfully");
@@ -111,6 +125,7 @@ export const EditUserPage = () => {
             name="name"
             value={userData.name}
             onChange={handleChange}
+            disabled={!hasUpdatePermission}
             className="input input-bordered w-full"
             placeholder="Enter name"
           />
@@ -125,13 +140,18 @@ export const EditUserPage = () => {
             name="email"
             value={userData.email}
             onChange={handleChange}
+            disabled={!hasUpdatePermission}
             className="input input-bordered w-full"
             placeholder="Enter email address"
           />
         </div>
         <div className="flex justify-between items-center">
           <div className="flex gap-4">
-            <Button variant="edit" type="submit" disabled={saving}>
+            <Button
+              variant="edit"
+              type="submit"
+              disabled={saving || !hasUpdatePermission}
+            >
               {saving ? "Saving..." : "Save"}
             </Button>
             <Button
@@ -145,6 +165,7 @@ export const EditUserPage = () => {
           <Button
             variant="delete"
             type="button"
+            disabled={!hasDeletePermission}
             onClick={handleDelete}
           >
             Delete User

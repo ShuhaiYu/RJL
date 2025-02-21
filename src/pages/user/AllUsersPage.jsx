@@ -8,12 +8,14 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
 export const AllUsersPage = () => {
-  const { auth, baseApi } = useAuthContext();
+  const { auth, baseApi, currentUser } = useAuthContext();
   const token = auth?.accessToken;
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
-  
+
+  const canUpdateUser = currentUser?.permissions?.user?.includes("update");
+
   const fetchUsers = async () => {
     try {
       setLoading(true);
@@ -28,7 +30,7 @@ export const AllUsersPage = () => {
       setLoading(false);
     }
   };
-  
+
   useEffect(() => {
     if (token) {
       fetchUsers();
@@ -45,92 +47,101 @@ export const AllUsersPage = () => {
     />
   );
 
-  const columns = useMemo(() => [
-    {
-      accessorKey: "name",
-      header: ({ header }) => (
-        <DataGridColumnHeader
-          column={header.column}
-          title="Name"
-          filter={<ColumnInputFilter column={header.column} />}
-        />
-      ),
-      enableSorting: true,
-    },
-    {
-      accessorKey: "email",
-      header: ({ header }) => (
-        <DataGridColumnHeader
-          column={header.column}
-          title="Email"
-          filter={<ColumnInputFilter column={header.column} />}
-        />
-      ),
-      enableSorting: true,
-    },
-    {
-      accessorKey: "role",
-      header: ({ header }) => (
-        <DataGridColumnHeader
-          column={header.column}
-          title="Role"
-          filter={<ColumnInputFilter column={header.column} />}
-        />
-      ),
-      enableSorting: true,
-    },
-    {
-      id: "actions",
-      header: "Actions",
-      cell: ({ row }) => {
-        const user = row.original;
-        return (
-          <div className="flex gap-2">
-            <Button
-              variant="edit"
-              size="sm"
-              onClick={() => navigate(`/users/${user.id}/edit`)}
-            >
-              Edit
-            </Button>
-            <Button
-              variant="delete"
-              size="sm"
-              onClick={async () => {
-                if(window.confirm("Are you sure you want to delete this user?")){
-                  try{
-                    await axios.delete(`${baseApi}/users/${user.id}`, {
-                      headers: { Authorization: `Bearer ${token}` },
-                    });
-                    toast.success("User deleted successfully");
-                    fetchUsers();
-                  } catch(error){
-                    console.error("Delete user error:", error);
-                    toast.error("Failed to delete user");
-                  }
-                }
-              }}
-            >
-              Delete
-            </Button>
-            <Button
-              className='btn btn-secondary'
-              size="sm"
-              onClick={() => navigate(`/users/${user.id}/permissions`)}
-            >
-              Permissions
-            </Button>
-          </div>
-        );
+  const columns = useMemo(
+    () => [
+      {
+        accessorKey: "name",
+        header: ({ header }) => (
+          <DataGridColumnHeader
+            column={header.column}
+            title="Name"
+            filter={<ColumnInputFilter column={header.column} />}
+          />
+        ),
+        enableSorting: true,
       },
-    },
-  ], [navigate, token, baseApi]);
+      {
+        accessorKey: "email",
+        header: ({ header }) => (
+          <DataGridColumnHeader
+            column={header.column}
+            title="Email"
+            filter={<ColumnInputFilter column={header.column} />}
+          />
+        ),
+        enableSorting: true,
+      },
+      {
+        accessorKey: "role",
+        header: ({ header }) => (
+          <DataGridColumnHeader
+            column={header.column}
+            title="Role"
+            filter={<ColumnInputFilter column={header.column} />}
+          />
+        ),
+        enableSorting: true,
+      },
+      {
+        id: "actions",
+        header: "Actions",
+        cell: ({ row }) => {
+          const user = row.original;
+          return (
+            <div className="flex gap-2">
+              <Button
+                variant="edit"
+                size="sm"
+                onClick={() => navigate(`/users/${user.id}/edit`)}
+              >
+                {canUpdateUser ? "Edit" : "View"}
+              </Button>
+              <Button
+                variant="delete"
+                size="sm"
+                disabled={!canUpdateUser}
+                onClick={async () => {
+                  if (
+                    window.confirm("Are you sure you want to delete this user?")
+                  ) {
+                    try {
+                      await axios.delete(`${baseApi}/users/${user.id}`, {
+                        headers: { Authorization: `Bearer ${token}` },
+                      });
+                      toast.success("User deleted successfully");
+                      fetchUsers();
+                    } catch (error) {
+                      console.error("Delete user error:", error);
+                      toast.error("Failed to delete user");
+                    }
+                  }
+                }}
+              >
+                Delete
+              </Button>
+              <Button
+                className="btn btn-secondary"
+                size="sm"
+                onClick={() => navigate(`/users/${user.id}/permissions`)}
+              >
+                Permissions
+              </Button>
+            </div>
+          );
+        },
+      },
+    ],
+    [navigate, token, baseApi]
+  );
 
   return (
     <div className="p-4">
       <h1 className="text-3xl font-bold mb-6">User Management</h1>
       <div className="mb-4 flex justify-end">
-        <Button variant="create" onClick={() => navigate("/public-profile/profiles/create")}>
+        <Button
+          variant="create"
+          onClick={() => navigate("/public-profile/profiles/create")}
+        >
           Create User
         </Button>
       </div>
