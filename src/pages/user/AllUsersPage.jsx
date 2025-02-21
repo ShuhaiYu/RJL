@@ -16,6 +16,9 @@ export const AllUsersPage = () => {
 
   const canUpdateUser = currentUser?.permissions?.user?.includes("update");
 
+  const [filteredCount, setFilteredCount] = useState(0);
+
+
   const fetchUsers = async () => {
     try {
       setLoading(true);
@@ -23,6 +26,7 @@ export const AllUsersPage = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUsers(response.data);
+      setFilteredCount(response.data.length);
     } catch (error) {
       console.error("Error fetching users:", error);
       toast.error("Failed to fetch users");
@@ -138,7 +142,7 @@ export const AllUsersPage = () => {
 
   return (
     <div className="p-4">
-      <h1 className="text-3xl font-bold mb-6">User Management</h1>
+      <h1 className="text-3xl font-bold mb-6">Users</h1>
       <div className="mb-4 flex justify-end">
         <Button
           variant="create"
@@ -148,12 +152,16 @@ export const AllUsersPage = () => {
         </Button>
       </div>
       <div className="mb-6">
+      <p className="text-sm text-gray-500 mb-4">
+        Showing {filteredCount} of {users.length} properties
+      </p>
         <DataGrid
           data={users}
           columns={columns}
           serverSide={false}
           rowSelection={false}
           pagination={{ size: 100 }}
+          onFilteredDataChange={(count) => setFilteredCount(count)}
         />
       </div>
       {loading && <div>Loading...</div>}

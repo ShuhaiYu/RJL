@@ -60,7 +60,7 @@ const DataGridPagination = () => {
     }
     return null;
   };
-  return <div className="flex flex-col md:flex-row justify-between items-center gap-5 md:gap-4" data-pagination>
+  return <div className="flex flex-col md:flex-row justify-between items-center gap-5 md:gap-4 mt-4" data-pagination>
       <div className="flex items-center space-x-2 order-2 md:order-1 pb-2 md:pb-0">
         <div className="text-sm text-muted-foreground">Rows per page</div>
         <Select value={`${table.getState().pagination.pageSize}`} onValueChange={value => {

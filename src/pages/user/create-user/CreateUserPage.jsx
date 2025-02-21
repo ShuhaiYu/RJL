@@ -224,7 +224,7 @@ export default function CreateUserPage() {
     }
 
     try {
-      const response = await axios.post(`${baseApi}/users`, payload, {
+      await axios.post(`${baseApi}/users`, payload, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,

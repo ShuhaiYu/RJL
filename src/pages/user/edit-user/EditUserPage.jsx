@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -112,7 +112,15 @@ export const EditUserPage = () => {
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-2xl bg-white shadow rounded-md">
+    <div className="container mx-auto p-6 max-w-2xl ">
+      {/* Back button */}
+      <button
+        className="btn btn-secondary mb-6"
+        onClick={() => navigate("/users")}
+      >
+        Back <i className="ki-filled ki-arrow-left"></i>
+      </button>
+      <div className="mx-auto p-6 max-w-2xl bg-white shadow rounded-md">
       <h1 className="text-3xl font-bold mb-6">Edit User</h1>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
@@ -154,13 +162,6 @@ export const EditUserPage = () => {
             >
               {saving ? "Saving..." : "Save"}
             </Button>
-            <Button
-              variant="default"
-              type="button"
-              onClick={() => navigate("/users")}
-            >
-              Cancel
-            </Button>
           </div>
           <Button
             variant="delete"
@@ -172,6 +173,7 @@ export const EditUserPage = () => {
           </Button>
         </div>
       </form>
+      </div>
     </div>
   );
 };

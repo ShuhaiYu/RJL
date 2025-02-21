@@ -1,19 +1,28 @@
-import { Link, Outlet } from 'react-router-dom';
-import { Fragment } from 'react';
-import { toAbsoluteUrl } from '@/utils';
-import useBodyClasses from '@/hooks/useBodyClasses';
-import { AuthBrandedLayoutProvider } from './AuthBrandedLayoutProvider';
+import { Fragment } from "react";
+import { Link, Outlet } from "react-router-dom";
+import { useAuthContext } from '@/auth';
+import { toAbsoluteUrl } from "@/utils";
+import useBodyClasses from "@/hooks/useBodyClasses";
+import { AuthBrandedLayoutProvider } from "./AuthBrandedLayoutProvider";
+
 const Layout = () => {
-  // Applying body classes to manage the background color in dark mode
-  useBodyClasses('dark:bg-coal-500');
-  return <Fragment>
+  useBodyClasses("dark:bg-coal-500");
+  const { currentUser } = useAuthContext();
+  const logoUrl =
+    currentUser &&
+    currentUser.agency.logo
+      ? currentUser.agency.logo
+      : toAbsoluteUrl("/media/app/RJL.png");
+
+  return (
+    <Fragment>
       <style>
         {`
           .branded-bg {
-            background-image: url('${toAbsoluteUrl('/media/images/2600x1600/1.png')}');
+            background-image: url('${toAbsoluteUrl("/media/images/2600x1600/1.png")}');
           }
           .dark .branded-bg {
-            background-image: url('${toAbsoluteUrl('/media/images/2600x1600/1-dark.png')}');
+            background-image: url('${toAbsoluteUrl("/media/images/2600x1600/1-dark.png")}');
           }
         `}
       </style>
@@ -26,7 +35,7 @@ const Layout = () => {
         <div className="lg:rounded-xl lg:border lg:border-gray-200 lg:m-5 order-1 lg:order-2 bg-top xxl:bg-center xl:bg-cover bg-no-repeat branded-bg">
           <div className="flex flex-col p-8 lg:p-16 gap-4">
             <Link to="/">
-              <img src={toAbsoluteUrl('/media/app/RJL.png')} className="h-[28px] max-w-none" alt="" />
+              <img src={logoUrl} className="h-[28px] max-w-none" alt="logo" />
             </Link>
 
             <div className="flex flex-col gap-3">
@@ -42,11 +51,13 @@ const Layout = () => {
           </div>
         </div>
       </div>
-    </Fragment>;
+    </Fragment>
+  );
 };
 
-// AuthBrandedLayout component that wraps the Layout component with AuthBrandedLayoutProvider
-const AuthBrandedLayout = () => <AuthBrandedLayoutProvider>
+const AuthBrandedLayout = () => (
+  <AuthBrandedLayoutProvider>
     <Layout />
-  </AuthBrandedLayoutProvider>;
+  </AuthBrandedLayoutProvider>
+);
 export { AuthBrandedLayout };
