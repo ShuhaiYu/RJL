@@ -13,6 +13,11 @@ export const MENU_SIDEBAR = [
     path: "/public-profile/profiles/crm",
   },
   {
+    title: "Users",
+    icon: "profile-circle",
+    path: "/users",
+  },
+  {
     title: "Create Agency",
     icon: "users",
     path: "/agencies/create-agency",

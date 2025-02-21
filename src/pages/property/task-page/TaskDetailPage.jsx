@@ -41,13 +41,6 @@ export default function TaskDetailPage() {
     fetchTaskDetail();
   }, [taskId, token]);
 
-  // 在新窗口打开邮件的 HTML 内容
-  const handleOpenEmail = (emailHtml) => {
-    const newWindow = window.open("", "_blank");
-    newWindow.document.write(emailHtml);
-    newWindow.document.close();
-  };
-
   const handleCopyTask = () => {
     navigate("/property/tasks/create", { state: { originalTask: task } });
   };
