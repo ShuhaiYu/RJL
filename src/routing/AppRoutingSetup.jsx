@@ -24,6 +24,7 @@ import { ContactPage } from "../pages/contact/ContactPage";
 import { CreateContactPage } from "../pages/contact/CreateContactPage";
 import { AllUsersPage } from "../pages/user/AllUsersPage";
 import { ModifyUserPermissionPage } from "../pages/user/user-permission/ModifyUserPermissionPage";
+import { EditUserPage } from "../pages/user/edit-user/EditUserPage";
 
 const AppRoutingSetup = () => {
   return (
@@ -42,6 +43,7 @@ const AppRoutingSetup = () => {
           />
           <Route path="/users" element={<AllUsersPage />} />
           <Route path="/users/:id/permissions" element={<ModifyUserPermissionPage />} />
+          <Route path="/users/:id/edit" element={<EditUserPage />} />
 
           <Route path="/agencies/my-agencies" element={<AgenciesList />} />
           <Route path="/agencies/create-agency" element={<CreateAgency />} />

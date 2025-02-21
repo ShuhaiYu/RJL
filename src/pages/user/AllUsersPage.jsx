@@ -86,7 +86,7 @@ export const AllUsersPage = () => {
         const user = row.original;
         return (
           <div className="flex gap-2">
-            {/* <Button
+            <Button
               variant="edit"
               size="sm"
               onClick={() => navigate(`/users/${user.id}/edit`)}
@@ -112,7 +112,7 @@ export const AllUsersPage = () => {
               }}
             >
               Delete
-            </Button> */}
+            </Button>
             <Button
               className='btn btn-secondary'
               size="sm"
