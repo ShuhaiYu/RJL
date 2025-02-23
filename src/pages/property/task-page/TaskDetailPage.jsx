@@ -21,6 +21,13 @@ export default function TaskDetailPage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [processingMarkAsDone, setProcessingMarkAsDone] = useState(false);
 
+  // ========== 文件相关状态 ==========
+  const [taskFiles, setTaskFiles] = useState([]); // 文件列表
+  const [selectedFile, setSelectedFile] = useState(null); // 当前选择的文件
+  const [fileDesc, setFileDesc] = useState(""); // 文件描述
+  const [uploading, setUploading] = useState(false);
+  const [fileInputKey, setFileInputKey] = useState(Date.now());
+
   // 获取任务详情（包括 contacts 和 emails）
   const fetchTaskDetail = async () => {
     if (!taskId || !token) return;
@@ -37,17 +44,37 @@ export default function TaskDetailPage() {
     }
   };
 
+  /**
+   * 获取当前任务的所有文件
+   */
+  const fetchTaskFiles = async () => {
+    if (!taskId || !token) return;
+    try {
+      const res = await axios.get(`${baseApi}/tasks/${taskId}/files`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setTaskFiles(res.data);
+    } catch (err) {
+      console.error("Failed to fetch task files", err);
+      toast.error("Failed to load files");
+    }
+  };
+
   useEffect(() => {
     fetchTaskDetail();
+    fetchTaskFiles();
   }, [taskId, token]);
 
+  /**
+   * 复制当前任务
+   */
   const handleCopyTask = () => {
     navigate("/property/tasks/create", { state: { originalTask: task } });
   };
 
-  // 点击按钮后将当前任务标记为 DONE，
-  // 若任务 repeat_frequency 不为 "none"，则创建一个新的 undo 任务
-  // 新任务名称格式为：repeat task {number} - old task name
+  /**
+   * 标记任务为 done，如有重复频率则创建下一条任务
+   */
   const handleMarkAsDone = async () => {
     if (!task) return;
     setProcessingMarkAsDone(true);
@@ -111,6 +138,85 @@ export default function TaskDetailPage() {
       toast.error("Failed to complete task");
     } finally {
       setProcessingMarkAsDone(false);
+    }
+  };
+
+  /**
+   * 文件选择
+   */
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setSelectedFile(e.target.files[0]);
+    }
+  };
+
+  /**
+   * 上传文件
+   */
+  const handleUploadFile = async () => {
+    if (!selectedFile) {
+      toast.error("Please select a file to upload");
+      return;
+    }
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+      formData.append("desc", fileDesc);
+
+      await axios.post(`${baseApi}/tasks/${taskId}/files`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      toast.success("File uploaded successfully!");
+      setSelectedFile(null);
+      setFileDesc("");
+      // 切换 key，迫使 input 重新渲染
+      setFileInputKey(Date.now());
+      fetchTaskFiles();
+    } catch (err) {
+      toast.error("File upload failed");
+      console.error(err);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  /**
+   * 删除文件
+   */
+  const handleDeleteFile = async (fileId) => {
+    if (!window.confirm("Are you sure to delete this file?")) return;
+    try {
+      await axios.delete(`${baseApi}/tasks/${taskId}/files/${fileId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      toast.success("File deleted successfully");
+      fetchTaskFiles();
+    } catch (err) {
+      toast.error("File deletion failed");
+      console.error(err);
+    }
+  };
+
+  /**
+   * 打开文件（通过后端获取预签名URL）
+   */
+  const handleOpenFile = async (fileId) => {
+    try {
+      const response = await axios.get(
+        `${baseApi}/tasks/${taskId}/files/${fileId}/download`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const signedUrl = response.data.url;
+      window.open(signedUrl, "_blank");
+      // location.href = signedUrl;
+    } catch (error) {
+      console.error("Failed to get pre-signed URL:", error);
+      toast.error("Unable to open file");
     }
   };
 
@@ -201,14 +307,80 @@ export default function TaskDetailPage() {
         </div>
       </div>
 
+      {/* 这里展示文件列表以及上传输入 */}
+      <div className="bg-white p-6 shadow rounded mb-6">
+        <h2 className="text-xl font-bold mb-4">Task Files</h2>
+
+        {/* 上传区域 */}
+        <div className="flex flex-col md:flex-row items-center gap-2 mb-4">
+          <input
+            key={fileInputKey}
+            className="file-input file-input-bordered file-input-primary"
+            type="file"
+            onChange={handleFileChange}
+            accept="image/*,application/pdf"
+          />
+          <input
+            type="text"
+            placeholder="File Description (Optional)"
+            className="input input-bordered w-full max-w-xs"
+            value={fileDesc}
+            onChange={(e) => setFileDesc(e.target.value)}
+          />
+          <button
+            className="btn btn-primary"
+            onClick={handleUploadFile}
+            disabled={uploading}
+          >
+            {uploading ? "Uploading..." : "Upload"}
+          </button>
+        </div>
+
+        {/* 文件列表 */}
+        {taskFiles.length === 0 ? (
+          <p className="text-gray-500">No Related Files</p>
+        ) : (
+          <ul className="divide-y">
+            {taskFiles.map((f) => (
+              <li key={f.id} className="py-2 flex items-center justify-between">
+                <div>
+                  <p className="font-semibold">{f.file_name}</p>
+                  {f.file_desc && (
+                    <p className="text-sm text-gray-600">{f.file_desc}</p>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    className="btn btn-sm btn-light"
+                    onClick={() => handleOpenFile(f.id)}
+                  >
+                    Open
+                  </button>
+                  <button
+                    className="btn btn-sm btn-danger"
+                    onClick={() => handleDeleteFile(f.id)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
       {/* 下方区域：Contacts DataTable */}
-      <div className="mb-6">
+      <div className="bg-white p-6 shadow rounded mb-6">
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-bold mb-4">Contacts</h2>
           <Button
             variant="create"
             className="mb-4"
-            onClick={() => navigate("/contacts/create", { state: { propertyId: task.property_id } })}
+            onClick={() =>
+              navigate("/contacts/create", {
+                state: { propertyId: task.property_id },
+              })
+            }
           >
             Add Contact
           </Button>
@@ -217,7 +389,7 @@ export default function TaskDetailPage() {
       </div>
 
       {/* 下方区域： Emails DataTable */}
-      <div className="mb-6">
+      <div className="bg-white p-6 shadow rounded mb-6">
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-bold mb-4">Emails</h2>
         </div>
