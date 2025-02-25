@@ -22,7 +22,7 @@ export default function CreateTaskPage() {
 
   // 新增字段
   const [taskType, setTaskType] = useState('gas');
-  const [status, setStatus] = useState('unknown');
+  const [status, setStatus] = useState('UNKNOWN');
 
   const [loading, setLoading] = useState(false);
 
@@ -63,7 +63,7 @@ export default function CreateTaskPage() {
       
       setRepeatFrequency(originalTask.repeat_frequency || 'none');
       setTaskType(originalTask.type || '');
-      setStatus(originalTask.status || 'unknown');
+      setStatus(originalTask.status || 'UNKNOWN');
       
       // 收集邮件ID
       setEmailId(originalTask.email_id || null);
@@ -178,11 +178,11 @@ export default function CreateTaskPage() {
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
               >
-                <option value="unknown">unknown</option>
-                <option value="undo">undo</option>
-                <option value="doing">doing</option>
+                <option value="UNKNOWN">UNKNOWN</option>
+                <option value="INCOMPLETE">INCOMPLETE</option>
+                <option value="PROCESSING">PROCESSING</option>
                 {/* <option value="done">done</option> */}
-                <option value="cancel">cancel</option>
+                <option value="CANCEL">CANCEL</option>
               </select>
             </div>
 

@@ -4,13 +4,12 @@ import clsx from 'clsx';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
 import { KeenIcon } from '@/components';
-import { toAbsoluteUrl } from '@/utils';
 import { useAuthContext } from '@/auth';
 import { useLayout } from '@/providers';
 import { Alert } from '@/components';
 const loginSchema = Yup.object().shape({
-  email: Yup.string().email('Wrong email format').min(3, 'Minimum 3 symbols').max(50, 'Maximum 50 symbols').required('Email is required'),
-  password: Yup.string().min(3, 'Minimum 3 symbols').max(50, 'Maximum 50 symbols').required('Password is required'),
+  email: Yup.string().email('Wrong email format').min(3, 'Minimum 3 characters').max(50, 'Maximum 50 characters').required('Email is required'),
+  password: Yup.string().min(6, 'Password must be at least 6 characters long').max(50, 'Maximum 50 characters').required('Password is required'),
   remember: Yup.boolean()
 });
 const savedEmail = localStorage.getItem('email');
@@ -88,11 +87,11 @@ const Login = () => {
           </a>
         </div> */}
 
-        {/*<div className="flex items-center gap-2">*/}
-        {/*  <span className="border-t border-gray-200 w-full"></span>*/}
-        {/*  <span className="text-2xs text-gray-500 font-medium uppercase">Or</span>*/}
-        {/*  <span className="border-t border-gray-200 w-full"></span>*/}
-        {/*</div>*/}
+        {/* <div className="flex items-center gap-2">
+         <span className="border-t border-gray-200 w-full"></span>
+         <span className="text-2xs text-gray-500 font-medium uppercase">Or</span>
+         <span className="border-t border-gray-200 w-full"></span>
+        </div> */}
 
         <Alert variant="primary">
           Use <span className="font-semibold text-gray-900">demo@email.com</span> username and{' '}

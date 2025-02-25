@@ -115,11 +115,11 @@ export default function TaskDetailModal({ task, onClose }) {
             value={status}
             onChange={(e) => setStatus(e.target.value)}
           >
-            <option value="unknown">unknown</option>
-            <option value="undo">undo</option>
-            <option value="doing">doing</option>
+            <option value="UNKNOWN">UNKNOWN</option>
+            <option value="INCOMPLETE">INCOMPLETE</option>
+            <option value="PROCESSING">PROCESSING</option>
             {/* <option value="done">done</option> */}
-            <option value="cancel">cancel</option>
+            <option value="CANCEL">CANCEL</option>
           </select>
         </div>
         <div className="mb-4">
@@ -129,8 +129,8 @@ export default function TaskDetailModal({ task, onClose }) {
             value={type}
             onChange={(e) => setType(e.target.value)}
           >
-            <option value="gas">gas</option>
-            <option value="electricity">electricity</option>
+            <option value="gas & electric">gas & electric</option>
+            <option value="electric">electric</option>
             <option value="smoke alarm">smoke alarm</option>
             <option value="">-</option>
           </select>
@@ -146,6 +146,7 @@ export default function TaskDetailModal({ task, onClose }) {
             <option value="monthly">Monthly</option>
             <option value="quarterly">Quarterly</option>
             <option value="yearly">Yearly</option>
+            <option value="2 years">2 Years</option>
           </select>
         </div>
         <div className="flex justify-end">

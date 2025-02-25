@@ -7,7 +7,14 @@ import { useAuthContext } from "@/auth";
 import TaskDetailModal from "../tasks/blocks/TaskDetailModal";
 import { Button } from "../../../components/ui/button";
 import ContactDataTable from "../../contact/blocks/ContactDataTable";
-import EmailsDataTable from "../../email/blocks/EmailsDataTable";
+import {
+  Modal,
+  ModalHeader,
+  ModalTitle,
+  ModalBody,
+  ModalContent,
+} from "@/components/modal";
+import { EditContactForm } from "../../contact/blocks/EditContactForm";
 
 export default function TaskDetailPage() {
   const navigate = useNavigate();
@@ -20,6 +27,10 @@ export default function TaskDetailPage() {
   const [error, setError] = useState("");
   const [showEditModal, setShowEditModal] = useState(false);
   const [processingMarkAsDone, setProcessingMarkAsDone] = useState(false);
+
+  // ========== 联系人相关状态 ==========
+  const [selectedContactId, setSelectedContactId] = useState(null);
+  const [editModalOpen, setEditModalOpen] = useState(false);
 
   // ========== 文件相关状态 ==========
   const [taskFiles, setTaskFiles] = useState([]); // 文件列表
@@ -82,13 +93,13 @@ export default function TaskDetailPage() {
       // 1. 更新当前任务状态为 done
       await axios.put(
         `${baseApi}/tasks/${task.id}`,
-        { status: "done" },
+        { status: "COMPLETED" },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       // 如果任务不设置重复（repeat_frequency === "none"），则只更新状态
       if (task.repeat_frequency === "none") {
-        toast.success("Task marked as done!");
+        toast.success("Task marked as COMPLETED!");
         fetchTaskDetail();
         return;
       }
@@ -116,7 +127,7 @@ export default function TaskDetailPage() {
       }
       const newTaskName = `repeat task ${repeatNumber} - ${baseName}`;
 
-      // 4. 创建新的任务，状态固定为 "undo"
+      // 4. 创建新的任务，状态固定为 "INCOMPLETE"
       const newTaskPayload = {
         property_id: task.property_id,
         due_date: newDueDate.toISOString(),
@@ -124,17 +135,17 @@ export default function TaskDetailPage() {
         task_description: task.task_description,
         type: task.type,
         repeat_frequency: task.repeat_frequency,
-        status: "undo",
+        status: "INCOMPLETE",
       };
 
       await axios.post(`${baseApi}/tasks`, newTaskPayload, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      toast.success("Task marked as done and next repeat task created!");
+      toast.success("Task marked as COMPLETED and next repeat task created!");
       fetchTaskDetail();
     } catch (error) {
-      console.error("Error marking task as done:", error);
+      console.error("Error marking task as COMPLETED:", error);
       toast.error("Failed to complete task");
     } finally {
       setProcessingMarkAsDone(false);
@@ -285,7 +296,7 @@ export default function TaskDetailPage() {
           <Button
             variant="edit"
             onClick={() => setShowEditModal(true)}
-            disabled={task.status === "done"}
+            disabled={task.status === "COMPLETED"}
           >
             Edit
           </Button>
@@ -293,7 +304,7 @@ export default function TaskDetailPage() {
             Copy Task
           </Button>
           {/* 如果当前任务未完成，则显示“完成并创建下个任务”的按钮 */}
-          {task.status !== "done" && (
+          {task.status !== "COMPLETED" && (
             <button
               className="btn bg-emerald-50 text-emerald-700 border-emerald-200"
               onClick={handleMarkAsDone}
@@ -301,7 +312,7 @@ export default function TaskDetailPage() {
             >
               {processingMarkAsDone
                 ? "Processing..."
-                : "Mark as Done & Create Next Task"}
+                : "Mark as COMPLETED & Create Next Task"}
             </button>
           )}
         </div>
@@ -385,15 +396,57 @@ export default function TaskDetailPage() {
             Add Contact
           </Button>
         </div>
-        <ContactDataTable contacts={task.contacts} />
+        <ContactDataTable
+          contacts={task.contacts}
+          onEdit={(id) => {
+            setSelectedContactId(id);
+            setEditModalOpen(true);
+          }}
+        />
       </div>
 
-      {/* 下方区域： Emails DataTable */}
+      <Modal open={editModalOpen} onClose={() => setEditModalOpen(false)}>
+        <ModalContent>
+          <ModalHeader>
+            <ModalTitle>Edit Contact</ModalTitle>
+          </ModalHeader>
+          <ModalBody>
+            {selectedContactId && (
+              <EditContactForm
+                contactId={selectedContactId}
+                onSuccess={() => {
+                  setEditModalOpen(false);
+                  fetchTaskDetail();
+                }}
+              />
+            )}
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+
+      {/* 下方区域： Email Info */}
       <div className="bg-white p-6 shadow rounded mb-6">
-        <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold mb-4">Emails</h2>
-        </div>
-        <EmailsDataTable emails={task.emails} />
+        <h2 className="text-xl font-bold mb-4">Email Information</h2>
+
+        {!task.emails || task.emails.length === 0 ? (
+          <p className="text-gray-500">No Email Info</p>
+        ) : (
+          task.emails.map((email) => (
+            <div key={email.id} className="mb-4">
+              <p className="font-medium">Subject: {email.subject}</p>
+              <p className="text-gray-600">Sender: {email.sender}</p>
+
+              {/* 这里是纯文本Body，保留换行 */}
+              <div className="mt-2 whitespace-pre-wrap">{email.email_body}</div>
+
+              {/*
+          如果还想渲染 HTML，可以使用:
+          <div dangerouslySetInnerHTML={{ __html: email.html }} />
+          注意安全性，避免XSS
+        */}
+            </div>
+          ))
+        )}
       </div>
 
       {/* 编辑弹窗：点击 Edit 按钮后打开 TaskDetailModal */}

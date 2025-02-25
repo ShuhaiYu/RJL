@@ -25,7 +25,7 @@ const ProfileCRMPage = () => {
         info={heroInfo}
       /> */}
 
-      <Container>
+      {/* <Container>
         <Navbar>
           <PageMenu />
 
@@ -39,7 +39,7 @@ const ProfileCRMPage = () => {
             <NavbarDropdown />
           </NavbarActions>
         </Navbar>
-      </Container>
+      </Container> */}
 
       <Container>
         <ProfileCRMContent user={currentUser} />

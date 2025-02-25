@@ -10,6 +10,8 @@ import {
 } from "@/components/modal";
 import { EditContactForm } from "./blocks/EditContactForm";
 import ContactDataTable from "./blocks/ContactDataTable";
+import { Box, CircularProgress } from "@mui/material";
+
 
 export const ContactPage = () => {
   const { auth, baseApi } = useAuthContext();
@@ -21,14 +23,19 @@ export const ContactPage = () => {
 
   const [filteredCount, setFilteredCount] = useState(0);
 
+  const [loading, setLoading] = useState(false);
+
   const fetchContacts = async () => {
     try {
+      setLoading(true);
       const response = await axios.get(`${baseApi}/contacts`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setContacts(response.data);
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -37,6 +44,13 @@ export const ContactPage = () => {
       fetchContacts();
     }
   }, [token]);
+
+  if (loading)
+    return (
+      <Box className="flex justify-center items-center h-40">
+        <CircularProgress />
+      </Box>
+    );
 
   return (
     <div style={{ height: 600, width: "100%", padding: 20 }}>

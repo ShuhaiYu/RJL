@@ -5,6 +5,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "@/auth";
 import MyPropertiesDataTable from "./blocks/MyPropertiesDataTable";
+import { Box, CircularProgress } from "@mui/material";
+
 
 export default function MyProperties() {
   const [properties, setProperties] = useState([]);
@@ -40,7 +42,13 @@ export default function MyProperties() {
     }
   }, [token]);
 
-  if (loading) return <div>Loading properties...</div>;
+  if (loading)
+    return (
+      <Box className="flex justify-center items-center h-40">
+        <CircularProgress />
+      </Box>
+    );
+    
   if (error) return <div className="text-red-500">Error: {error}</div>;
 
   // 点击某条属性的 "Edit" 按钮时

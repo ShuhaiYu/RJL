@@ -20,19 +20,19 @@ function StatusSelectCell({ task, onStatusUpdated }) {
   // 不同状态对应不同样式
   const statusColorClasses = {
     // UNKNOWN: 使用柔和的黄色，表示需要关注和处理
-    unknown: "bg-amber-50 text-amber-700 border-amber-200",
+    UNKNOWN: "bg-amber-50 text-amber-700 border-amber-200",
 
     // UNDO: 使用醒目的橙色，表示需要重点关注和行动
-    undo: "bg-orange-50 text-orange-700 border-orange-200",
+    INCOMPLETE: "bg-orange-50 text-orange-700 border-orange-200",
 
     // DOING: 使用温和的蓝色，表示正在进行中但不需要立即关注
-    doing: "bg-sky-50 text-sky-700 border-sky-200",
+    PROCESSING: "bg-sky-50 text-sky-700 border-sky-200",
 
     // DONE: 使用清新的绿色，表示已完成
-    done: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    COMPLETED: "bg-emerald-50 text-emerald-700 border-emerald-200",
 
     // CANCEL: 使用中性的灰色，表示已取消
-    cancel: "bg-gray-100 text-gray-500 border-gray-200",
+    CANCEL: "bg-gray-100 text-gray-500 border-gray-200",
   };
 
   const handleChange = async (e) => {
@@ -73,14 +73,14 @@ function StatusSelectCell({ task, onStatusUpdated }) {
     <select
       value={status}
       onChange={handleChange}
-      disabled={task.status === "done"}
+      disabled={task.status === "COMPLETED"}
       className={`rounded px-2 py-1 ${colorClass}`}
     >
-      <option value="unknown">unknown</option>
-      <option value="undo">undo</option>
-      <option value="doing">doing</option>
-      {status === "done" && <option value="done">done</option>}
-      <option value="cancel">cancel</option>
+      <option value="UNKNOWN">UNKNOWN</option>
+      <option value="INCOMPLETE">INCOMPLETE</option>
+      <option value="PROCESSING">PROCESSING</option>
+      {status === "COMPLETED" && <option value="COMPLETED">COMPLETED</option>}
+      <option value="CANCEL">CANCEL</option>
     </select>
   );
 }

@@ -4,7 +4,6 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { useAuthContext } from "@/auth";
 import PropertyDetailModal from "./blocks/PropertyDetailModal";
-import CreateTaskModal from "./blocks/CreateTaskModal";
 import TasksDataTable from "../tasks/blocks/TasksDataTable";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../../components/ui/button";
@@ -18,7 +17,6 @@ export default function PropertyDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showEditModal, setShowEditModal] = useState(false);
-  const [showCreateTaskModal, setShowCreateTaskModal] = useState(false);
 
   const navigate = useNavigate();
 
@@ -93,9 +91,7 @@ export default function PropertyDetailPage() {
           <Button variant="edit" onClick={() => setShowEditModal(true)}>
             Edit
           </Button>
-          <Button variant="create" onClick={() => setShowCreateTaskModal(true)}>
-            Create Task
-          </Button>
+
           <Button
             variant="view"
             onClick={() =>
@@ -114,7 +110,7 @@ export default function PropertyDetailPage() {
       </div>
 
       {/* 下方区域：任务列表 */}
-      <TasksDataTable tasks={property.tasks} onTaskClick={handleTaskClick} />
+      <TasksDataTable tasks={property.tasks} onTaskClick={handleTaskClick} hideColumns={['property_address']}/>
 
       {/* 编辑弹窗：点击 Edit 按钮后打开 */}
       {showEditModal && (
@@ -128,20 +124,7 @@ export default function PropertyDetailPage() {
         />
       )}
 
-      {/* 创建 Task 弹窗 */}
-      {showCreateTaskModal && (
-        <CreateTaskModal
-          propertyId={propertyId}
-          token={token}
-          baseApi={baseApi}
-          onClose={() => setShowCreateTaskModal(false)}
-          onCreated={() => {
-            // 回调: 关闭弹窗后刷新 property 详情, 以便看到新任务
-            setShowCreateTaskModal(false);
-            fetchPropertyDetail();
-          }}
-        />
-      )}
+      
     </div>
   );
 }

@@ -11,6 +11,7 @@ export default function TasksDataTable({
   tasks,
   onTaskClick,
   onStatusUpdated,
+  hideColumns = []
 }) {
   const [filteredCount, setFilteredCount] = useState(tasks.length);
 
@@ -25,7 +26,7 @@ export default function TasksDataTable({
     );
   };
   // 定义表格列
-  const columns = useMemo(() => {
+  const baseColumns = useMemo(() => {
     return [
       {
         accessorKey: "property_address",
@@ -88,8 +89,8 @@ export default function TasksDataTable({
 
           // 根据不同 type 设置颜色类
           const typeColorClasses = {
-            gas: "bg-blue-100 text-blue-700",
-            electricity: "bg-yellow-100 text-yellow-700",
+            "gas & electric": "bg-blue-100 text-blue-700",
+            "electric": "bg-yellow-100 text-yellow-700",
             "smoke alarm": "bg-green-100 text-green-700",
           };
           // 如果 type 不在 [A,B,C], 给一个默认颜色
@@ -159,6 +160,13 @@ export default function TasksDataTable({
       },
     ];
   }, [onTaskClick, onStatusUpdated]);
+
+    const columns = useMemo(() => {
+    return baseColumns.filter((col) => {
+      const key = col.accessorKey || col.id;
+      return !hideColumns.includes(key);
+    });
+  }, [baseColumns, hideColumns]);
 
   // 渲染 DataGrid
   return (

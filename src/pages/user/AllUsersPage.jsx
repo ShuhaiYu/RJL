@@ -6,6 +6,7 @@ import { DataGrid, DataGridColumnHeader } from "@/components/data-grid";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { Box, CircularProgress } from "@mui/material";
 
 export const AllUsersPage = () => {
   const { auth, baseApi, currentUser } = useAuthContext();
@@ -140,6 +141,16 @@ export const AllUsersPage = () => {
     [navigate, token, baseApi]
   );
 
+  // 如果加载中，则只渲染一个 CircularProgress
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+  
+
   return (
     <div className="p-4">
       <h1 className="text-3xl font-bold mb-6">Users</h1>
@@ -153,7 +164,7 @@ export const AllUsersPage = () => {
       </div>
       <div className="mb-6">
       <p className="text-sm text-gray-500 mb-4">
-        Showing {filteredCount} of {users.length} properties
+        Showing {filteredCount} of {users.length} users
       </p>
         <DataGrid
           data={users}

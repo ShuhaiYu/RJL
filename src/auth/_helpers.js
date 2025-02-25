@@ -51,6 +51,15 @@ export function setupAxios(axios) {
     async (error) => {
       const originalRequest = error.config;
 
+      // 如果是 401，但请求地址是 /auth/login，说明是用户登录失败的情况，
+      // 不需要走刷新逻辑，直接把错误抛给前端
+      if (
+        error.response?.status === 401 &&
+        originalRequest.url.includes("/auth/login")
+      ) {
+        return Promise.reject(error);
+      }
+
       // 处理401错误且不是刷新token的请求
       if (
         error.response?.status === 401 &&

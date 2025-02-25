@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuthContext } from "@/auth";
 import EmailsDataTable from "./blocks/EmailsDataTable"; // 根据实际路径调整
+import { Box, CircularProgress } from "@mui/material";
 
 export default function Emails() {
   const [emails, setEmails] = useState([]);
@@ -32,9 +33,16 @@ export default function Emails() {
     }
   }, [token]);
 
-  if (loading) return <div>Loading emails...</div>;
+
   if (error)
     return <div className="text-red-500">Error: {error}</div>;
+
+  if (loading)
+    return (
+      <Box className="flex justify-center items-center h-40">
+        <CircularProgress />
+      </Box>
+    );
 
   return (
     <div className="container mx-auto p-4">

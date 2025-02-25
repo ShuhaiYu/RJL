@@ -4,32 +4,38 @@ import { KeenIcon } from '@/components';
 import { CardProjectExtended, CardProjectExtendedRow } from '@/partials/cards';
 import axios from 'axios';
 import { useAuthContext } from '@/auth';
+import { Box, CircularProgress } from "@mui/material";
+
 
 const Agencies = () => {
   const [activeView, setActiveView] = useState('cards');
   const [agencies, setAgencies] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // 从 AuthContext 中获取 token 与基础 API 路径（例如：`${import.meta.env.VITE_API_BASE_URL}/superuser`）
   const { auth, baseApi } = useAuthContext();
   const token = auth?.accessToken;
 
-  useEffect(() => {
+  const fetchAgencies = async () => {
     if (!token) return;
-    // 请求 agencies 数据（例如：GET /{role}/agencies）
-    axios
-      .get(`${baseApi}/agencies`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((response) => {
-        // 根据数据中 is_active 字段过滤，只保留 active 的机构
-        setAgencies((response.data || []).filter((agency) => agency.is_active));
-      })
-      .catch((err) => {
-        console.error('Failed to fetch agencies:', err);
+    setLoading(true);
+    try {
+      const response = await axios.get(`${baseApi}/agencies`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-  }, [token, baseApi]);
+      setAgencies(response.data);
+      setLoading(false);
+    } catch (err) {
+      console.error('Failed to fetch agencies:', err);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (token) {
+      fetchAgencies();
+    }
+  }, [token]);
 
   const handleRemove = (deletedId) => {
     setAgencies((prevAgencies) =>
@@ -67,6 +73,14 @@ const Agencies = () => {
       />
     );
   };
+
+  if (loading) {
+    return (
+      <Box className="flex justify-center items-center h-40">
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <div className="flex flex-col items-stretch gap-5 lg:gap-7.5">

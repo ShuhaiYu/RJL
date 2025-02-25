@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useAuthContext } from '@/auth'
 import { useNavigate } from 'react-router-dom'
-import Select from 'react-select'
 import TasksDataTable from './blocks/TasksDataTable'
 
 export default function Tasks() {
@@ -18,21 +17,6 @@ export default function Tasks() {
   const { auth, baseApi } = useAuthContext()
   const token = auth?.accessToken
   const navigate = useNavigate()
-
-  // // 假设你要筛选的状态
-  // const statusOptions = [
-  //   { value: 'unknown', label: 'Unknown' },
-  //   { value: 'undo', label: 'Undo' },
-  //   { value: 'doing', label: 'Doing' },
-  //   { value: 'done', label: 'Done' },
-  // ]
-
-  // // 假设你要筛选的类型
-  // const typesOptions = [
-  //   { value: 'A', label: 'A' },
-  //   { value: 'B', label: 'B' },
-  //   { value: 'C', label: 'C' },
-  // ]
 
   // 请求后端获取 tasks
   const fetchTasks = () => {
