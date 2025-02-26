@@ -107,11 +107,13 @@ export default function TaskDetailPage() {
       // 2. 根据重复频率计算新任务的到期日期
       let newDueDate = new Date();
       const repeat = task.repeat_frequency; // "monthly", "quarterly", "yearly"
-      if (repeat === "monthly") {
+      if (repeat === "1 month") {
         newDueDate.setMonth(newDueDate.getMonth() + 1);
-      } else if (repeat === "quarterly") {
+      } else if (repeat === "3 months") {
         newDueDate.setMonth(newDueDate.getMonth() + 3);
-      } else if (repeat === "yearly") {
+      } else if (repeat === "6 months") {
+        newDueDate.setMonth(newDueDate.getMonth() + 6);
+      } else if (repeat === "1 year") {
         newDueDate.setFullYear(newDueDate.getFullYear() + 1);
       } else if (repeat === "2 years") {
         newDueDate.setFullYear(newDueDate.getFullYear() + 2);

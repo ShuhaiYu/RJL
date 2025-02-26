@@ -19,7 +19,9 @@ export default function TaskDetailModal({ task, onClose }) {
     task.repeat_frequency || "none"
   );
   const [agencies, setAgencies] = useState([]);
-  const [selectedAgencyId, setSelectedAgencyId] = useState(task.agency_id || "");
+  const [selectedAgencyId, setSelectedAgencyId] = useState(
+    task.agency_id || ""
+  );
 
   const { auth, baseApi, currentUser } = useAuthContext();
   const token = auth?.accessToken;
@@ -168,10 +170,12 @@ export default function TaskDetailModal({ task, onClose }) {
             onChange={(e) => setRepeatFrequency(e.target.value)}
           >
             <option value="none">None</option>
-            <option value="monthly">Monthly</option>
-            <option value="quarterly">Quarterly</option>
-            <option value="yearly">Yearly</option>
+            <option value="1 month">1 Month</option>
+            <option value="3 months">3 Months</option>
+            <option value="6 months">6 Months</option>
+            <option value="1 year">1 Year</option>
             <option value="2 years">2 Years</option>
+            <option value="3 years">3 Years</option>
           </select>
         </div>
         {/* 下拉选择 Agency (如果是 RJL 用户显示, 中介用户只显示自己的 agency) */}

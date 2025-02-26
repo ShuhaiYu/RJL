@@ -1,10 +1,10 @@
 // src/pages/MyPropertiesDataTable.jsx
 
 import { useMemo, useState } from "react";
-// 假设你有一个封装好的 DataGrid
 import { DataGrid, DataGridColumnHeader } from "@/components/data-grid";
 import { Button } from "../../../../components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Link } from "react-router-dom";
 
 export default function MyPropertiesDataTable({ properties, onEdit }) {
   const [filteredCount, setFilteredCount] = useState(properties.length);
@@ -30,6 +30,10 @@ export default function MyPropertiesDataTable({ properties, onEdit }) {
             filter={<ColumnInputFilter column={header.column} />}
           />
         ),
+        cell: ({ row }) => {
+          const property = row.original;
+          return <Link className="btn btn-link" to={`/property/${property.id}`}>{property.address}</Link>;
+        },
       },
       {
         id: "agency_name",
@@ -40,8 +44,11 @@ export default function MyPropertiesDataTable({ properties, onEdit }) {
             filter={<ColumnInputFilter column={header.column} />}
           />
         ),
-        // accessorFn 可以从 row.user?.agency?.agency_name 中取值
-        accessorFn: (row) => row.agency?.agency_name || "N/A",
+        cell: ({ row }) => {
+          const property = row.original;
+          return <Link className="btn btn-link" to={`/agencies/${property.agency?.id}`}>{property.agency?.agency_name}</Link>;
+        }
+
       },
       {
         id: "actions",

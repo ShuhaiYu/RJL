@@ -1,9 +1,9 @@
 // src/pages/blocks/EmailsDataTable.jsx
 import { useMemo, useState } from "react";
-// 根据你的实际情况修改 DataGrid 导入路径
 import { DataGrid, DataGridColumnHeader } from "@/components/data-grid";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Link } from "react-router-dom";
 // 点击按钮后在新窗口展示 HTML 内容
 const handleViewEmail = (emailHtml) => {
   const newWindow = window.open("", "_blank");
@@ -35,6 +35,14 @@ export default function EmailsDataTable({ emails }) {
             filter={<ColumnInputFilter column={header.column} />}
           />
         ),
+        cell: ({ row }) => {
+          const email = row.original;
+          return (
+            <Link className="btn btn-link" to={`/property/${email.property_id}`}>
+              {email.property_address}
+            </Link>
+          );
+        },
         enableSorting: true,
       },
       {
@@ -90,6 +98,14 @@ export default function EmailsDataTable({ emails }) {
             filter={<ColumnInputFilter column={header.column} />}
           />
         ),
+        cell: ({ row }) => {
+          const email = row.original;
+          return (
+            <Link className="btn btn-link" to={`/property/tasks/${email.task_id}`}>
+              {email.task_name}
+            </Link>
+          );
+        },
         enableSorting: true,
       },
       {

@@ -6,6 +6,7 @@ import { DataGrid, DataGridColumnHeader } from "@/components/data-grid";
 import { Input } from "@/components/ui/input";
 import StatusSelectCell from "./StatusSelectCell";
 import { Button } from "../../../../components/ui/button";
+import { Link } from "react-router-dom";
 
 export default function TasksDataTable({
   tasks,
@@ -37,7 +38,12 @@ export default function TasksDataTable({
             filter={<ColumnInputFilter column={header.column} />}
           />
         ),
-
+        cell: ({ row }) => {
+          const task = row.original;
+          return (
+            <Link className="btn btn-link" to={`/property/${task.property_id}`}>{task.property_address}</Link>
+          )
+        },
         enableSorting: true,
       },
       {
@@ -49,6 +55,12 @@ export default function TasksDataTable({
             filter={<ColumnInputFilter column={header.column} />}
           />
         ),
+        cell: ({ row }) => {
+          const task = row.original;
+          return (
+            <Link className="btn btn-link" to={`/agencies/${task.agency_id}`}>{task.agency_name}</Link>
+          )
+        },
         enableSorting: true, // 列启用排序
       },
       // 新的 status 列
