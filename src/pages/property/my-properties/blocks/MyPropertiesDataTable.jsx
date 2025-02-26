@@ -6,7 +6,7 @@ import { Button } from "../../../../components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
 
-export default function MyPropertiesDataTable({ properties, onEdit }) {
+export default function MyPropertiesDataTable({ properties, onEdit, hideColumns = [] }) {
   const [filteredCount, setFilteredCount] = useState(properties.length);
   const ColumnInputFilter = ({ column }) => {
     return (
@@ -19,7 +19,7 @@ export default function MyPropertiesDataTable({ properties, onEdit }) {
     );
   };
   // 定义 DataGrid 的列
-  const columns = useMemo(
+  const baseColumns = useMemo(
     () => [
       {
         accessorKey: "address",
@@ -65,6 +65,13 @@ export default function MyPropertiesDataTable({ properties, onEdit }) {
     ],
     [onEdit]
   );
+
+  const columns = useMemo(() => {
+    return baseColumns.filter((col) => {
+      const key = col.accessorKey || col.id;
+      return !hideColumns.includes(key);
+    });
+  }, [baseColumns, hideColumns]);
 
   return (
     <div>

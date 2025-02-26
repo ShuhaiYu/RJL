@@ -12,7 +12,7 @@ export default function TasksDataTable({
   tasks,
   onTaskClick,
   onStatusUpdated,
-  hideColumns = []
+  hideColumns = [],
 }) {
   const [filteredCount, setFilteredCount] = useState(tasks.length);
 
@@ -41,8 +41,10 @@ export default function TasksDataTable({
         cell: ({ row }) => {
           const task = row.original;
           return (
-            <Link className="btn btn-link" to={`/property/${task.property_id}`}>{task.property_address}</Link>
-          )
+            <Link className="btn btn-link" to={`/property/${task.property_id}`}>
+              {task.property_address}
+            </Link>
+          );
         },
         enableSorting: true,
       },
@@ -58,8 +60,10 @@ export default function TasksDataTable({
         cell: ({ row }) => {
           const task = row.original;
           return (
-            <Link className="btn btn-link" to={`/agencies/${task.agency_id}`}>{task.agency_name}</Link>
-          )
+            <Link className="btn btn-link" to={`/agencies/${task.agency_id}`}>
+              {task.agency_name}
+            </Link>
+          );
         },
         enableSorting: true, // 列启用排序
       },
@@ -102,7 +106,7 @@ export default function TasksDataTable({
           // 根据不同 type 设置颜色类
           const typeColorClasses = {
             "gas & electric": "bg-blue-100 text-blue-700",
-            "electric": "bg-yellow-100 text-yellow-700",
+            electric: "bg-yellow-100 text-yellow-700",
             "smoke alarm": "bg-green-100 text-green-700",
           };
           // 如果 type 不在 [A,B,C], 给一个默认颜色
@@ -173,7 +177,7 @@ export default function TasksDataTable({
     ];
   }, [onTaskClick, onStatusUpdated]);
 
-    const columns = useMemo(() => {
+  const columns = useMemo(() => {
     return baseColumns.filter((col) => {
       const key = col.accessorKey || col.id;
       return !hideColumns.includes(key);

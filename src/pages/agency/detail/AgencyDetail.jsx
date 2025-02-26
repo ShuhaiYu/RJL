@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuthContext } from "@/auth";
 import MyPropertiesDataTable from "../../property/my-properties/blocks/MyPropertiesDataTable";
+import TasksDataTable from "../../property/tasks/blocks/TasksDataTable";
 
 export default function AgencyDetail() {
   const { id } = useParams();
@@ -52,6 +53,10 @@ export default function AgencyDetail() {
     navigate(`/property/${propertyId}`);
   };
 
+  const handleTaskClick = (taskId) => {
+    navigate(`/property/tasks/${taskId}`);
+  };
+
   return (
     <div className="container mx-auto p-6 max-w-3xl">
       {/* 机构详情卡片 */}
@@ -95,9 +100,24 @@ export default function AgencyDetail() {
           <MyPropertiesDataTable
             properties={agency.properties}
             onEdit={handleEdit}
+            hideColumns={["agency_name"]}
           />
         )}
       </div>
+
+      {/* 任务列表 */}
+      <div className="bg-white rounded-xl shadow p-6 mt-8">
+        <h2 className="text-2xl font-bold mb-4 text-gray-800">Tasks</h2>
+        {agency.tasks.length === 0 ? (
+          <div className="text-center py-6 text-gray-500">No tasks found.</div>
+        ) : (
+          <TasksDataTable
+            tasks={agency.tasks || []}
+            onTaskClick={handleTaskClick}
+            hideColumns={["property", "agency_name"]}
+          />
+        )}
+        </div>
     </div>
   );
 }
