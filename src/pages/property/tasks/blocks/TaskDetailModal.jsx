@@ -68,10 +68,11 @@ export default function TaskDetailModal({ task, onClose }) {
         {
           task_name: taskName,
           task_description: taskDescription,
-          due_date: dueDate || null,
+          due_date: dueDate,
           status: status,
           type: type,
           repeat_frequency: repeatFrequency,
+          agency_id: selectedAgencyId,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
