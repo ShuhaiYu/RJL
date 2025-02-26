@@ -8,11 +8,8 @@ import TasksDataTable from './blocks/TasksDataTable'
 
 export default function Tasks() {
   const [tasks, setTasks] = useState([])
-  const [filteredTasks, setFilteredTasks] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  // const [selectedStatuses, setSelectedStatuses] = useState([])
-  // const [selectedTypes, setSelectedTypes] = useState([])
 
   const { auth, baseApi } = useAuthContext()
   const token = auth?.accessToken
@@ -42,23 +39,6 @@ export default function Tasks() {
     }
   }, [token])
 
-  // 根据选中的 status / type 来过滤 tasks
-  // useEffect(() => {
-  //   let filtered = [...tasks]
-
-  //   if (selectedStatuses.length > 0) {
-  //     const selectedValues = selectedStatuses.map((s) => s.value)
-  //     filtered = filtered.filter((task) => selectedValues.includes(task.status))
-  //   }
-
-  //   if (selectedTypes.length > 0) {
-  //     const selectedValues = selectedTypes.map((t) => t.value)
-  //     filtered = filtered.filter((task) => selectedValues.includes(task.type))
-  //   }
-
-  //   setFilteredTasks(filtered)
-  // }, [tasks, selectedStatuses, selectedTypes])
-
   // 点击单个任务时跳转
   const handleTaskClick = (taskId) => {
     navigate(`/property/tasks/${taskId}`)
@@ -75,30 +55,6 @@ export default function Tasks() {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">Tasks</h1>
-
-      
-      {/* <div className="mb-4">
-        <h2 className="text-xl font-bold mb-2">Filter by status</h2>
-        <Select
-          isMulti
-          options={statusOptions}
-          value={selectedStatuses}
-          onChange={(selected) => setSelectedStatuses(selected)}
-          placeholder="Filter by status..."
-        />
-      </div>
-
-      
-      <div className="mb-4">
-        <h2 className="text-xl font-bold mb-2">Filter by types</h2>
-        <Select
-          isMulti
-          options={typesOptions}
-          value={selectedTypes}
-          onChange={(selected) => setSelectedTypes(selected)}
-          placeholder="Filter by types..."
-        />
-      </div> */}
 
       {/* 数据表格 */}
       {tasks.length === 0 ? (

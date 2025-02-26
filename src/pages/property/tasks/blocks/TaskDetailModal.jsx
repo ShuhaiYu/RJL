@@ -18,9 +18,12 @@ export default function TaskDetailModal({ task, onClose }) {
   const [repeatFrequency, setRepeatFrequency] = useState(
     task.repeat_frequency || "none"
   );
+  const [agencies, setAgencies] = useState([]);
+  const [selectedAgencyId, setSelectedAgencyId] = useState(task.agency_id || "");
 
-  const { auth, baseApi } = useAuthContext();
+  const { auth, baseApi, currentUser } = useAuthContext();
   const token = auth?.accessToken;
+  const isAgencyUser = currentUser?.agency_id ? true : false;
 
   const userTimeZone = "Australia/Sydney"; // 可根据实际情况调整
 
@@ -35,6 +38,27 @@ export default function TaskDetailModal({ task, onClose }) {
       setDueDate("");
     }
   }, [task.due_date, userTimeZone]);
+
+  // 新增 useEffect 获取 agency 列表
+  useEffect(() => {
+    if (!token) return;
+    axios
+      .get(`${baseApi}/agencies`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        setAgencies(res.data);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch agencies:", err);
+      });
+  }, [token]);
+
+  useEffect(() => {
+    if (isAgencyUser && currentUser.agency_id) {
+      setSelectedAgencyId(String(currentUser.agency_id));
+    }
+  }, [isAgencyUser, currentUser]);
 
   const handleSaveTask = () => {
     // 此处直接使用 dueDate 字符串，无需转换
@@ -147,6 +171,24 @@ export default function TaskDetailModal({ task, onClose }) {
             <option value="quarterly">Quarterly</option>
             <option value="yearly">Yearly</option>
             <option value="2 years">2 Years</option>
+          </select>
+        </div>
+        {/* 下拉选择 Agency (如果是 RJL 用户显示, 中介用户只显示自己的 agency) */}
+        <div className="mb-4">
+          <label className="block mb-2 font-medium">Task Agency</label>
+
+          <select
+            className="select select-bordered w-full"
+            value={selectedAgencyId}
+            disabled={isAgencyUser}
+            onChange={(e) => setSelectedAgencyId(e.target.value)}
+          >
+            <option value="">-- Choose Agency --</option>
+            {agencies.map((ag) => (
+              <option key={ag.id} value={ag.id}>
+                {ag.agency_name}
+              </option>
+            ))}
           </select>
         </div>
         <div className="flex justify-end">

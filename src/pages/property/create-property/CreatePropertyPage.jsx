@@ -1,5 +1,5 @@
 // src/pages/CreatePropertyPage.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -9,9 +9,41 @@ import { toast } from "sonner";
 export default function CreatePropertyPage() {
   const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(false);
-  const { auth, baseApi } = useAuthContext();
+  const { auth, baseApi, currentUser } = useAuthContext();
   const token = auth?.accessToken;
   const navigate = useNavigate();
+
+  const [allUsers, setAllUsers] = useState([]);
+  const [selectedUserId, setSelectedUserId] = useState(""); // 存储选中的 user
+  const [loadingUsers, setLoadingUsers] = useState(false);
+
+  const fetchUsers = async () => {
+    if (!token) return;
+    setLoadingUsers(true);
+    try {
+      const response = await axios.get(`${baseApi}/users`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      // 如果用户是 superuser/admin(RJL管理员)，后端返回所有用户，
+      // 但你说"不能选没有agency的用户" => 前端可过滤掉 agency_id=null
+      let fetchedUsers = response.data;
+
+      // 假设你用 "is_rjl_admin" 或 "role === 'admin' || role==='superuser'" 来判断
+      if (!currentUser.agency) {
+        fetchedUsers = fetchedUsers.filter(u => u.agency_id);
+      }
+
+      setAllUsers(fetchedUsers);
+    } catch (err) {
+      console.error("fetchUsers error:", err);
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, [token]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,7 +55,7 @@ export default function CreatePropertyPage() {
     try {
       const response = await axios.post(
         `${baseApi}/properties`,
-        { address },
+        { address, user_id: selectedUserId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success("Property created successfully!");
@@ -56,6 +88,27 @@ export default function CreatePropertyPage() {
               value={address}
               onChange={(e) => setAddress(e.target.value)}
             />
+          </div>
+          <div>
+            <label className="block mb-2 font-medium">
+              Assign to User (Required)
+            </label>
+            {loadingUsers ? (
+              <p>Loading users...</p>
+            ) : (
+              <select
+                className="select select-bordered w-full"
+                value={selectedUserId}
+                onChange={(e) => setSelectedUserId(e.target.value)}
+              >
+                <option value="">-- Please choose a user --</option>
+                {allUsers.map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.name || u.email} {/* 显示用户名或邮箱 */}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
 
           <div>

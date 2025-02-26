@@ -41,11 +41,11 @@ export default function TasksDataTable({
         enableSorting: true,
       },
       {
-        accessorKey: "task_name",
+        accessorKey: "agency_name",
         header: ({ header }) => (
           <DataGridColumnHeader
             column={header.column}
-            title="Task Name"
+            title="Agency Name"
             filter={<ColumnInputFilter column={header.column} />}
           />
         ),

@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
-import TaskDetailModal from "@/pages/property/tasks/blocks/TaskDetailModal";
 import { useAuthContext } from "@/auth";
 import TasksDataTable from "../../tasks/blocks/TasksDataTable";
 import { useNavigate } from "react-router-dom";
@@ -14,23 +13,32 @@ export default function PropertyDetailModal({ propertyId, onClose }) {
   const [propertyDetail, setPropertyDetail] = useState(null);
 
   // 编辑属性状态
-  const [propertyName, setPropertyName] = useState("");
   const [propertyAddress, setPropertyAddress] = useState("");
-  const [agencyId, setAgencyId] = useState("");
 
-  // 控制 Task 详情弹窗
-  const [selectedTaskId, setSelectedTaskId] = useState(null);
-
-  // 控制创建 Task 弹窗
-  const [showCreateTask, setShowCreateTask] = useState(false);
-  const [newTaskName, setNewTaskName] = useState("");
-  const [newTaskDesc, setNewTaskDesc] = useState("");
-  const [newTaskDue, setNewTaskDue] = useState("");
-
-  const { baseApi, auth } = useAuthContext();
+  const { baseApi, auth, currentUser } = useAuthContext();
+  const isDisableAssignUser = currentUser?.agency_id ? true : false;
   const token = auth?.accessToken;
 
   const navigate = useNavigate();
+
+  // 新增状态
+  const [userList, setUserList] = useState([]);
+  const [selectedUserId, setSelectedUserId] = useState("");
+
+  // 新增 useEffect 获取用户列表
+  useEffect(() => {
+    if (!token) return;
+    axios
+      .get(`${baseApi}/users`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        setUserList(res.data);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch users:", err);
+      });
+  }, [token]);
 
   // 获取属性详情：使用 Agency Admin 路径
   const fetchPropertyDetail = () => {
@@ -45,9 +53,10 @@ export default function PropertyDetailModal({ propertyId, onClose }) {
       })
       .then((res) => {
         setPropertyDetail(res.data);
-        setPropertyName(res.data.name || "");
+
         setPropertyAddress(res.data.address || "");
-        setAgencyId(res.data.agency_id || "");
+        setSelectedUserId(res.data.user_id || "");
+
         setLoading(false);
       })
       .catch((err) => {
@@ -70,9 +79,8 @@ export default function PropertyDetailModal({ propertyId, onClose }) {
       .put(
         `${baseApi}/properties/${propertyId}`,
         {
-          name: propertyName,
           address: propertyAddress,
-          agency_id: agencyId,
+          user_id: selectedUserId,
         },
         {
           headers: {
@@ -83,9 +91,8 @@ export default function PropertyDetailModal({ propertyId, onClose }) {
       .then(() => {
         setPropertyDetail({
           ...propertyDetail,
-          name: propertyName,
           address: propertyAddress,
-          agency_id: agencyId,
+          user_id: selectedUserId,
         });
         toast("Property updated successfully!");
       })
@@ -125,15 +132,8 @@ export default function PropertyDetailModal({ propertyId, onClose }) {
   };
 
   const handleTaskClick = (taskId) => {
-    // setSelectedTaskId(taskId);
     navigate(`/property/tasks/${taskId}`);
   };
-
-  // const closeTaskModal = () => {
-  //   setSelectedTaskId(null);
-  //   // 可选：刷新详情以更新任务数据
-  //   fetchPropertyDetail();
-  // };
 
   return (
     <div
@@ -162,15 +162,6 @@ export default function PropertyDetailModal({ propertyId, onClose }) {
         ) : propertyDetail ? (
           <>
             {/* 编辑表单 */}
-            {/*<div className="mb-4">*/}
-            {/*  <label className="block mb-1 font-medium">Property Name</label>*/}
-            {/*  <input*/}
-            {/*    type="text"*/}
-            {/*    className="border w-full p-2 rounded"*/}
-            {/*    value={propertyName}*/}
-            {/*    onChange={(e) => setPropertyName(e.target.value)}*/}
-            {/*  />*/}
-            {/*</div>*/}
             <div className="mb-4">
               <label className="block mb-1 font-medium">Address</label>
               <input
@@ -180,15 +171,22 @@ export default function PropertyDetailModal({ propertyId, onClose }) {
                 onChange={(e) => setPropertyAddress(e.target.value)}
               />
             </div>
-            {/*<div className="mb-4">*/}
-            {/*  <label className="block mb-1 font-medium">Agency ID</label>*/}
-            {/*  <input*/}
-            {/*    type="number"*/}
-            {/*    className="border w-full p-2 rounded"*/}
-            {/*    value={agencyId}*/}
-            {/*    onChange={(e) => setAgencyId(e.target.value)}*/}
-            {/*  />*/}
-            {/*</div>*/}
+            <div className="mb-4">
+              <label className="block mb-1 font-medium">Assigned User</label>
+              <select
+                className="select select-bordered w-full"
+                value={selectedUserId}
+                disabled={isDisableAssignUser}
+                onChange={(e) => setSelectedUserId(e.target.value)}
+              >
+                <option value="">-- Select User --</option>
+                {userList.map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.name || u.email} 
+                  </option>
+                ))}
+              </select>
+            </div>
 
             <div className="flex justify-end mb-6">
               <Button variant="edit" onClick={handleSave}>
@@ -210,15 +208,6 @@ export default function PropertyDetailModal({ propertyId, onClose }) {
           <div>No data</div>
         )}
 
-        {/* 二级弹窗：TaskDetailModal */}
-        {/* {selectedTaskId && (
-          <TaskDetailModal
-            taskId={selectedTaskId}
-            token={token}
-            onClose={closeTaskModal}
-          />
-        )} */}
-
         {/* Footer: Create Task & Delete Property */}
         <div className="flex justify-between items-center mt-4 pt-4 border-t">
           <Button onClick={handleCreateTask} variant="create">
@@ -228,54 +217,6 @@ export default function PropertyDetailModal({ propertyId, onClose }) {
             Delete Property
           </Button>
         </div>
-
-        {/* 简易 Create Task 弹窗 */}
-        {/* {showCreateTask && (
-          <div
-            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50"
-            onClick={() => setShowCreateTask(false)}
-          >
-            <div
-              className="bg-white p-4 rounded shadow"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h3 className="text-lg font-bold mb-2">Create Task</h3>
-              <input
-                className="border p-2 w-full mb-2"
-                placeholder="Task Name"
-                value={newTaskName}
-                onChange={(e) => setNewTaskName(e.target.value)}
-              />
-              <textarea
-                className="border p-2 w-full mb-2"
-                placeholder="Task Description"
-                value={newTaskDesc}
-                onChange={(e) => setNewTaskDesc(e.target.value)}
-              />
-              <label className="block mb-1">Due Date</label>
-              <input
-                type="datetime-local"
-                className="border p-2 w-full mb-2"
-                value={newTaskDue}
-                onChange={(e) => setNewTaskDue(e.target.value)}
-              />
-              <div className="flex justify-end">
-                <button
-                  className="bg-gray-300 text-gray-800 px-3 py-1 rounded mr-2"
-                  onClick={() => setShowCreateTask(false)}
-                >
-                  Cancel
-                </button>
-                <button
-                  className="bg-blue-600 text-white px-3 py-1 rounded"
-                  onClick={handleCreateTask}
-                >
-                  Save
-                </button>
-              </div>
-            </div>
-          </div>
-        )} */}
       </div>
     </div>
   );

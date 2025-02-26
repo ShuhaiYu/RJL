@@ -113,6 +113,10 @@ export default function TaskDetailPage() {
         newDueDate.setMonth(newDueDate.getMonth() + 3);
       } else if (repeat === "yearly") {
         newDueDate.setFullYear(newDueDate.getFullYear() + 1);
+      } else if (repeat === "2 years") {
+        newDueDate.setFullYear(newDueDate.getFullYear() + 2);
+      } else if (repeat === "3 years") {
+        newDueDate.setFullYear(newDueDate.getFullYear() + 3);
       }
 
       // 3. 根据旧任务名称确定重复次数，构造新任务名称
@@ -290,6 +294,10 @@ export default function TaskDetailPage() {
           <p className="mt-1 text-gray-600">
             <span className="font-medium">Description: </span>
             {task.task_description}
+          </p>
+          <p className="mt-1 text-gray-600">
+            <span className="font-medium">Agency: </span>
+            {task.agency_name || "N/A"}
           </p>
         </div>
         <div className="mt-4 md:mt-0 flex flex-col gap-2">
