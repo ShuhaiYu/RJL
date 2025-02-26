@@ -2,12 +2,11 @@ import { useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { DataGrid, DataGridColumnHeader } from "@/components/data-grid";
-import { toast } from "sonner";
-import axios from "axios";
 
 export default function ContactDataTable({
   contacts,
   onEdit,
+  onDelete,
   onFilteredDataChange,
 }) {
   const ColumnInputFilter = ({ column }) => {
@@ -19,19 +18,6 @@ export default function ContactDataTable({
         className="h-9 w-full max-w-40"
       />
     );
-  };
-
-  const handleDelete = async (contactId) => {
-    if (!window.confirm("Are you sure you want to delete this contact?")) return;
-    try {
-      await axios.delete(`/api/contacts/${contactId}`);
-      toast.success("Contact deleted successfully!");
-      // 如有需要，可调用 onFilteredDataChange 刷新表格数据
-      if (onFilteredDataChange) onFilteredDataChange();
-    } catch (error) {
-      console.error("Delete contact error:", error);
-      toast.error("Failed to delete contact");
-    }
   };
 
   const columns = useMemo(() => {
@@ -88,7 +74,7 @@ export default function ContactDataTable({
               <Button
                 variant="delete"
                 size="sm"
-                onClick={() => handleDelete(contact.id)}
+                onClick={() => onDelete(contact.id)}
               >
                 Delete
               </Button>

@@ -410,6 +410,23 @@ export default function TaskDetailPage() {
             setSelectedContactId(id);
             setEditModalOpen(true);
           }}
+          onDelete={(id) => {
+            if (!window.confirm("Are you sure to delete this contact?")) return;
+
+            // 删除联系人
+            axios
+              .delete(`${baseApi}/contacts/${id}`, {
+                headers: { Authorization: `Bearer ${token}` },
+              })
+              .then(() => {
+                toast.success("Contact deleted successfully");
+                fetchTaskDetail();
+              })
+              .catch((err) => {
+                console.error("Failed to delete contact", err);
+                toast.error("Failed to delete contact");
+              });
+          }}
         />
       </div>
 

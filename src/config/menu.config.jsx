@@ -4,7 +4,7 @@ export const MENU_SIDEBAR = [
   },
   {
     title: "Dashboard",
-    icon: "profile-circle",
+    icon: "home",
     path: "/",
   },
   {
@@ -14,52 +14,13 @@ export const MENU_SIDEBAR = [
   },
   {
     title: "Users",
-    icon: "profile-circle",
+    icon: "users",
     path: "/users",
   },
-  {
-    title: "Create Agency",
-    icon: "users",
-    path: "/agencies/create-agency",
-    permissions: {
-      agency: ["create"],
-    },
-  },
-  {
-    title: "Create User",
-    icon: "profile-circle",
-    path: "/public-profile/profiles/create",
-    permissions: {
-      user: ["create"],
-    },
-  },
-  {
-    title: "Create Property",
-    icon: "home",
-    path: "/property/create",
-    permissions: {
-      property: ["create"],
-    },
-  },
-  {
-    title: "Create Task",
-    icon: "home",
-    path: "/property/tasks/create",
-    permissions: {
-      task: ["create"],
-    },
-  },
-  {
-    title: "Create Contact",
-    icon: "home",
-    path: "/contacts/create",
-    permissions: {
-      contact: ["create"],
-    },
-  },
+  
   {
     title: "Agencies",
-    icon: "users",
+    icon: "people",
     path: "/agencies/my-agencies",
     permissions: {
       agency: ["create"],
@@ -68,7 +29,7 @@ export const MENU_SIDEBAR = [
 
   {
     title: "Properties",
-    icon: "home",
+    icon: "home-3",
     path: "/property/my-properties",
     permissions: {
       property: ["read"],
@@ -76,20 +37,60 @@ export const MENU_SIDEBAR = [
   },
   {
     title: "Tasks",
-    icon: "home",
+    icon: "scroll",
     path: "/property/tasks",
     
   },
   {
     title: "Emails",
-    icon: "home",
+    icon: "sms",
     path: "/emails",
   },
+  // {
+  //   title: "Contacts",
+  //   icon: "address-book",
+  //   path: "/contacts",
+  // },
   {
-    title: "Contacts",
-    icon: "home",
-    path: "/contacts",
-  }
+    title: "Create Agency",
+    icon: "plus-circle",
+    path: "/agencies/create-agency",
+    permissions: {
+      agency: ["create"],
+    },
+  },
+  {
+    title: "Create User",
+    icon: "plus-circle",
+    path: "/public-profile/profiles/create",
+    permissions: {
+      user: ["create"],
+    },
+  },
+  {
+    title: "Create Property",
+    icon: "plus-circle",
+    path: "/property/create",
+    permissions: {
+      property: ["create"],
+    },
+  },
+  {
+    title: "Create Task",
+    icon: "plus-circle",
+    path: "/property/tasks/create",
+    permissions: {
+      task: ["create"],
+    },
+  },
+  // {
+  //   title: "Create Contact",
+  //   icon: "plus-circle",
+  //   path: "/contacts/create",
+  //   permissions: {
+  //     contact: ["create"],
+  //   },
+  // },
 ];
 export const MENU_MEGA = [
   {
