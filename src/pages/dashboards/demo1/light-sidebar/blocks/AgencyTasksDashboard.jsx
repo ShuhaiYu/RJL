@@ -4,7 +4,7 @@ import { useAuthContext } from "@/auth";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import TasksDataTable from "../../../../property/tasks/blocks/TasksDataTable";
+import TasksDataTable from "../../../../task/blocks/TasksDataTable";
 
 export default function AgencyTasksDashboard() {
   const { auth, baseApi } = useAuthContext();

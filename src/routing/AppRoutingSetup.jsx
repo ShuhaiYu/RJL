@@ -1,30 +1,27 @@
 import { Navigate, Route, Routes } from "react-router";
-import { DefaultPage, Demo1DarkSidebarPage } from "@/pages/dashboards";
-import { ProfileCRMPage } from "@/pages/public-profile";
-import {
-  AccountCompanyProfilePage,
-  AccountUserProfilePage,
-} from "@/pages/account/home";
-import { AgenciesList } from "@/pages/agency/list";
+import {Demo1DarkSidebarPage} from "@/pages/dashboards/demo1/dark-sidebar/Demo1DarkSidebarPage";
 import { AuthPage } from "@/auth";
 import { RequireAuth } from "@/auth/RequireAuth";
 import { Demo1Layout } from "@/layouts/demo1";
 import { ErrorsRouting } from "@/errors";
-import CreateAgency from "../pages/agency/create/CreateAgency";
-import AgencyDetail from "../pages/agency/detail/AgencyDetail";
-import MyProperties from "../pages/property/my-properties/MyProperties";
-import Tasks from "../pages/property/tasks/Tasks";
-import PropertyDetailPage from "../pages/property/property-page/PeopertyDetailPage";
-import TaskDetailPage from "../pages/property/task-page/TaskDetailPage";
-import CreatePropertyPage from "../pages/property/create-property/CreatePropertyPage";
-import CreateTaskPage from "../pages/property/create-task/CreateTaskPage";
-import CreateUserPage from "../pages/user/create-user/CreateUserPage";
+import CreateAgency from "../pages/agency/CreateAgency";
+import AgencyDetail from "../pages/agency/AgencyDetail";
+import MyProperties from "../pages/property/MyProperties";
+import TaskDetailPage from "../pages/task/TaskDetailPage";
+import CreatePropertyPage from "../pages/property/CreatePropertyPage";
+import CreateTaskPage from "../pages/task/CreateTaskPage";
+import CreateUserPage from "../pages/user/CreateUserPage";
 import Emails from "../pages/email/Emails";
 import { ContactPage } from "../pages/contact/ContactPage";
 import { CreateContactPage } from "../pages/contact/CreateContactPage";
 import { AllUsersPage } from "../pages/user/AllUsersPage";
-import { ModifyUserPermissionPage } from "../pages/user/user-permission/ModifyUserPermissionPage";
-import { EditUserPage } from "../pages/user/edit-user/EditUserPage";
+import { ModifyUserPermissionPage } from "../pages/user/ModifyUserPermissionPage";
+import { EditUserPage } from "../pages/user/EditUserPage";
+import { ProfileCRMPage } from "../pages/public-profile/profiles/crm/ProfileCRMPage";
+import AgenciesList from "../pages/agency/AgenciesList";
+import Tasks from "../pages/task/Tasks";
+import PropertyDetailPage from "../pages/property/PeopertyDetailPage";
+import { DefaultPage } from "../pages/dashboards/default/DefaultPage";
 
 const AppRoutingSetup = () => {
   return (
@@ -60,14 +57,6 @@ const AppRoutingSetup = () => {
             </Route>
           </Route>
 
-          <Route
-            path="/account/home/user-profile"
-            element={<AccountUserProfilePage />}
-          />
-          <Route
-            path="/account/home/company-profile"
-            element={<AccountCompanyProfilePage />}
-          />
           <Route path="/emails" element={<Emails />} />
           <Route path="/contacts" element={<ContactPage />} />
           <Route path="/contacts/create" element={<CreateContactPage />} />

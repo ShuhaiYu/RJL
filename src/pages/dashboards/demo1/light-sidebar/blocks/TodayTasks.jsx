@@ -1,8 +1,8 @@
 import { useAuthContext } from "@/auth";
 import axios from "axios";
 import { useState, useEffect } from "react";
-import TasksDataTable from "../../../../property/tasks/blocks/TasksDataTable";
 import { useNavigate } from "react-router-dom";
+import TasksDataTable from "../../../../task/blocks/TasksDataTable";
 
 export default function TodayTasks() {
   const { auth, baseApi } = useAuthContext();

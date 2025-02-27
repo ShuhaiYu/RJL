@@ -1,14 +1,10 @@
 // ProfileCRMPage.jsx
-import { Fragment, useState, useEffect } from 'react';
-import axios from 'axios';
-import { toAbsoluteUrl } from '@/utils/Assets';
-import { KeenIcon } from '@/components';
+import { Fragment } from 'react';
+
 import { Container } from '@/components/container';
-import { UserProfileHero } from '@/partials/heros';
-import { Navbar, NavbarActions, NavbarDropdown } from '@/partials/navbar';
-import { PageMenu } from '@/pages/public-profile';
-import { ProfileCRMContent } from '.';
+
 import { useAuthContext } from '@/auth';
+import { ProfileCRMContent } from './ProfileCRMContent';
 
 const ProfileCRMPage = () => {
   const { currentUser } = useAuthContext(); // 从认证上下文中取 token、role、user_id、email 等
