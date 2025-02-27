@@ -22,6 +22,7 @@ import AgenciesList from "../pages/agency/AgenciesList";
 import Tasks from "../pages/task/Tasks";
 import PropertyDetailPage from "../pages/property/PeopertyDetailPage";
 import { DefaultPage } from "../pages/dashboards/default/DefaultPage";
+import SettingsPage from "../pages/setting/SettingsPage";
 
 const AppRoutingSetup = () => {
   return (
@@ -60,6 +61,7 @@ const AppRoutingSetup = () => {
           <Route path="/emails" element={<Emails />} />
           <Route path="/contacts" element={<ContactPage />} />
           <Route path="/contacts/create" element={<CreateContactPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
         </Route>
       </Route>
       <Route path="error/*" element={<ErrorsRouting />} />

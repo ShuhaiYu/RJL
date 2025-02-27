@@ -83,6 +83,11 @@ export const MENU_SIDEBAR = [
       task: ["create"],
     },
   },
+  {
+    title: "Settings",
+    icon: "setting-2",
+    path: "/settings",
+  }
   // {
   //   title: "Create Contact",
   //   icon: "plus-circle",

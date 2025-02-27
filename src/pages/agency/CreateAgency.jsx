@@ -11,6 +11,7 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "@/components/ui/tooltip";
+import AddressInput from "../../components/custom/AddressInput";
 
 export default function CreateAgency() {
   const [form, setForm] = useState({
@@ -41,20 +42,14 @@ export default function CreateAgency() {
     setError("");
 
     // 简单校验
-    const {
-      agency_name,
-      name,
-      email,
-      password,
-      confirmPassword,
-    } = form;
+    const { agency_name, name, email, password, confirmPassword, address } = form;
     if (
       !agency_name.trim() ||
       !name.trim() ||
       !email.trim() ||
       !password.trim() ||
-      !confirmPassword.trim() 
-
+      !confirmPassword.trim() ||
+      !address.trim()
     ) {
       toast.error("Please fill in all required field");
       setLoading(false);
@@ -191,21 +186,20 @@ export default function CreateAgency() {
           {/* Address */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Address 
+              Address <span className="text-red-500">*</span>
             </label>
-            <Input
-              type="text"
-              name="address"
+            <AddressInput
               value={form.address}
-              onChange={handleChange}
-              placeholder="Enter address"
+              onChange={(formattedAddress) =>
+                setForm((prev) => ({ ...prev, address: formattedAddress }))
+              }
             />
           </div>
 
           {/* Phone */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Phone 
+              Phone
             </label>
             <Input
               type="text"

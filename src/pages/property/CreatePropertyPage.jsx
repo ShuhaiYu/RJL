@@ -1,4 +1,3 @@
-// src/pages/CreatePropertyPage.jsx
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -6,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { useAuthContext } from "@/auth";
 import { toast } from "sonner";
 import AsyncUserSelect from "../../components/custom/AsyncUserSelect";
+// 导入 AddressInput 组件
+import AddressInput from "../../components/custom/AddressInput";
 
 export default function CreatePropertyPage() {
   const [address, setAddress] = useState("");
@@ -30,8 +31,6 @@ export default function CreatePropertyPage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success("Property created successfully!");
-      // 跳转到新创建的房产详情页面（例如 /properties/123）
-
       navigate(`/property/${response.data.data.id}`);
     } catch (error) {
       console.error("Create property error:", error);
@@ -52,26 +51,22 @@ export default function CreatePropertyPage() {
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label className="block mb-2 font-medium">Address</label>
-            <input
-              type="text"
-              className="input input-bordered w-full"
-              placeholder="Enter property address"
+            {/* 使用 AddressInput 组件替换原有的 input */}
+            <AddressInput
               value={address}
-              onChange={(e) => setAddress(e.target.value)}
+              onChange={(formattedAddress) => setAddress(formattedAddress)}
             />
           </div>
           <div>
             <label className="block mb-2 font-medium">
               Assign to User (Required)
             </label>
-
             <AsyncUserSelect
               onChange={(option) =>
                 setSelectedUserId(option ? option.value : "")
               }
             />
           </div>
-
           <div>
             <Button
               type="submit"
