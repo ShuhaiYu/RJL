@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { Box, CircularProgress } from "@mui/material";
 import axios from "axios";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import { useAuthContext } from "@/auth";
-import { Button } from '@/components/ui/button';
 import { toast } from "sonner";
+import { Box, CircularProgress } from "@mui/material";
+import AsyncPropertySelect from "../../components/custom/AsyncPropertySelect";
 
 export const CreateContactPage = () => {
   const navigate = useNavigate();
@@ -21,28 +22,18 @@ export const CreateContactPage = () => {
     email: "",
     property_id: propertyIdFromState || "",
   });
-  const [properties, setProperties] = useState([]);
   const [loadingProperties, setLoadingProperties] = useState(true);
   const [loading, setLoading] = useState(false);
 
+  // 如果没有预设propertyId，则不需要加载全部房产
   useEffect(() => {
-    const fetchProperties = async () => {
-      try {
-        const response = await axios.get(`${baseApi}/properties`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setProperties(response.data);
-      } catch (error) {
-        console.error("Error fetching properties:", error);
-      } finally {
-        setLoadingProperties(false);
-      }
-    };
-
-    if (token) {
-      fetchProperties();
+    if (propertyIdFromState) {
+      setLoadingProperties(false);
+    } else {
+      // 可选：预加载房产列表，这里可留空，AsyncPropertySelect 会异步加载
+      setLoadingProperties(false);
     }
-  }, [token, baseApi]);
+  }, [propertyIdFromState]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -70,10 +61,15 @@ export const CreateContactPage = () => {
         }
       );
       if (response.status === 201) {
-        navigate("/contacts");
+        toast.success("Contact created successfully!");
+        // 返回到之前页面
+        navigate(-1);
       }
     } catch (error) {
       console.error("Create failed:", error);
+      toast.error(
+        error.response?.data?.message || "Failed to create contact."
+      );
     }
     setLoading(false);
   };
@@ -145,25 +141,23 @@ export const CreateContactPage = () => {
             <label className="block mb-2 font-medium" htmlFor="property_id">
               Select Property
             </label>
-            <select
-              id="property_id"
-              name="property_id"
-              value={formData.property_id}
-              disabled={!!propertyIdFromState}
-              className="select select-bordered w-full"
-              onChange={(e) =>
-                setFormData({ ...formData, property_id: e.target.value })
-              }
-            >
-              <option value="">-- Please choose --</option>
-              {properties.map((prop) => (
-                <option key={prop.id} value={prop.id}>
-                  {prop.address}
-                </option>
-              ))}
-            </select>
+            {propertyIdFromState ? (
+              <input
+                type="text"
+                value={formData.property_id}
+                className="input input-bordered w-full"
+                disabled
+              />
+            ) : (
+              <AsyncPropertySelect
+                onChange={(option) =>
+                  setFormData({ ...formData, property_id: option ? option.value : "" })
+                }
+                placeholder="Search property by address..."
+              />
+            )}
           </div>
-          <Button type="submit" className="btn btn-primary">
+          <Button type="submit" className="btn btn-primary" disabled={loading}>
             {loading ? "Creating..." : "Create Contact"}
           </Button>
         </form>

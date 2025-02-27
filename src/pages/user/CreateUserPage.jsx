@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
+import AsyncAgencySelect from "../../components/custom/AsyncAgencySelect";
 
 // Available permission scopes/values
 const permissionOptions = {
@@ -265,22 +266,7 @@ export default function CreateUserPage() {
           {/* If superuser/admin => select agency */}
           {(currentUser?.role === "superuser" ||
             currentUser?.role === "admin") && (
-            <div>
-              <label className="block mb-2 font-medium">Select Agency</label>
-              <select
-                className="form-select block w-full border border-gray-300 rounded-md"
-                value={selectedAgencyId}
-                onChange={(e) => setSelectedAgencyId(e.target.value)}
-                disabled={!canCreate}
-              >
-                <option value="">-- Choose an agency --</option>
-                {agencies.map((agency) => (
-                  <option key={agency.id} value={agency.id}>
-                    {agency.agency_name || `Agency #${agency.id}`}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <AsyncAgencySelect onChange={(option) => setSelectedAgencyId(option)} />
           )}
 
           <div>

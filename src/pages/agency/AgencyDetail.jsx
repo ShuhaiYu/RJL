@@ -1,25 +1,26 @@
+// src/pages/AgencyDetail.jsx
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useParams, useNavigate } from "react-router-dom";
 import { useAuthContext } from "@/auth";
 import MyPropertiesDataTable from "../property/blocks/MyPropertiesDataTable";
 import TasksDataTable from "../task/blocks/TasksDataTable";
+import { Box, CircularProgress } from "@mui/material";
+import EditAgencyModal from "./blocks/EditAgencyModal";
 
 export default function AgencyDetail() {
   const { id } = useParams();
   const [agency, setAgency] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [editModalOpen, setEditModalOpen] = useState(false);
 
-  // 从 useAuthContext 中获取 token 与 baseApi
   const { auth, baseApi } = useAuthContext();
   const token = auth?.accessToken;
-
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!token) return;
-
     axios
       .get(`${baseApi}/agencies/${id}`, {
         headers: {
@@ -41,18 +42,19 @@ export default function AgencyDetail() {
 
   if (loading)
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div>Loading...</div>
-      </div>
+      <Box className="flex justify-center items-center h-screen">
+        <CircularProgress />
+      </Box>
     );
   if (error) return <div className="text-red-500 text-center p-4">{error}</div>;
   if (!agency) return <div className="text-center p-4">No agency found.</div>;
 
   // 点击属性“Edit”按钮时触发
-  const handleEdit = (propertyId) => {
+  const handleEditProperty = (propertyId) => {
     navigate(`/property/${propertyId}`);
   };
 
+  // 点击任务“View”按钮时触发
   const handleTaskClick = (taskId) => {
     navigate(`/property/tasks/${taskId}`);
   };
@@ -87,19 +89,28 @@ export default function AgencyDetail() {
             {new Date(agency.updated_at).toLocaleString()}
           </div>
         </div>
+        {/* 添加编辑机构按钮 */}
+        <div className="flex justify-end mt-4 ">
+          <button
+            className="btn btn-secondary"
+            onClick={() => setEditModalOpen(true)}
+          >
+            Edit Agency
+          </button>
+        </div>
       </div>
 
       {/* 房产列表 */}
       <div className="bg-white rounded-xl shadow p-6">
         <h2 className="text-2xl font-bold mb-4 text-gray-800">Properties</h2>
-        {agency.properties.length === 0 ? (
+        {(agency.properties || []).length === 0 ? (
           <div className="text-center py-6 text-gray-500">
             No properties found.
           </div>
         ) : (
           <MyPropertiesDataTable
             properties={agency.properties}
-            onEdit={handleEdit}
+            onEdit={handleEditProperty}
             hideColumns={["agency_name"]}
           />
         )}
@@ -108,16 +119,38 @@ export default function AgencyDetail() {
       {/* 任务列表 */}
       <div className="bg-white rounded-xl shadow p-6 mt-8">
         <h2 className="text-2xl font-bold mb-4 text-gray-800">Tasks</h2>
-        {agency.tasks.length === 0 ? (
+        {(agency.tasks || []).length === 0 ? (
           <div className="text-center py-6 text-gray-500">No tasks found.</div>
         ) : (
           <TasksDataTable
-            tasks={agency.tasks || []}
+            tasks={agency.tasks}
             onTaskClick={handleTaskClick}
             hideColumns={["property", "agency_name"]}
           />
         )}
-        </div>
+      </div>
+
+      {/* 编辑机构弹窗 */}
+      {editModalOpen && (
+        <EditAgencyModal
+          agency={agency}
+          onClose={() => setEditModalOpen(false)}
+          onUpdated={(updatedAgency) =>
+            setAgency((prev) => ({
+              ...prev,
+              ...updatedAgency,
+              properties:
+                updatedAgency.properties !== undefined
+                  ? updatedAgency.properties
+                  : prev.properties,
+              tasks:
+                updatedAgency.tasks !== undefined
+                  ? updatedAgency.tasks
+                  : prev.tasks,
+            }))
+          }
+        />
+      )}
     </div>
   );
 }

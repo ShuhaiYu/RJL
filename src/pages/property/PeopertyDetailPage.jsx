@@ -8,7 +8,16 @@ import TasksDataTable from "../task/blocks/TasksDataTable";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import { Box, CircularProgress } from "@mui/material";
-
+import ContactDataTable from "../contact/blocks/ContactDataTable";
+import { toast } from "sonner";
+import {
+  Modal,
+  ModalHeader,
+  ModalTitle,
+  ModalBody,
+  ModalContent,
+} from "@/components/modal";
+import { EditContactForm } from "../contact/blocks/EditContactForm";
 
 export default function PropertyDetailPage() {
   const { id: propertyId } = useParams();
@@ -19,6 +28,9 @@ export default function PropertyDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showEditModal, setShowEditModal] = useState(false);
+
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedContactId, setSelectedContactId] = useState(null);
 
   const navigate = useNavigate();
 
@@ -114,7 +126,72 @@ export default function PropertyDetailPage() {
       </div>
 
       {/* 下方区域：任务列表 */}
-      <TasksDataTable tasks={property.tasks} onTaskClick={handleTaskClick} hideColumns={['property_address']}/>
+      <TasksDataTable
+        tasks={property.tasks}
+        onTaskClick={handleTaskClick}
+        hideColumns={["property_address"]}
+      />
+
+      {/* 下方区域：Contacts DataTable */}
+      <div className="bg-white p-6 shadow rounded my-6">
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-bold mb-4">Contacts</h2>
+          <Button
+            variant="create"
+            className="mb-4"
+            onClick={() =>
+              navigate("/contacts/create", {
+                state: { propertyId: property.id },
+              })
+            }
+          >
+            Add Contact
+          </Button>
+        </div>
+        <ContactDataTable
+          contacts={property.contacts}
+          onEdit={(id) => {
+            setSelectedContactId(id);
+            setEditModalOpen(true);
+          }}
+          onDelete={(id) => {
+            if (!window.confirm("Are you sure to delete this contact?")) return;
+
+            // 删除联系人
+            axios
+              .delete(`${baseApi}/contacts/${id}`, {
+                headers: { Authorization: `Bearer ${token}` },
+              })
+              .then(() => {
+                toast.success("Contact deleted successfully");
+                fetchPropertyDetail(); // 刷新详情以显示更新后的数据
+              })
+              .catch((err) => {
+                console.error("Failed to delete contact", err);
+                toast.error("Failed to delete contact");
+              });
+          }}
+        />
+      </div>
+
+      <Modal open={editModalOpen} onClose={() => setEditModalOpen(false)}>
+        <ModalContent>
+          <ModalHeader>
+            <ModalTitle>Edit Contact</ModalTitle>
+          </ModalHeader>
+          <ModalBody>
+            {selectedContactId && (
+              <EditContactForm
+                contactId={selectedContactId}
+                onSuccess={() => {
+                  setEditModalOpen(false);
+                  fetchPropertyDetail(); // 刷新详情以显示更新后的数据
+                }}
+              />
+            )}
+          </ModalBody>
+        </ModalContent>
+      </Modal>
 
       {/* 编辑弹窗：点击 Edit 按钮后打开 */}
       {showEditModal && (
@@ -127,8 +204,6 @@ export default function PropertyDetailPage() {
           }}
         />
       )}
-
-      
     </div>
   );
 }

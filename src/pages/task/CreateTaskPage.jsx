@@ -5,6 +5,8 @@ import { useAuthContext } from "@/auth";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useLocation } from "react-router-dom";
+import AsyncPropertySelect from "../../components/custom/AsyncPropertySelect";
+import AsyncAgencySelect from "../../components/custom/AsyncAgencySelect";
 
 export default function CreateTaskPage() {
   const { auth, baseApi, currentUser } = useAuthContext();
@@ -12,7 +14,6 @@ export default function CreateTaskPage() {
   const navigate = useNavigate();
 
   // 1) 获取 property 列表并存储
-  const [properties, setProperties] = useState([]);
   const [selectedPropertyId, setSelectedPropertyId] = useState("");
 
   const [taskName, setTaskName] = useState("");
@@ -30,36 +31,9 @@ export default function CreateTaskPage() {
   const originalTask = location.state?.originalTask;
   const [emailId, setEmailId] = useState(null);
 
-  const [agencies, setAgencies] = useState([]);
   const [selectedAgencyId, setSelectedAgencyId] = useState("");
 
   const isAgencyUser = currentUser?.agency_id ? true : false;
-
-  // 2) 加载 property 列表
-  useEffect(() => {
-    if (!token) return;
-    axios
-      .get(`${baseApi}/properties`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => {
-        setProperties(res.data || []);
-      })
-      .catch((err) => {
-        console.error("Failed to load properties:", err);
-      });
-
-    axios
-      .get(`${baseApi}/agencies`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => {
-        setAgencies(res.data || []);
-      })
-      .catch((err) => {
-        console.error("Failed to load agencies:", err);
-      });
-  }, [token, baseApi]);
 
   useEffect(() => {
     if (isAgencyUser && currentUser.agency_id) {
@@ -137,18 +111,11 @@ export default function CreateTaskPage() {
           {/* Property 下拉选择 */}
           <div>
             <label className="block mb-2 font-medium">Select Property</label>
-            <select
-              className="select select-bordered w-full"
-              value={selectedPropertyId}
-              onChange={(e) => setSelectedPropertyId(e.target.value)}
-            >
-              <option value="">-- Please choose --</option>
-              {properties.map((prop) => (
-                <option key={prop.id} value={prop.id}>
-                  {prop.address}
-                </option>
-              ))}
-            </select>
+            <AsyncPropertySelect
+              onChange={(option) => {
+                setSelectedPropertyId(option);
+              }}
+            />
           </div>
 
           {/* Task Name */}
@@ -232,26 +199,25 @@ export default function CreateTaskPage() {
               <option value="2 years">2 Years</option>
               <option value="3 years">3 Years</option>
             </select>
-
           </div>
 
           {/* 下拉选择 Agency (如果是 RJL 用户显示, 中介用户只显示自己的 agency) */}
           <div>
             <label className="block mb-2 font-medium">Task Agency</label>
 
-            <select
-              className="select select-bordered w-full"
-              value={selectedAgencyId}
-              disabled={isAgencyUser}
-              onChange={(e) => setSelectedAgencyId(e.target.value)}
-            >
-              <option value="">-- Choose Agency --</option>
-              {agencies.map((ag) => (
-                <option key={ag.id} value={ag.id}>
-                  {ag.agency_name}
-                </option>
-              ))}
-            </select>
+            <AsyncAgencySelect
+              onChange={(option) => setSelectedAgencyId(option)}
+              placeholder="Select agency..."
+              isDisabled={isAgencyUser}
+              defaultValue={
+                isAgencyUser
+                  ? {
+                      value: currentUser.agency_id,
+                      label: currentUser.agency.agency_name,
+                    }
+                  : undefined
+              }
+            />
           </div>
 
           {/* Submit Button */}
