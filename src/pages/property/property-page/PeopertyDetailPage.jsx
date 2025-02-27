@@ -7,6 +7,8 @@ import PropertyDetailModal from "./blocks/PropertyDetailModal";
 import TasksDataTable from "../tasks/blocks/TasksDataTable";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../../components/ui/button";
+import { Box, CircularProgress } from "@mui/material";
+
 
 export default function PropertyDetailPage() {
   const { id: propertyId } = useParams();
@@ -46,7 +48,9 @@ export default function PropertyDetailPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-4">Loading property details...</div>
+      <Box className="flex justify-center items-center h-40">
+        <CircularProgress />
+      </Box>
     );
   }
 

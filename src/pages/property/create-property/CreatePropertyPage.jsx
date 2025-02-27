@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuthContext } from "@/auth";
 import { toast } from "sonner";
+import { Box, CircularProgress } from "@mui/material";
 
 export default function CreatePropertyPage() {
   const [address, setAddress] = useState("");
@@ -94,7 +95,9 @@ export default function CreatePropertyPage() {
               Assign to User (Required)
             </label>
             {loadingUsers ? (
-              <p>Loading users...</p>
+              <Box className="flex justify-center items-center h-40">
+                <CircularProgress />
+              </Box>
             ) : (
               <select
                 className="select select-bordered w-full"

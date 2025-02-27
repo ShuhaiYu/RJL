@@ -5,6 +5,8 @@ import axios from 'axios'
 import { useAuthContext } from '@/auth'
 import { useNavigate } from 'react-router-dom'
 import TasksDataTable from './blocks/TasksDataTable'
+import { Box, CircularProgress } from "@mui/material";
+
 
 export default function Tasks() {
   const [tasks, setTasks] = useState([])
@@ -45,7 +47,11 @@ export default function Tasks() {
   }
 
   if (loading) {
-    return <div>Loading tasks...</div>
+    return (
+      <Box className="flex justify-center items-center h-40">
+        <CircularProgress />
+      </Box>
+    )
   }
 
   if (error) {

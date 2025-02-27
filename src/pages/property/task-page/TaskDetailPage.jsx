@@ -15,6 +15,8 @@ import {
   ModalContent,
 } from "@/components/modal";
 import { EditContactForm } from "../../contact/blocks/EditContactForm";
+import { Box, CircularProgress } from "@mui/material";
+
 
 export default function TaskDetailPage() {
   const navigate = useNavigate();
@@ -238,7 +240,11 @@ export default function TaskDetailPage() {
   };
 
   if (loading) {
-    return <div className="container mx-auto p-4">Loading task details...</div>;
+    return (
+      <Box className="flex justify-center items-center h-40">
+        <CircularProgress />
+      </Box>
+    )
   }
 
   if (error) {
