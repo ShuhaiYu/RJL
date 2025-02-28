@@ -16,6 +16,9 @@ export const MENU_SIDEBAR = [
     title: "Users",
     icon: "users",
     path: "/users",
+    permissions: {
+      user: ["create"],
+    }
   },
   
   {
@@ -39,7 +42,9 @@ export const MENU_SIDEBAR = [
     title: "Tasks",
     icon: "scroll",
     path: "/property/tasks",
-    
+    permissions: {
+      task: ["create"],
+    }
   },
   {
     title: "Emails",
@@ -83,11 +88,11 @@ export const MENU_SIDEBAR = [
       task: ["create"],
     },
   },
-  {
-    title: "Settings",
-    icon: "setting-2",
-    path: "/settings",
-  }
+  // {
+  //   title: "Settings",
+  //   icon: "setting-2",
+  //   path: "/settings",
+  // }
   // {
   //   title: "Create Contact",
   //   icon: "plus-circle",
