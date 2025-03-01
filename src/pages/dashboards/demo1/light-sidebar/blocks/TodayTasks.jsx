@@ -41,6 +41,10 @@ export default function TodayTasks() {
 
   return (
     <div style={{ width: "100%" }}>
+      <div style={{ width: "100%", marginBottom: '20px'  }}>
+        <h2 className="text-lg font-semibold text-gray-800">Unknown Tasks</h2>
+        <TasksDataTable tasks={unknownTasks} onTaskClick={handleTaskClick} />
+      </div>
       <div style={{ width: "100%", marginBottom: "20px" }}>
         <h2 className="text-lg font-semibold text-gray-800">Incomplete Tasks</h2>
         <TasksDataTable tasks={undoTasks} onTaskClick={handleTaskClick} />
@@ -48,10 +52,6 @@ export default function TodayTasks() {
       <div style={{ width: "100%", marginBottom: "20px" }}>
         <h2 className="text-lg font-semibold text-gray-800">Processing Tasks</h2>
         <TasksDataTable tasks={doingTasks} onTaskClick={handleTaskClick} />
-      </div>
-      <div style={{ width: "100%", marginBottom: '20px'  }}>
-        <h2 className="text-lg font-semibold text-gray-800">Unknown Tasks</h2>
-        <TasksDataTable tasks={unknownTasks} onTaskClick={handleTaskClick} />
       </div>
     </div>
   );
