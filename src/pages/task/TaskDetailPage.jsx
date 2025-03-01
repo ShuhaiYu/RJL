@@ -144,6 +144,7 @@ export default function TaskDetailPage() {
         type: task.type,
         repeat_frequency: task.repeat_frequency,
         status: "INCOMPLETE",
+        agency_id: task.agency_id,
       };
 
       await axios.post(`${baseApi}/tasks`, newTaskPayload, {

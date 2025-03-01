@@ -16,6 +16,18 @@ export default function TasksDataTable({
 }) {
   const [filteredCount, setFilteredCount] = useState(tasks.length);
 
+  // 1) 统计所有 未完成任务 (非 COMPLETED/CANCEL) 的 property_id+type
+  const incompleteTaskCountMap = useMemo(() => {
+    const map = {};
+    for (const t of tasks) {
+      if (!["CANCEL", "COMPLETED"].includes(t.status)) {
+        const key = `${t.property_id}--${t.type}`;
+        map[key] = (map[key] || 0) + 1;
+      }
+    }
+    return map;
+  }, [tasks]);
+
   const ColumnInputFilter = ({ column }) => {
     return (
       <Input
@@ -184,6 +196,19 @@ export default function TasksDataTable({
         // 将 onFilteredDataChange 回调传递给 DataGrid
         onFilteredDataChange={(count) => setFilteredCount(count)}
         sorting={[{ id: "updated_at", desc: true }]}
+        getRowClassName={(task) => {
+          // 1) 如果该行本身就是 CANCEL / COMPLETED，不标红
+          if (["CANCEL", "COMPLETED"].includes(task.status)) {
+            return "";
+          }
+      
+          // 2) 若是“未完成”行，则判断该 (property_id + type) 下未完成任务数
+          const key = `${task.property_id}--${task.type}`;
+          const count = incompleteTaskCountMap[key] || 0;
+      
+          // 3) 如果此组合 >= 2，才标红
+          return count >= 2 ? "bg-red-100" : "";
+        }}
       />
     </div>
   );

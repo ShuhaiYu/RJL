@@ -34,7 +34,8 @@ export const DataGridProvider = props => {
       more: false
     },
     rowSelection: false,
-    serverSide: false
+    serverSide: false,
+    getRowClassName: undefined,
   };
   const mergedProps = deepMerge(defaultValues, props);
   const [data, setData] = useState(mergedProps.data || []);

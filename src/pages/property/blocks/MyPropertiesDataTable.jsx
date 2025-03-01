@@ -22,6 +22,10 @@ export default function MyPropertiesDataTable({
       />
     );
   };
+
+  //hide updated_at column
+  hideColumns.push("updated_at");
+
   // 定义 DataGrid 的列
   const baseColumns = useMemo(
     () => [
@@ -76,6 +80,14 @@ export default function MyPropertiesDataTable({
           );
         },
       },
+      {
+        accessorKey: "updated_at", // 必须与数据源中的字段名一致
+        header: "Updated At",
+        cell: ({ row }) => {
+          const { updated_at } = row.original;
+          return new Date(updated_at).toLocaleString();
+        },
+      },
     ],
     [onEdit]
   );
@@ -86,6 +98,8 @@ export default function MyPropertiesDataTable({
       return !hideColumns.includes(key);
     });
   }, [baseColumns, hideColumns]);
+
+  
 
   return (
     <div>
@@ -101,6 +115,7 @@ export default function MyPropertiesDataTable({
         pagination={{ size: 100 }}
         onFilteredDataChange={(count) => setFilteredCount(count)}
         sorting={[{ id: "updated_at", desc: true }]}
+        
       />
     </div>
   );
