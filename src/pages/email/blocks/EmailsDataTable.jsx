@@ -90,11 +90,11 @@ export default function EmailsDataTable({ emails }) {
         },
       },
       {
-        accessorKey: "task_name",
+        accessorKey: "task_type",
         header: ({ header }) => (
           <DataGridColumnHeader
             column={header.column}
-            title="Task Name"
+            title="Task Type"
             filter={<ColumnInputFilter column={header.column} />}
           />
         ),

@@ -142,20 +142,20 @@ export default function TasksDataTable({
           />
         ),
       },
-      {
-        accessorKey: "next_reminder",
-        header: ({ header }) => (
-          <DataGridColumnHeader
-            column={header.column}
-            title="Next Reminder"
-            filter={<ColumnInputFilter column={header.column} />}
-          />
-        ),
-        cell: ({ getValue }) => {
-          const val = getValue();
-          return val ? new Date(val).toLocaleString() : "-";
-        },
-      },
+      // {
+      //   accessorKey: "next_reminder",
+      //   header: ({ header }) => (
+      //     <DataGridColumnHeader
+      //       column={header.column}
+      //       title="Next Reminder"
+      //       filter={<ColumnInputFilter column={header.column} />}
+      //     />
+      //   ),
+      //   cell: ({ getValue }) => {
+      //     const val = getValue();
+      //     return val ? new Date(val).toLocaleString() : "-";
+      //   },
+      // },
       // 如果你想放一个操作列，就再加一个
       {
         id: "actions",

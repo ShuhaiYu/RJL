@@ -293,12 +293,12 @@ export default function TaskDetailPage() {
             <span className="font-medium">Repeat Frequency: </span>
             {task.repeat_frequency}
           </p>
-          <p className="mt-1 text-gray-600">
-            <span className="font-medium">Next Reminder: </span>
-            {task.next_reminder
-              ? new Date(task.next_reminder).toLocaleString()
-              : "N/A"}
-          </p>
+          {/*<p className="mt-1 text-gray-600">*/}
+          {/*  <span className="font-medium">Next Reminder: </span>*/}
+          {/*  {task.next_reminder*/}
+          {/*    ? new Date(task.next_reminder).toLocaleString()*/}
+          {/*    : "N/A"}*/}
+          {/*</p>*/}
           <p className="mt-1 text-gray-600">
             <span className="font-medium">Description: </span>
             {task.task_description}
