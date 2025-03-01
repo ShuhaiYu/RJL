@@ -126,7 +126,7 @@ export default function AgencyDetail() {
           <TasksDataTable
             tasks={agency.tasks}
             onTaskClick={handleTaskClick}
-            hideColumns={["property", "agency_name"]}
+            hideColumns={["property_address", "agency_name"]}
           />
         )}
       </div>

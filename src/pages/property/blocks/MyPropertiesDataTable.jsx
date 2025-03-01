@@ -6,7 +6,11 @@ import { Button } from "../../../components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
 
-export default function MyPropertiesDataTable({ properties, onEdit, hideColumns = [] }) {
+export default function MyPropertiesDataTable({
+  properties,
+  onEdit,
+  hideColumns = [],
+}) {
   const [filteredCount, setFilteredCount] = useState(properties.length);
   const ColumnInputFilter = ({ column }) => {
     return (
@@ -32,7 +36,11 @@ export default function MyPropertiesDataTable({ properties, onEdit, hideColumns 
         ),
         cell: ({ row }) => {
           const property = row.original;
-          return <Link className="btn btn-link" to={`/property/${property.id}`}>{property.address}</Link>;
+          return (
+            <Link className="btn btn-link" to={`/property/${property.id}`}>
+              {property.address}
+            </Link>
+          );
         },
       },
       {
@@ -46,9 +54,15 @@ export default function MyPropertiesDataTable({ properties, onEdit, hideColumns 
         ),
         cell: ({ row }) => {
           const property = row.original;
-          return <Link className="btn btn-link" to={`/agencies/${property.agency?.id}`}>{property.agency?.agency_name}</Link>;
-        }
-
+          return (
+            <Link
+              className="btn btn-link"
+              to={`/agencies/${property.agency?.id}`}
+            >
+              {property.agency?.agency_name}
+            </Link>
+          );
+        },
       },
       {
         id: "actions",
@@ -79,16 +93,15 @@ export default function MyPropertiesDataTable({ properties, onEdit, hideColumns 
         Showing {filteredCount} of {properties.length} properties
       </p>
       <DataGrid
-      columns={columns}
-      data={properties}
-      serverSide={false} // 前端分页/排序
-      rowSelection={false} // 不需要选择行
-      // 其它 DataGrid 配置，如 toolbar, pagination, etc.
-      pagination={{ size: 100 }}
-      onFilteredDataChange={(count) => setFilteredCount(count)}
-
-    />
+        columns={columns}
+        data={properties}
+        serverSide={false} // 前端分页/排序
+        rowSelection={false} // 不需要选择行
+        // 其它 DataGrid 配置，如 toolbar, pagination, etc.
+        pagination={{ size: 100 }}
+        onFilteredDataChange={(count) => setFilteredCount(count)}
+        sorting={[{ id: "updated_at", desc: true }]}
+      />
     </div>
-    
   );
 }

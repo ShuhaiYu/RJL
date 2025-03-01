@@ -38,7 +38,10 @@ export default function EmailsDataTable({ emails }) {
         cell: ({ row }) => {
           const email = row.original;
           return (
-            <Link className="btn btn-link" to={`/property/${email.property_id}`}>
+            <Link
+              className="btn btn-link"
+              to={`/property/${email.property_id}`}
+            >
               {email.property_address}
             </Link>
           );
@@ -101,7 +104,10 @@ export default function EmailsDataTable({ emails }) {
         cell: ({ row }) => {
           const email = row.original;
           return (
-            <Link className="btn btn-link" to={`/property/tasks/${email.task_id}`}>
+            <Link
+              className="btn btn-link"
+              to={`/property/tasks/${email.task_id}`}
+            >
               {email.task_name}
             </Link>
           );
@@ -143,6 +149,7 @@ export default function EmailsDataTable({ emails }) {
         rowSelection={false}
         pagination={{ size: 100 }}
         onFilteredDataChange={(count) => setFilteredCount(count)}
+        sorting={[{ id: "updated_at", desc: true }]}
       />
     </div>
   );

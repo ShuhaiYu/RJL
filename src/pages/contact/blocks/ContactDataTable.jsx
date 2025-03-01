@@ -93,6 +93,7 @@ export default function ContactDataTable({
       rowSelection={false} // 不需要多选行
       pagination={{ size: 100 }}
       onFilteredDataChange={onFilteredDataChange}
+      sorting={[{ id: "updated_at", desc: true }]}
     />
   );
 }

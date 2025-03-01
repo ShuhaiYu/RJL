@@ -142,21 +142,6 @@ export default function TasksDataTable({
           />
         ),
       },
-      // {
-      //   accessorKey: "next_reminder",
-      //   header: ({ header }) => (
-      //     <DataGridColumnHeader
-      //       column={header.column}
-      //       title="Next Reminder"
-      //       filter={<ColumnInputFilter column={header.column} />}
-      //     />
-      //   ),
-      //   cell: ({ getValue }) => {
-      //     const val = getValue();
-      //     return val ? new Date(val).toLocaleString() : "-";
-      //   },
-      // },
-      // 如果你想放一个操作列，就再加一个
       {
         id: "actions",
         header: "Actions",
@@ -198,6 +183,7 @@ export default function TasksDataTable({
         pagination={{ size: 100 }}
         // 将 onFilteredDataChange 回调传递给 DataGrid
         onFilteredDataChange={(count) => setFilteredCount(count)}
+        sorting={[{ id: "updated_at", desc: true }]}
       />
     </div>
   );
