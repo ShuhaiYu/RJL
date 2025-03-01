@@ -115,7 +115,7 @@ export default function TaskDetailPage() {
         newDueDate.setMonth(newDueDate.getMonth() + 3);
       } else if (repeat === "6 months") {
         newDueDate.setMonth(newDueDate.getMonth() + 6);
-      } else if (repeat === "1 year") {
+      } else if (repeat === "yearly") {
         newDueDate.setFullYear(newDueDate.getFullYear() + 1);
       } else if (repeat === "2 years") {
         newDueDate.setFullYear(newDueDate.getFullYear() + 2);
