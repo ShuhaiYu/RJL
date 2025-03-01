@@ -7,6 +7,7 @@ import MyPropertiesDataTable from "../property/blocks/MyPropertiesDataTable";
 import TasksDataTable from "../task/blocks/TasksDataTable";
 import { Box, CircularProgress } from "@mui/material";
 import EditAgencyModal from "./blocks/EditAgencyModal";
+import AgencyWhitelistEmails from "./blocks/AgencyWhitelistEmails";
 
 export default function AgencyDetail() {
   const { id } = useParams();
@@ -129,6 +130,13 @@ export default function AgencyDetail() {
           />
         )}
       </div>
+
+      {/* ============ 新增: 机构白名单管理区块 ============ */}
+      <div className="bg-white rounded-xl shadow p-6 mt-8">
+        <h2 className="text-2xl font-bold mb-4 text-gray-800">Email Whitelist</h2>
+        <AgencyWhitelistEmails agencyId={id} />
+      </div>
+      {/* ============ 新增结束 ============ */}
 
       {/* 编辑机构弹窗 */}
       {editModalOpen && (
