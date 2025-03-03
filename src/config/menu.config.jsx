@@ -7,11 +7,11 @@ export const MENU_SIDEBAR = [
     icon: "home",
     path: "/",
   },
-  {
-    title: "My Profile",
-    icon: "profile-circle",
-    path: "/public-profile/profiles/crm",
-  },
+  // {
+  //   title: "My Profile",
+  //   icon: "profile-circle",
+  //   path: "/public-profile/profiles/crm",
+  // },
   {
     title: "Users",
     icon: "users",
@@ -20,7 +20,7 @@ export const MENU_SIDEBAR = [
       user: ["create"],
     }
   },
-  
+
   {
     title: "Agencies",
     icon: "people",
