@@ -39,12 +39,58 @@ export const MENU_SIDEBAR = [
     },
   },
   {
-    title: "Tasks",
+    title: "Job Orders",
     icon: "scroll",
-    path: "/property/tasks",
     permissions: {
       task: ["create"],
-    }
+    },
+    children: [
+      {
+        title: "All",
+        icon: "plus-circle",
+        path: "/property/tasks",
+      },
+      {
+        title: "Unknown",
+        icon: "plus-circle",
+        path: "/property/tasks?status=UNKNOWN",
+      },
+      {
+        title: "Processing",
+        icon: "plus-circle",
+        path: "/property/tasks?status=PROCESSING",
+      },
+      {
+        title: "Incomplete",
+        icon: "plus-circle",
+        path: "/property/tasks?status=INCOMPLETE",
+      },
+      {
+        title: "Completed",
+        icon: "plus-circle",
+        path: "/property/tasks?status=COMPLETED",
+      },
+      {
+        title: "Due Soon",
+        icon: "plus-circle",
+        path: "/property/tasks?status=DUE_SOON",
+      },
+      {
+        title: "Expired",
+        icon: "plus-circle",
+        path: "/property/tasks?status=EXPIRED",
+      },
+      {
+        title: "Smoke Alarm",
+        icon: "plus-circle",
+        path: "/property/tasks?type=smoke_alarm",
+      },
+      {
+        title: "Gas & Electric",
+        icon: "plus-circle",
+        path: "/property/tasks?type=gas_%26_electric",
+      },
+    ],
   },
   {
     title: "Emails",

@@ -13,7 +13,7 @@ export default function TaskDetailModal({ task, onClose }) {
     task.task_description || ""
   );
   const [dueDate, setDueDate] = useState("");
-  const [status, setStatus] = useState(task.status || "unknown");
+  const [inspectionDate, setInspectionDate] = useState(task.inspection_date || "");
   const [type, setType] = useState(task.type || "unknown");
   const [repeatFrequency, setRepeatFrequency] = useState(
     task.repeat_frequency || "none"
@@ -39,7 +39,15 @@ export default function TaskDetailModal({ task, onClose }) {
     } else {
       setDueDate("");
     }
-  }, [task.due_date, userTimeZone]);
+    if (task.inspection_date) {
+      const serverUtcDate = new Date(task.inspection_date);
+      const zonedDate = toZonedTime(serverUtcDate, userTimeZone);
+      const displayString = format(zonedDate, "yyyy-MM-dd'T'HH:mm");
+      setInspectionDate(displayString);
+    } else {
+      setInspectionDate("");
+    }
+  }, [task.due_date, task.inspection_date, userTimeZone]);
 
   // 新增 useEffect 获取 agency 列表
   useEffect(() => {
@@ -71,7 +79,7 @@ export default function TaskDetailModal({ task, onClose }) {
           task_name: taskName,
           task_description: taskDescription,
           due_date: dueDate,
-          status: status,
+          inspection_date: inspectionDate,
           type: type,
           repeat_frequency: repeatFrequency,
           agency_id: selectedAgencyId,
@@ -99,7 +107,7 @@ export default function TaskDetailModal({ task, onClose }) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center border-b pb-2 mb-4">
-          <h2 className="text-xl font-semibold">Edit Task</h2>
+          <h2 className="text-xl font-semibold">Edit Job Order</h2>
           <button
             className="text-gray-600 hover:text-gray-800"
             onClick={onClose}
@@ -109,7 +117,7 @@ export default function TaskDetailModal({ task, onClose }) {
         </div>
         {/* 任务编辑表单 */}
         <div className="mb-4">
-          <label className="block mb-1 font-medium">Task Name</label>
+          <label className="block mb-1 font-medium">Job Order Name</label>
           <input
             type="text"
             className="border w-full p-2 rounded"
@@ -118,7 +126,7 @@ export default function TaskDetailModal({ task, onClose }) {
           />
         </div>
         <div className="mb-4">
-          <label className="block mb-1 font-medium">Task Description</label>
+          <label className="block mb-1 font-medium">Job Order Description</label>
           <textarea
             rows={3}
             className="border w-full p-2 rounded"
@@ -136,18 +144,13 @@ export default function TaskDetailModal({ task, onClose }) {
           />
         </div>
         <div className="mb-4">
-          <label className="block mb-1 font-medium">Status</label>
-          <select
+          <label className="block mb-1 font-medium">Inspection Date</label>
+          <input
+            type="datetime-local"
             className="border w-full p-2 rounded"
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-          >
-            <option value="UNKNOWN">UNKNOWN</option>
-            <option value="INCOMPLETE">INCOMPLETE</option>
-            <option value="PROCESSING">PROCESSING</option>
-            {/* <option value="done">done</option> */}
-            <option value="CANCEL">CANCEL</option>
-          </select>
+            value={inspectionDate}
+            onChange={(e) => setInspectionDate(e.target.value)}
+          />
         </div>
         <div className="mb-4">
           <label className="block mb-1 font-medium">Type</label>
@@ -157,7 +160,6 @@ export default function TaskDetailModal({ task, onClose }) {
             onChange={(e) => setType(e.target.value)}
           >
             <option value="gas & electric">gas & electric</option>
-            <option value="electric">electric</option>
             <option value="smoke alarm">smoke alarm</option>
             <option value="">-</option>
           </select>
@@ -180,7 +182,7 @@ export default function TaskDetailModal({ task, onClose }) {
         </div>
         {/* 下拉选择 Agency (如果是 RJL 用户显示, 中介用户只显示自己的 agency) */}
         <div className="mb-4">
-          <label className="block mb-2 font-medium">Task Agency</label>
+          <label className="block mb-2 font-medium">Job Order Agency</label>
 
           <select
             className="select select-bordered w-full"
@@ -201,7 +203,7 @@ export default function TaskDetailModal({ task, onClose }) {
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             onClick={handleSaveTask}
           >
-            Save Task
+            Save Job Order
           </button>
         </div>
       </div>

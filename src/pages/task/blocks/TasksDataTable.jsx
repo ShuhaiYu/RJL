@@ -185,7 +185,7 @@ export default function TasksDataTable({
   return (
     <div>
       <p className="text-sm text-gray-500 mb-4">
-        Showing {filteredCount} of {tasks.length} tasks
+        Showing {filteredCount} of {tasks.length} Job Orders
       </p>
       <DataGrid
         columns={columns}

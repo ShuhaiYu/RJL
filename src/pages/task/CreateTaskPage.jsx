@@ -104,7 +104,7 @@ export default function CreateTaskPage() {
   return (
     <div className="container mx-auto p-4 max-w-xl">
       <div className="card-header py-5">
-        <h3 className="card-title text-xl font-bold">Create New Task</h3>
+        <h3 className="card-title text-xl font-bold">Create New Job Order</h3>
       </div>
       <div className="card-body p-5">
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -120,7 +120,7 @@ export default function CreateTaskPage() {
 
           {/* Task Name */}
           <div>
-            <label className="block mb-2 font-medium">Task Name</label>
+            <label className="block mb-2 font-medium">Job Order Name</label>
             <input
               type="text"
               className="input input-bordered w-full"
@@ -132,7 +132,7 @@ export default function CreateTaskPage() {
 
           {/* Task Description */}
           <div>
-            <label className="block mb-2 font-medium">Task Description</label>
+            <label className="block mb-2 font-medium">Job Order Description</label>
             <textarea
               rows={3}
               className="textarea textarea-bordered w-full"
@@ -144,31 +144,14 @@ export default function CreateTaskPage() {
 
           {/* Type */}
           <div>
-            <label className="block mb-2 font-medium">Task Type</label>
+            <label className="block mb-2 font-medium">Job Order Type</label>
             <select
               className="select select-bordered w-full"
               value={taskType}
               onChange={(e) => setTaskType(e.target.value)}
             >
-              <option value="gas">Gas</option>
-              <option value="electricity">Electricity</option>
+              <option value="gas & electricity">Gas & Electricity</option>
               <option value="smoke alarm">Smoke Alarm</option>
-            </select>
-          </div>
-
-          {/* Status */}
-          <div>
-            <label className="block mb-2 font-medium">Status</label>
-            <select
-              className="select select-bordered w-full"
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-            >
-              <option value="UNKNOWN">UNKNOWN</option>
-              <option value="INCOMPLETE">INCOMPLETE</option>
-              <option value="PROCESSING">PROCESSING</option>
-              {/* <option value="done">done</option> */}
-              <option value="CANCEL">CANCEL</option>
             </select>
           </div>
 
@@ -203,7 +186,7 @@ export default function CreateTaskPage() {
 
           {/* 下拉选择 Agency (如果是 RJL 用户显示, 中介用户只显示自己的 agency) */}
           <div>
-            <label className="block mb-2 font-medium">Task Agency</label>
+            <label className="block mb-2 font-medium">Job Order Agency</label>
 
             <AsyncAgencySelect
               onChange={(option) => setSelectedAgencyId(option)}

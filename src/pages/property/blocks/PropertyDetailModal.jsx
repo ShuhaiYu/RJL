@@ -211,7 +211,7 @@ export default function PropertyDetailModal({ propertyId, onClose }) {
         {/* Footer: Create Task & Delete Property */}
         <div className="flex justify-between items-center mt-4 pt-4 border-t">
           <Button onClick={handleCreateTask} variant="create">
-            Create Task
+            Create Job Order
           </Button>
           <Button onClick={handleDeleteProperty} variant="delete">
             Delete Property

@@ -54,6 +54,7 @@ export default function PropertyDetailPage() {
   const handleTaskClick = (taskId) => {
     navigate(`/property/tasks/${taskId}`);
   };
+
   useEffect(() => {
     fetchPropertyDetail();
   }, [propertyId, token]);
@@ -80,7 +81,14 @@ export default function PropertyDetailPage() {
     );
   }
 
-  // 只读展示房产详情（顶部区域）及任务列表（下方区域）
+  // 根据任务 status 拆分为 activeTasks 与 archivedTasks
+  const activeTasks = property.tasks.filter(
+    (task) => !["COMPLETED", "HISTORY"].includes(task.status.toUpperCase())
+  );
+  const archivedTasks = property.tasks.filter((task) =>
+    ["COMPLETED", "HISTORY"].includes(task.status.toUpperCase())
+  );
+
   return (
     <div className="container mx-auto p-4">
       {/* Back Button */}
@@ -107,7 +115,6 @@ export default function PropertyDetailPage() {
           <Button variant="edit" onClick={() => setShowEditModal(true)}>
             Edit
           </Button>
-
           <Button
             variant="view"
             onClick={() =>
@@ -120,17 +127,26 @@ export default function PropertyDetailPage() {
               })
             }
           >
-            Create Task
+            Create Job Order
           </Button>
         </div>
       </div>
 
-      {/* 下方区域：任务列表 */}
-      <TasksDataTable
-        tasks={property.tasks}
-        onTaskClick={handleTaskClick}
-        hideColumns={["property_address"]}
-      />
+      {/* 下方区域：Active Tasks */}
+      <div>
+        <h2 className="text-xl font-bold mb-4">Active Job Orders</h2>
+        {activeTasks.length === 0 ? (
+          <div className="bg-white rounded shadow p-6 text-center">
+            <p>No active Job Orders found.</p>
+          </div>
+        ) : (
+          <TasksDataTable
+            tasks={activeTasks}
+            onTaskClick={handleTaskClick}
+            hideColumns={["property_address"]}
+          />
+        )}
+      </div>
 
       {/* 下方区域：Contacts DataTable */}
       <div className="bg-white p-6 shadow rounded my-6">
@@ -155,7 +171,8 @@ export default function PropertyDetailPage() {
             setEditModalOpen(true);
           }}
           onDelete={(id) => {
-            if (!window.confirm("Are you sure to delete this contact?")) return;
+            if (!window.confirm("Are you sure to delete this contact?"))
+              return;
 
             // 删除联系人
             axios
@@ -172,6 +189,24 @@ export default function PropertyDetailPage() {
               });
           }}
         />
+      </div>
+
+      {/* 下方区域：Archived Tasks */}
+      <div className="mt-6">
+        <h2 className="text-xl font-bold mb-4">
+          Completed / Archived Job Orders
+        </h2>
+        {archivedTasks.length === 0 ? (
+          <div className="bg-white rounded shadow p-6 text-center">
+            <p>No completed or archived Job Orders found.</p>
+          </div>
+        ) : (
+          <TasksDataTable
+            tasks={archivedTasks}
+            onTaskClick={handleTaskClick}
+            hideColumns={["property_address"]}
+          />
+        )}
       </div>
 
       <Modal open={editModalOpen} onClose={() => setEditModalOpen(false)}>

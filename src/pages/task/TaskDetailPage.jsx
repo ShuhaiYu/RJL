@@ -17,7 +17,6 @@ import { EditContactForm } from "../contact/blocks/EditContactForm";
 import { Box, CircularProgress } from "@mui/material";
 import TaskDetailModal from "./blocks/TaskDetailModal";
 
-
 export default function TaskDetailPage() {
   const navigate = useNavigate();
   const { id: taskId } = useParams();
@@ -28,7 +27,10 @@ export default function TaskDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showEditModal, setShowEditModal] = useState(false);
-  const [processingMarkAsDone, setProcessingMarkAsDone] = useState(false);
+
+  // 新增状态：控制状态更新弹窗以及输入内容
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [statusModalInput, setStatusModalInput] = useState("");
 
   // ========== 联系人相关状态 ==========
   const [selectedContactId, setSelectedContactId] = useState(null);
@@ -78,86 +80,85 @@ export default function TaskDetailPage() {
     fetchTaskFiles();
   }, [taskId, token]);
 
+  // 删除复制任务及创建新任务的相关代码
+
   /**
-   * 复制当前任务
+   * 根据当前任务状态确定下一步状态和需要输入的字段
+   * UNKNOWN -> INCOMPLETE，需要选择 type
+   * INCOMPLETE -> PROCESSING，需要输入 inspection date
+   * PROCESSING -> COMPLETED，需要输入 due date
+   * COMPLETED -> HISTORY，无需输入，直接归档
    */
-  const handleCopyTask = () => {
-    navigate("/property/tasks/create", { state: { originalTask: task } });
+  const getNextStatusAndField = (currentStatus) => {
+    switch (currentStatus) {
+      case "UNKNOWN":
+        return {
+          nextStatus: "INCOMPLETE",
+          fieldLabel: "Select Type",
+          fieldKey: "type",
+          inputType: "text",
+        };
+      case "INCOMPLETE":
+        return {
+          nextStatus: "PROCESSING",
+          fieldLabel: "Enter Inspection Date",
+          fieldKey: "inspection_date",
+          inputType: "date",
+        };
+      case "PROCESSING":
+        return {
+          nextStatus: "COMPLETED",
+          fieldLabel: "Enter Due Date",
+          fieldKey: "due_date",
+          inputType: "date",
+        };
+      case "COMPLETED":
+        return {
+          nextStatus: "HISTORY",
+          fieldLabel: "",
+          fieldKey: "",
+          inputType: "hidden",
+        };
+      default:
+        return {
+          nextStatus: "",
+          fieldLabel: "",
+          fieldKey: "",
+          inputType: "text",
+        };
+    }
   };
 
-  /**
-   * 标记任务为 done，如有重复频率则创建下一条任务
-   */
-  const handleMarkAsDone = async () => {
-    if (!task) return;
-    setProcessingMarkAsDone(true);
+  // 打开状态更新弹窗
+  const handleOpenStatusModal = () => {
+    setShowStatusModal(true);
+  };
+
+  // 提交弹窗表单，更新任务状态
+  const handleStatusModalSubmit = async (e) => {
+    e.preventDefault();
+    const { nextStatus, fieldKey, inputType } = getNextStatusAndField(
+      task.status
+    );
+    const payload = { status: nextStatus };
+    if (fieldKey && statusModalInput) {
+      // 对于日期类型，转换为 ISO 格式
+      payload[fieldKey] =
+        inputType === "date"
+          ? new Date(statusModalInput).toISOString()
+          : statusModalInput;
+    }
     try {
-      // 1. 更新当前任务状态为 done
-      await axios.put(
-        `${baseApi}/tasks/${task.id}`,
-        { status: "COMPLETED" },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      // 如果任务不设置重复（repeat_frequency === "none"），则只更新状态
-      if (task.repeat_frequency === "none") {
-        toast.success("Task marked as COMPLETED!");
-        fetchTaskDetail();
-        return;
-      }
-
-      // 2. 根据重复频率计算新任务的到期日期
-      let newDueDate = new Date();
-      const repeat = task.repeat_frequency; // "monthly", "quarterly", "yearly"
-      if (repeat === "1 month") {
-        newDueDate.setMonth(newDueDate.getMonth() + 1);
-      } else if (repeat === "3 months") {
-        newDueDate.setMonth(newDueDate.getMonth() + 3);
-      } else if (repeat === "6 months") {
-        newDueDate.setMonth(newDueDate.getMonth() + 6);
-      } else if (repeat === "1 year") {
-        newDueDate.setFullYear(newDueDate.getFullYear() + 1);
-      } else if (repeat === "2 years") {
-        newDueDate.setFullYear(newDueDate.getFullYear() + 2);
-      } else if (repeat === "3 years") {
-        newDueDate.setFullYear(newDueDate.getFullYear() + 3);
-      }
-
-      // 3. 根据旧任务名称确定重复次数，构造新任务名称
-      // 如果旧任务名称已经包含 "repeat task {number} - ..."，则递增，否则设为 1
-      let baseName = task.task_name;
-      let repeatNumber = 1;
-      const regex = /^repeat task (\d+)\s*-\s*(.*)$/i;
-      const match = task.task_name.match(regex);
-      if (match) {
-        repeatNumber = Number(match[1]) + 1;
-        baseName = match[2];
-      }
-      const newTaskName = `repeat task ${repeatNumber} - ${baseName}`;
-
-      // 4. 创建新的任务，状态固定为 "INCOMPLETE"
-      const newTaskPayload = {
-        property_id: task.property_id,
-        due_date: newDueDate.toISOString(),
-        task_name: newTaskName,
-        task_description: task.task_description,
-        type: task.type,
-        repeat_frequency: task.repeat_frequency,
-        status: "INCOMPLETE",
-        agency_id: task.agency_id,
-      };
-
-      await axios.post(`${baseApi}/tasks`, newTaskPayload, {
+      await axios.put(`${baseApi}/tasks/${task.id}`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
-      toast.success("Task marked as COMPLETED and next repeat task created!");
+      toast.success("Task status updated successfully");
       fetchTaskDetail();
+      setShowStatusModal(false);
+      setStatusModalInput("");
     } catch (error) {
-      console.error("Error marking task as COMPLETED:", error);
-      toast.error("Failed to complete task");
-    } finally {
-      setProcessingMarkAsDone(false);
+      console.error("Failed to update task status:", error);
+      toast.error("Failed to update task status");
     }
   };
 
@@ -233,7 +234,6 @@ export default function TaskDetailPage() {
       );
       const signedUrl = response.data.url;
       window.open(signedUrl, "_blank");
-      // location.href = signedUrl;
     } catch (error) {
       console.error("Failed to get pre-signed URL:", error);
       toast.error("Unable to open file");
@@ -245,7 +245,7 @@ export default function TaskDetailPage() {
       <Box className="flex justify-center items-center h-40">
         <CircularProgress />
       </Box>
-    )
+    );
   }
 
   if (error) {
@@ -256,9 +256,49 @@ export default function TaskDetailPage() {
 
   if (!task) {
     return (
-      <div className="container mx-auto p-4 text-red-500">Task not found.</div>
+      <div className="container mx-auto p-4 text-red-500">Job OrderOrder not found.</div>
     );
   }
+
+  // 定义状态按钮文本，根据当前任务状态返回不同的文字
+  const getStatusButtonLabel = () => {
+    switch (task.status) {
+      case "UNKNOWN":
+        return "Check"; // 弹窗要求选择 type
+      case "INCOMPLETE":
+        return "Process"; // 弹窗要求输入 inspection date
+      case "PROCESSING":
+        return "Complete"; // 弹窗要求输入 due date
+      case "COMPLETED":
+      case "DUE SOON":
+      case "EXPIRED":
+        return "Archive Task"; // 归档操作，将状态变为 HISTORY
+      default:
+        return "Update Status";
+    }
+  };
+
+  // 辅助函数：根据状态返回对应的颜色类
+  const getStatusColorClass = (status) => {
+    switch (status) {
+      case "UNKNOWN":
+        return "text-red-500";
+      case "INCOMPLETE":
+        return "text-yellow-500";
+      case "PROCESSING":
+        return "text-blue-500";
+      case "COMPLETED":
+        return "text-green-500";
+      case "DUE SOON":
+        return "text-orange-500";
+      case "EXPIRED":
+        return "text-red-600";
+      case "HISTORY":
+        return "text-gray-500";
+      default:
+        return "text-gray-600";
+    }
+  };
 
   return (
     <div className="container mx-auto p-4">
@@ -273,7 +313,7 @@ export default function TaskDetailPage() {
       {/* 顶部区域 */}
       <div className="flex flex-col md:flex-row items-center justify-between bg-white p-6 shadow rounded mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Task Detail</h1>
+          <h1 className="text-2xl font-bold text-gray-800">Job Order Detail</h1>
           <p className="mt-2 text-gray-600">
             <span className="font-medium">Task Name: </span>
             {task.task_name}
@@ -284,8 +324,11 @@ export default function TaskDetailPage() {
           </p>
           <p className="mt-1 text-gray-600">
             <span className="font-medium">Status: </span>
-            {task.status}
+            <span className={getStatusColorClass(task.status)}>
+              {task.status}
+            </span>
           </p>
+
           <p className="mt-1 text-gray-600">
             <span className="font-medium">Type: </span>
             {task.type}
@@ -294,12 +337,6 @@ export default function TaskDetailPage() {
             <span className="font-medium">Repeat Frequency: </span>
             {task.repeat_frequency}
           </p>
-          {/*<p className="mt-1 text-gray-600">*/}
-          {/*  <span className="font-medium">Next Reminder: </span>*/}
-          {/*  {task.next_reminder*/}
-          {/*    ? new Date(task.next_reminder).toLocaleString()*/}
-          {/*    : "N/A"}*/}
-          {/*</p>*/}
           <p className="mt-1 text-gray-600">
             <span className="font-medium">Description: </span>
             {task.task_description}
@@ -317,25 +354,15 @@ export default function TaskDetailPage() {
           >
             Edit
           </Button>
-          <Button className="btn btn-secondary" onClick={handleCopyTask}>
-            Copy Task
-          </Button>
-          {/* 如果当前任务未完成，则显示“完成并创建下个任务”的按钮 */}
-          {task.status !== "COMPLETED" && (
-            <button
-              className="btn bg-emerald-50 text-emerald-700 border-emerald-200"
-              onClick={handleMarkAsDone}
-              disabled={processingMarkAsDone}
-            >
-              {processingMarkAsDone
-                ? "Processing..."
-                : "Mark as COMPLETED & Create Next Task"}
-            </button>
+          {task.status !== "HISTORY" && (
+            <Button onClick={handleOpenStatusModal}>
+              {getStatusButtonLabel()}
+            </Button>
           )}
         </div>
       </div>
 
-      {/* 这里展示文件列表以及上传输入 */}
+      {/* 文件列表及上传区域 */}
       <div className="bg-white p-6 shadow rounded mb-6">
         <h2 className="text-xl font-bold mb-4">Task Files</h2>
 
@@ -397,7 +424,7 @@ export default function TaskDetailPage() {
         )}
       </div>
 
-      {/* 下方区域：Contacts DataTable */}
+      {/* Contacts DataTable */}
       <div className="bg-white p-6 shadow rounded mb-6">
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-bold mb-4">Contacts</h2>
@@ -421,8 +448,6 @@ export default function TaskDetailPage() {
           }}
           onDelete={(id) => {
             if (!window.confirm("Are you sure to delete this contact?")) return;
-
-            // 删除联系人
             axios
               .delete(`${baseApi}/contacts/${id}`, {
                 headers: { Authorization: `Bearer ${token}` },
@@ -458,10 +483,9 @@ export default function TaskDetailPage() {
         </ModalContent>
       </Modal>
 
-      {/* 下方区域： Email Info */}
+      {/* Email Information */}
       <div className="bg-white p-6 shadow rounded mb-6">
         <h2 className="text-xl font-bold mb-4">Email Information</h2>
-
         {!task.emails || task.emails.length === 0 ? (
           <p className="text-gray-500">No Email Info</p>
         ) : (
@@ -469,30 +493,69 @@ export default function TaskDetailPage() {
             <div key={email.id} className="mb-4">
               <p className="font-medium">Subject: {email.subject}</p>
               <p className="text-gray-600">Sender: {email.sender}</p>
-
-              {/* 这里是纯文本Body，保留换行 */}
               <div className="mt-2 whitespace-pre-wrap">{email.email_body}</div>
-
-              {/*
-          如果还想渲染 HTML，可以使用:
-          <div dangerouslySetInnerHTML={{ __html: email.html }} />
-          注意安全性，避免XSS
-        */}
             </div>
           ))
         )}
       </div>
 
-      {/* 编辑弹窗：点击 Edit 按钮后打开 TaskDetailModal */}
+      {/* TaskDetailModal（编辑任务弹窗） */}
       {showEditModal && (
         <TaskDetailModal
-          task={task} // 直接传入 task 对象，而非 taskId
+          task={task}
           token={token}
           onClose={() => {
             setShowEditModal(false);
-            fetchTaskDetail(); // 如需要刷新详情
+            fetchTaskDetail();
           }}
         />
+      )}
+
+      {/* 新增状态更新弹窗，根据任务当前状态决定下一步操作 */}
+      {showStatusModal && (
+        <Modal open={showStatusModal} onClose={() => setShowStatusModal(false)}>
+          <ModalContent>
+            <ModalHeader>
+              <ModalTitle>Update Task Status</ModalTitle>
+            </ModalHeader>
+            <ModalBody>
+              <form onSubmit={handleStatusModalSubmit}>
+                {(() => {
+                  const { fieldLabel, inputType } = getNextStatusAndField(
+                    task.status
+                  );
+                  // 若无需输入（例如 COMPLETED -> HISTORY），则不展示输入框
+                  if (fieldLabel) {
+                    return (
+                      <div className="mb-4">
+                        <label className="block mb-2 font-medium">
+                          {fieldLabel}
+                        </label>
+                        <input
+                          type={inputType}
+                          className="input input-bordered w-full"
+                          value={statusModalInput}
+                          onChange={(e) => setStatusModalInput(e.target.value)}
+                          placeholder={fieldLabel}
+                        />
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
+                <div className="mt-4 flex justify-end gap-2">
+                  <Button
+                    type="button"
+                    onClick={() => setShowStatusModal(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="submit">Confirm</Button>
+                </div>
+              </form>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
       )}
     </div>
   );
