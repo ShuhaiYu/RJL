@@ -80,13 +80,11 @@ export default function TaskDetailPage() {
     fetchTaskFiles();
   }, [taskId, token]);
 
-  // 删除复制任务及创建新任务的相关代码
-
   /**
    * 根据当前任务状态确定下一步状态和需要输入的字段
    * UNKNOWN -> INCOMPLETE，需要选择 type
    * INCOMPLETE -> PROCESSING，需要输入 inspection date
-   * PROCESSING -> COMPLETED，需要输入 due date
+   * PROCESSING -> COMPLETED，需要输入 due date（此时默认值根据 repeat_frequency 计算）
    * COMPLETED -> HISTORY，无需输入，直接归档
    */
   const getNextStatusAndField = (currentStatus) => {
@@ -96,7 +94,7 @@ export default function TaskDetailPage() {
           nextStatus: "INCOMPLETE",
           fieldLabel: "Select Type",
           fieldKey: "type",
-          inputType: "text",
+          inputType: "select",
         };
       case "INCOMPLETE":
         return {
@@ -129,20 +127,86 @@ export default function TaskDetailPage() {
     }
   };
 
-  // 打开状态更新弹窗
-  const handleOpenStatusModal = () => {
-    setShowStatusModal(true);
+  // 计算默认 Due Date，根据当前任务的 repeat_frequency 设置（格式：YYYY-MM-DD）
+  const computeDefaultDueDate = () => {
+    if (task && task.repeat_frequency && task.repeat_frequency !== "none") {
+      const defaultDueDate = new Date();
+      switch (task.repeat_frequency) {
+        case "1 month":
+          defaultDueDate.setMonth(defaultDueDate.getMonth() + 1);
+          break;
+        case "3 months":
+          defaultDueDate.setMonth(defaultDueDate.getMonth() + 3);
+          break;
+        case "6 months":
+          defaultDueDate.setMonth(defaultDueDate.getMonth() + 6);
+          break;
+        case "1 year":
+          defaultDueDate.setFullYear(defaultDueDate.getFullYear() + 1);
+          break;
+        case "2 years":
+          defaultDueDate.setFullYear(defaultDueDate.getFullYear() + 2);
+          break;
+        case "3 years":
+          defaultDueDate.setFullYear(defaultDueDate.getFullYear() + 3);
+          break;
+        default:
+          break;
+      }
+      // 返回格式化后的字符串 YYYY-MM-DD
+      return defaultDueDate.toISOString().split("T")[0];
+    }
+    return "";
   };
 
+  // 打开状态更新弹窗
+  const handleOpenStatusModal = () => {
+    // 如果任务状态是归档状态，直接更新状态为 HISTORY，不打开弹窗
+    const archiveStatuses = ["COMPLETED", "DUE SOON", "EXPIRED"];
+    if (archiveStatuses.includes(task.status)) {
+      axios
+        .put(
+          `${baseApi}/tasks/${task.id}`,
+          { status: "HISTORY" },
+          { headers: { Authorization: `Bearer ${token}` } }
+        )
+        .then(() => {
+          toast.success("Task archived successfully");
+          fetchTaskDetail();
+        })
+        .catch((error) => {
+          console.error("Failed to archive task:", error);
+          toast.error("Failed to archive task");
+        });
+      return;
+    }
+  
+    // 如果状态是 PROCESSING，则预计算默认 due date
+    if (task.status === "PROCESSING") {
+      const defaultDate = computeDefaultDueDate();
+      setStatusModalInput(defaultDate);
+    } else {
+      setStatusModalInput("");
+    }
+    setShowStatusModal(true);
+  };
+  
+
   // 提交弹窗表单，更新任务状态
+  // 在 handleStatusModalSubmit 中增加必填校验
   const handleStatusModalSubmit = async (e) => {
     e.preventDefault();
-    const { nextStatus, fieldKey, inputType } = getNextStatusAndField(
-      task.status
-    );
+    const { nextStatus, fieldKey, inputType, fieldLabel } =
+      getNextStatusAndField(task.status);
+
+    // 如果必填字段为空，则提示错误
+    if (fieldLabel && !statusModalInput) {
+      toast.error(`Please enter/select ${fieldLabel}`);
+      return;
+    }
+
     const payload = { status: nextStatus };
     if (fieldKey && statusModalInput) {
-      // 对于日期类型，转换为 ISO 格式
       payload[fieldKey] =
         inputType === "date"
           ? new Date(statusModalInput).toISOString()
@@ -240,44 +304,6 @@ export default function TaskDetailPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <Box className="flex justify-center items-center h-40">
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="container mx-auto p-4 text-red-500">Error: {error}</div>
-    );
-  }
-
-  if (!task) {
-    return (
-      <div className="container mx-auto p-4 text-red-500">Job OrderOrder not found.</div>
-    );
-  }
-
-  // 定义状态按钮文本，根据当前任务状态返回不同的文字
-  const getStatusButtonLabel = () => {
-    switch (task.status) {
-      case "UNKNOWN":
-        return "Check"; // 弹窗要求选择 type
-      case "INCOMPLETE":
-        return "Process"; // 弹窗要求输入 inspection date
-      case "PROCESSING":
-        return "Complete"; // 弹窗要求输入 due date
-      case "COMPLETED":
-      case "DUE SOON":
-      case "EXPIRED":
-        return "Archive Task"; // 归档操作，将状态变为 HISTORY
-      default:
-        return "Update Status";
-    }
-  };
-
   // 辅助函数：根据状态返回对应的颜色类
   const getStatusColorClass = (status) => {
     switch (status) {
@@ -299,6 +325,46 @@ export default function TaskDetailPage() {
         return "text-gray-600";
     }
   };
+
+  // 定义状态按钮文本，根据当前任务状态返回不同的文字
+  const getStatusButtonLabel = () => {
+    switch (task.status) {
+      case "UNKNOWN":
+        return "Check";
+      case "INCOMPLETE":
+        return "Process";
+      case "PROCESSING":
+        return "Complete";
+      case "COMPLETED":
+      case "DUE SOON":
+      case "EXPIRED":
+        return "Archive Task";
+      default:
+        return "Update Status";
+    }
+  };
+
+  if (loading) {
+    return (
+      <Box className="flex justify-center items-center h-40">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto p-4 text-red-500">Error: {error}</div>
+    );
+  }
+
+  if (!task) {
+    return (
+      <div className="container mx-auto p-4 text-red-500">
+        Job OrderOrder not found.
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-4">
@@ -524,22 +590,46 @@ export default function TaskDetailPage() {
                   const { fieldLabel, inputType } = getNextStatusAndField(
                     task.status
                   );
-                  // 若无需输入（例如 COMPLETED -> HISTORY），则不展示输入框
                   if (fieldLabel) {
-                    return (
-                      <div className="mb-4">
-                        <label className="block mb-2 font-medium">
-                          {fieldLabel}
-                        </label>
-                        <input
-                          type={inputType}
-                          className="input input-bordered w-full"
-                          value={statusModalInput}
-                          onChange={(e) => setStatusModalInput(e.target.value)}
-                          placeholder={fieldLabel}
-                        />
-                      </div>
-                    );
+                    if (inputType === "select") {
+                      return (
+                        <div className="mb-4">
+                          <label className="block mb-2 font-medium">
+                            {fieldLabel}
+                          </label>
+                          <select
+                            className="select select-bordered w-full"
+                            value={statusModalInput}
+                            onChange={(e) =>
+                              setStatusModalInput(e.target.value)
+                            }
+                          >
+                            <option value="">Select an option</option>
+                            <option value="smoke alarm">smoke alarm</option>
+                            <option value="gas & electric">
+                              gas & electric
+                            </option>
+                          </select>
+                        </div>
+                      );
+                    } else {
+                      return (
+                        <div className="mb-4">
+                          <label className="block mb-2 font-medium">
+                            {fieldLabel}
+                          </label>
+                          <input
+                            type={inputType}
+                            className="input input-bordered w-full"
+                            value={statusModalInput}
+                            onChange={(e) =>
+                              setStatusModalInput(e.target.value)
+                            }
+                            placeholder={fieldLabel}
+                          />
+                        </div>
+                      );
+                    }
                   }
                   return null;
                 })()}
