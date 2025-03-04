@@ -82,6 +82,17 @@ export const AllUsersPage = () => {
         enableSorting: true,
       },
       {
+        accessorKey: "agency_name",
+        header: ({ header }) => (
+          <DataGridColumnHeader
+            column={header.column}
+            title="Agency Name"
+            filter={<ColumnInputFilter column={header.column} />}
+          />
+        ),
+        enableSorting: true,
+      },
+      {
         accessorKey: "role",
         header: ({ header }) => (
           <DataGridColumnHeader

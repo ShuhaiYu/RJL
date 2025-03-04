@@ -31,6 +31,9 @@ export default function Tasks() {
     if (typeQuery) parts.push(`Type: ${typeQuery}`);
     h1Title = `Tasks (${parts.join(", ")})`;
   }
+  if (agencyIdFromState) {
+    h1Title = h1Title + " for Agency";
+  }
 
   const fetchTasks = () => {
     if (!token) return;
