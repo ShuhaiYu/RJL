@@ -47,7 +47,7 @@ export default function AddressInput({ value, onChange }) {
         setInternalValue(e.target.value);
         onChange(e.target.value);
       }}
-      options={{ types: ["address"] }}
+      options={{ types: ["address"], componentRestrictions: { country: "au" } }}
       placeholder="Enter address..."
       className="input input-bordered w-full"
       language="en"

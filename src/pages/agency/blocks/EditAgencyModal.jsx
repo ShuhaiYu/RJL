@@ -12,6 +12,7 @@ import {
 } from "@/components/modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import AddressInput from "../../../components/custom/AddressInput";
 
 export default function EditAgencyModal({ agency, onClose, onUpdated }) {
   const [agencyName, setAgencyName] = useState(agency.agency_name || "");
@@ -59,11 +60,9 @@ export default function EditAgencyModal({ agency, onClose, onUpdated }) {
             </div>
             <div>
               <label className="block text-sm font-medium">Address</label>
-              <Input
-                type="text"
+              <AddressInput
                 value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                placeholder="Enter address"
+                onChange={(formattedAddress) => setAddress(formattedAddress)}
               />
             </div>
             <div>

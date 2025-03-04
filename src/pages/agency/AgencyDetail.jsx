@@ -119,9 +119,9 @@ export default function AgencyDetail() {
 
       {/* 任务列表 */}
       <div className="bg-white rounded-xl shadow p-6 mt-8">
-        <h2 className="text-2xl font-bold mb-4 text-gray-800">Tasks</h2>
+        <h2 className="text-2xl font-bold mb-4 text-gray-800">Job Orders</h2>
         {(agency.tasks || []).length === 0 ? (
-          <div className="text-center py-6 text-gray-500">No tasks found.</div>
+          <div className="text-center py-6 text-gray-500">No job orders found.</div>
         ) : (
           <TasksDataTable
             tasks={agency.tasks}
