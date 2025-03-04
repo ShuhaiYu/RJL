@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { useAuthContext } from "@/auth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { DataGrid, DataGridColumnHeader } from "@/components/data-grid";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,13 +12,14 @@ export const AllUsersPage = () => {
   const { auth, baseApi, currentUser } = useAuthContext();
   const token = auth?.accessToken;
   const navigate = useNavigate();
+  const location = useLocation();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
-
-  const canUpdateUser = currentUser?.permissions?.user?.includes("update");
-
   const [filteredCount, setFilteredCount] = useState(0);
 
+  const canUpdateUser = currentUser?.permissions?.user?.includes("update");
+  // 从 state 中获取 agency_id（如果有）
+  const agencyIdFromState = location.state?.agency_id;
 
   const fetchUsers = async () => {
     try {
@@ -26,8 +27,13 @@ export const AllUsersPage = () => {
       const response = await axios.get(`${baseApi}/users`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setUsers(response.data);
-      setFilteredCount(response.data.length);
+      let data = response.data;
+      // 如果传入了 agency_id，则只显示该机构下的用户
+      if (agencyIdFromState) {
+        data = data.filter((user) => user.agency_id === agencyIdFromState);
+      }
+      setUsers(data);
+      setFilteredCount(data.length);
     } catch (error) {
       console.error("Error fetching users:", error);
       toast.error("Failed to fetch users");
@@ -40,9 +46,8 @@ export const AllUsersPage = () => {
     if (token) {
       fetchUsers();
     }
-  }, [token]);
+  }, [token, agencyIdFromState]);
 
-  // 定义 datagrid 列过滤器
   const ColumnInputFilter = ({ column }) => (
     <Input
       placeholder="Filter..."
@@ -132,16 +137,15 @@ export const AllUsersPage = () => {
                 >
                   Permissions
                 </Button>
-                )}
+              )}
             </div>
           );
         },
       },
     ],
-    [navigate, token, baseApi]
+    [navigate, token, baseApi, canUpdateUser, currentUser]
   );
 
-  // 如果加载中，则只渲染一个 CircularProgress
   if (loading) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
@@ -149,7 +153,6 @@ export const AllUsersPage = () => {
       </Box>
     );
   }
-  
 
   return (
     <div className="p-4">
@@ -163,9 +166,9 @@ export const AllUsersPage = () => {
         </Button>
       </div>
       <div className="mb-6">
-      <p className="text-sm text-gray-500 mb-4">
-        Showing {filteredCount} of {users.length} users
-      </p>
+        <p className="text-sm text-gray-500 mb-4">
+          Showing {filteredCount} of {users.length} users
+        </p>
         <DataGrid
           data={users}
           columns={columns}
@@ -175,7 +178,6 @@ export const AllUsersPage = () => {
           onFilteredDataChange={(count) => setFilteredCount(count)}
         />
       </div>
-      {loading && <div>Loading...</div>}
     </div>
   );
 };

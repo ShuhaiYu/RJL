@@ -5,6 +5,7 @@ import { CardProjectExtended, CardProjectExtendedRow } from '@/partials/cards';
 import axios from 'axios';
 import { useAuthContext } from '@/auth';
 import { Box, CircularProgress } from "@mui/material";
+import AgenciesMetricsDataGrid from './AgenciesMetricsDataGrid';
 
 
 const Agencies = () => {
@@ -88,6 +89,9 @@ const Agencies = () => {
         <h3 className="text-lg text-gray-900 font-semibold">
           {agencies.length} Agencies
         </h3>
+
+        <AgenciesMetricsDataGrid agencies={agencies} />
+
 
         <div className="btn-tabs" data-tabs="true">
           <a

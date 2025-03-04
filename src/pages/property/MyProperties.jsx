@@ -1,33 +1,35 @@
-// src/pages/MyProperties.jsx
-
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuthContext } from "@/auth";
 import MyPropertiesDataTable from "./blocks/MyPropertiesDataTable";
 import { Box, CircularProgress } from "@mui/material";
-
 
 export default function MyProperties() {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
   const { auth, baseApi } = useAuthContext();
   const token = auth?.accessToken;
   const navigate = useNavigate();
+  const location = useLocation();
+  // 从 state 中获取 agency_id
+  const agencyIdFromState = location.state?.agency_id;
 
   const fetchProperties = () => {
     if (!token) return;
     setLoading(true);
     axios
       .get(`${baseApi}/properties`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        setProperties(response.data);
+        let data = response.data;
+        // 如果传入 agency_id，则过滤
+        if (agencyIdFromState) {
+          data = data.filter((property) => property.agency.id === agencyIdFromState);
+        }
+        setProperties(data);
         setLoading(false);
       })
       .catch((err) => {
@@ -40,7 +42,7 @@ export default function MyProperties() {
     if (token) {
       fetchProperties();
     }
-  }, [token]);
+  }, [token, agencyIdFromState]);
 
   if (loading)
     return (
@@ -48,10 +50,9 @@ export default function MyProperties() {
         <CircularProgress />
       </Box>
     );
-    
+
   if (error) return <div className="text-red-500">Error: {error}</div>;
 
-  // 点击某条属性的 "Edit" 按钮时
   const handleEdit = (propertyId) => {
     navigate(`/property/${propertyId}`);
   };
@@ -64,10 +65,7 @@ export default function MyProperties() {
           <p>No properties found.</p>
         </div>
       ) : (
-        <MyPropertiesDataTable
-          properties={properties}
-          onEdit={handleEdit}
-        />
+        <MyPropertiesDataTable properties={properties} onEdit={handleEdit} />
       )}
     </div>
   );

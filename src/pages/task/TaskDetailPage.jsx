@@ -111,6 +111,8 @@ export default function TaskDetailPage() {
           inputType: "date",
         };
       case "COMPLETED":
+      case "DUE SOON":
+      case "EXPIRED":
         return {
           nextStatus: "HISTORY",
           fieldLabel: "",
@@ -161,26 +163,6 @@ export default function TaskDetailPage() {
 
   // 打开状态更新弹窗
   const handleOpenStatusModal = () => {
-    // 如果任务状态是归档状态，直接更新状态为 HISTORY，不打开弹窗
-    const archiveStatuses = ["COMPLETED", "DUE SOON", "EXPIRED"];
-    if (archiveStatuses.includes(task.status)) {
-      axios
-        .put(
-          `${baseApi}/tasks/${task.id}`,
-          { status: "HISTORY" },
-          { headers: { Authorization: `Bearer ${token}` } }
-        )
-        .then(() => {
-          toast.success("Task archived successfully");
-          fetchTaskDetail();
-        })
-        .catch((error) => {
-          console.error("Failed to archive task:", error);
-          toast.error("Failed to archive task");
-        });
-      return;
-    }
-  
     // 如果状态是 PROCESSING，则预计算默认 due date
     if (task.status === "PROCESSING") {
       const defaultDate = computeDefaultDueDate();
@@ -190,7 +172,6 @@ export default function TaskDetailPage() {
     }
     setShowStatusModal(true);
   };
-  
 
   // 提交弹窗表单，更新任务状态
   // 在 handleStatusModalSubmit 中增加必填校验
@@ -199,7 +180,7 @@ export default function TaskDetailPage() {
     const { nextStatus, fieldKey, inputType, fieldLabel } =
       getNextStatusAndField(task.status);
 
-    // 如果必填字段为空，则提示错误
+    // 对于需要用户输入的情况，必填校验
     if (fieldLabel && !statusModalInput) {
       toast.error(`Please enter/select ${fieldLabel}`);
       return;
@@ -591,6 +572,7 @@ export default function TaskDetailPage() {
                     task.status
                   );
                   if (fieldLabel) {
+                    // 如果有必填字段，则显示输入控件
                     if (inputType === "select") {
                       return (
                         <div className="mb-4">
@@ -630,8 +612,16 @@ export default function TaskDetailPage() {
                         </div>
                       );
                     }
+                  } else {
+                    // fieldLabel 为空，说明是归档操作，显示确认信息
+                    return (
+                      <div className="mb-4">
+                        <p className="text-sm">
+                          Are you sure you want to archive this task?
+                        </p>
+                      </div>
+                    );
                   }
-                  return null;
                 })()}
                 <div className="mt-4 flex justify-end gap-2">
                   <Button
