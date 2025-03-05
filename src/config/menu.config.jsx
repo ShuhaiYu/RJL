@@ -54,17 +54,21 @@ export const MENU_SIDEBAR = [
         title: "Unknown",
         icon: "plus-circle",
         path: "/property/tasks?status=UNKNOWN",
-      },
-      {
-        title: "Processing",
-        icon: "plus-circle",
-        path: "/property/tasks?status=PROCESSING",
+        permissions: {
+          role: ["create"],
+        },
       },
       {
         title: "Incomplete",
         icon: "plus-circle",
         path: "/property/tasks?status=INCOMPLETE",
       },
+      {
+        title: "Processing",
+        icon: "plus-circle",
+        path: "/property/tasks?status=PROCESSING",
+      },
+      
       {
         title: "Completed",
         icon: "plus-circle",
@@ -127,7 +131,7 @@ export const MENU_SIDEBAR = [
     },
   },
   {
-    title: "Create Task",
+    title: "Create Job Order",
     icon: "plus-circle",
     path: "/property/tasks/create",
     permissions: {

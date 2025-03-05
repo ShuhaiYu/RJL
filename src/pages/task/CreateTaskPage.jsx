@@ -22,8 +22,8 @@ export default function CreateTaskPage() {
   const [repeatFrequency, setRepeatFrequency] = useState("none");
 
   // 新增字段
-  const [taskType, setTaskType] = useState("gas");
-  const [status, setStatus] = useState("UNKNOWN");
+  const [taskType, setTaskType] = useState("gas & electric");
+  const [status, setStatus] = useState("INCOMPLETE");
 
   const [loading, setLoading] = useState(false);
 
@@ -57,7 +57,7 @@ export default function CreateTaskPage() {
 
       setRepeatFrequency(originalTask.repeat_frequency || "none");
       setTaskType(originalTask.type || "");
-      setStatus(originalTask.status || "UNKNOWN");
+      setStatus(originalTask.status || "INCOMPLETE");
 
       // 收集邮件ID
       setEmailId(originalTask.email_id || null);
@@ -150,7 +150,7 @@ export default function CreateTaskPage() {
               value={taskType}
               onChange={(e) => setTaskType(e.target.value)}
             >
-              <option value="gas & electricity">Gas & Electricity</option>
+              <option value="gas & electric">Gas & Electricity</option>
               <option value="smoke alarm">Smoke Alarm</option>
             </select>
           </div>
