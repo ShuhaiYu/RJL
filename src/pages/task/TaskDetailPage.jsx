@@ -31,6 +31,8 @@ export default function TaskDetailPage() {
   // 新增状态：控制状态更新弹窗以及输入内容
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [statusModalInput, setStatusModalInput] = useState("");
+  const [archiveConflicts, setArchiveConflicts] = useState(true);
+
 
   // ========== 联系人相关状态 ==========
   const [selectedContactId, setSelectedContactId] = useState(null);
@@ -193,6 +195,11 @@ export default function TaskDetailPage() {
           ? new Date(statusModalInput).toISOString()
           : statusModalInput;
     }
+    // 如果是 UNKNOWN -> INCOMPLETE，并且用户勾选了“Archive conflicting job orders”
+    if (task.status === "UNKNOWN" && nextStatus === "INCOMPLETE" && archiveConflicts) {
+      payload.archive_conflicts = true;
+    }
+
     try {
       await axios.put(`${baseApi}/tasks/${task.id}`, payload, {
         headers: { Authorization: `Bearer ${token}` },
@@ -365,10 +372,36 @@ export default function TaskDetailPage() {
             <span className="font-medium">Task Name: </span>
             {task.task_name}
           </p>
-          <p className="mt-1 text-gray-600">
-            <span className="font-medium">Due Date: </span>
-            {task.due_date ? new Date(task.due_date).toLocaleString() : "N/A"}
-          </p>
+          {/* 动态日期显示 */}
+          {(() => {
+            if (task.status === "PROCESSING") {
+              // 显示 Inspection Date
+              return (
+                <p className="mt-1 text-gray-600">
+                  <span className="font-medium">Inspection Date: </span>
+                  {task.inspection_date
+                    ? new Date(task.inspection_date).toLocaleString()
+                    : "N/A"}
+                </p>
+              );
+            } else if (
+              ["COMPLETED", "DUE SOON", "EXPIRED", "HISTORY"].includes(
+                task.status
+              )
+            ) {
+              // 显示 Due Date
+              return (
+                <p className="mt-1 text-gray-600">
+                  <span className="font-medium">Due Date: </span>
+                  {task.due_date
+                    ? new Date(task.due_date).toLocaleString()
+                    : "N/A"}
+                </p>
+              );
+            }
+            // 如果是 UNKNOWN 或 INCOMPLETE，则不显示任何日期
+            return null;
+          })()}
           <p className="mt-1 text-gray-600">
             <span className="font-medium">Status: </span>
             <span className={getStatusColorClass(task.status)}>
@@ -592,6 +625,24 @@ export default function TaskDetailPage() {
                               gas & electric
                             </option>
                           </select>
+
+                          {/* 如果是 UNKNOWN -> INCOMPLETE，再显示复选框 */}
+                          {task.status === "UNKNOWN" && (
+                            <div className="flex items-center mt-3">
+                              <input
+                                type="checkbox"
+                                id="archiveConflicts"
+                                className="checkbox mr-2"
+                                checked={archiveConflicts}
+                                onChange={(e) =>
+                                  setArchiveConflicts(e.target.checked)
+                                }
+                              />
+                              <label htmlFor="archiveConflicts">
+                                Archive conflicting job orders
+                              </label>
+                            </div>
+                          )}
                         </div>
                       );
                     } else {

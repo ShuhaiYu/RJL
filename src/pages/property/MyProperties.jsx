@@ -4,12 +4,13 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useAuthContext } from "@/auth";
 import MyPropertiesDataTable from "./blocks/MyPropertiesDataTable";
 import { Box, CircularProgress } from "@mui/material";
+import { Button } from "@/components/ui/button";
 
 export default function MyProperties() {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const { auth, baseApi } = useAuthContext();
+  const { auth, baseApi, currentUser } = useAuthContext();
   const token = auth?.accessToken;
   const navigate = useNavigate();
   const location = useLocation();
@@ -57,9 +58,22 @@ export default function MyProperties() {
     navigate(`/property/${propertyId}`);
   };
 
+  // check user has create property permission
+  const canCreateProperty = currentUser?.permissions?.property?.includes("create");  
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">My Properties</h1>
+      <div className="mb-4 flex justify-end">
+        {canCreateProperty && (
+          <Button
+            variant="create"
+            onClick={() => navigate("/property/create")}
+          >
+            Create Property
+          </Button>
+        )}
+      </div>
       {properties.length === 0 ? (
         <div className="bg-white rounded shadow p-6 text-center">
           <p>No properties found.</p>

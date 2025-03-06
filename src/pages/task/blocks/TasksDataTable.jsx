@@ -16,11 +16,13 @@ export default function TasksDataTable({
 }) {
   const [filteredCount, setFilteredCount] = useState(tasks.length);
 
-  // 1) 统计所有 未完成任务 (非 COMPLETED/CANCEL) 的 property_id+type
-  const incompleteTaskCountMap = useMemo(() => {
+  // ======= 修改 1：改用 pendingTaskCountMap，只统计 UNKNOWN/INCOMPLETE/PROCESSING 状态 =======
+  const pendingStatuses = new Set(["UNKNOWN", "INCOMPLETE", "PROCESSING"]);
+
+  const pendingTaskCountMap = useMemo(() => {
     const map = {};
     for (const t of tasks) {
-      if (!["CANCEL", "COMPLETED"].includes(t.status)) {
+      if (pendingStatuses.has(t.status)) {
         const key = `${t.property_id}--${t.type}`;
         map[key] = (map[key] || 0) + 1;
       }
@@ -197,16 +199,16 @@ export default function TasksDataTable({
         onFilteredDataChange={(count) => setFilteredCount(count)}
         sorting={[{ id: "updated_at", desc: true }]}
         getRowClassName={(task) => {
-          // 1) 如果该行本身就是 CANCEL / COMPLETED，不标红
-          if (["CANCEL", "COMPLETED"].includes(task.status)) {
+          // 如果该条任务本身不在 [UNKNOWN, INCOMPLETE, PROCESSING], 不标红
+          if (!pendingStatuses.has(task.status)) {
             return "";
           }
-      
-          // 2) 若是“未完成”行，则判断该 (property_id + type) 下未完成任务数
+
+          // 否则，找出同房产+同类型 未完成任务数
           const key = `${task.property_id}--${task.type}`;
-          const count = incompleteTaskCountMap[key] || 0;
-      
-          // 3) 如果此组合 >= 2，才标红
+          const count = pendingTaskCountMap[key] || 0;
+
+          // 如果此组合 >= 2 就标红
           return count >= 2 ? "bg-red-100" : "";
         }}
       />

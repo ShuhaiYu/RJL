@@ -4,13 +4,14 @@ import { useAuthContext } from "@/auth";
 import { useNavigate, useLocation } from "react-router-dom";
 import TasksDataTable from "./blocks/TasksDataTable";
 import { Box, CircularProgress } from "@mui/material";
+import { Button } from "@/components/ui/button";
 
 export default function Tasks() {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const { auth, baseApi } = useAuthContext();
+  const { auth, baseApi, currentUser } = useAuthContext();
   const token = auth?.accessToken;
   const navigate = useNavigate();
   const location = useLocation();
@@ -79,9 +80,22 @@ export default function Tasks() {
     return <div className="text-red-500">Error: {error}</div>;
   }
 
+  // 判断当前用户是否有创建任务的权限
+  const canCreateTask = currentUser?.permissions?.task?.includes("create");
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">{h1Title}</h1>
+      <div className="mb-4 flex justify-end">
+        {canCreateTask && (
+          <Button
+            variant="create"
+            onClick={() => navigate("/property/tasks/create")}
+          >
+            Create Job Order
+          </Button>
+        )}
+      </div>
 
       {tasks.length === 0 ? (
         <div className="bg-white rounded shadow p-6 text-center">
