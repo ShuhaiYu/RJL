@@ -1,5 +1,6 @@
 import SendReminderButton from "./blocks/SendReminderButton";
 import TasksDashboard from "./blocks/TasksDashboard";
+import SyncLastWeekEmails from "./blocks/SyncLastWeekEmails";
 
 const Demo1LightSidebarContent = () => {
   return (
@@ -7,6 +8,9 @@ const Demo1LightSidebarContent = () => {
       <div className="w-full grid lg:grid-cols-3 gap-5 lg:gap-7.5 items-stretch">
         <div className="lg:col-span-1">
           <SendReminderButton />
+        </div>
+        <div className="lg:col-span-1">
+          <SyncLastWeekEmails />
         </div>
       </div>
 

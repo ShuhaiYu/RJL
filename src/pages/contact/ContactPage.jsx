@@ -11,11 +11,13 @@ import {
 import { EditContactForm } from "./blocks/EditContactForm";
 import ContactDataTable from "./blocks/ContactDataTable";
 import { Box, CircularProgress } from "@mui/material";
-
+import { useNavigate } from "react-router-dom";
 
 export const ContactPage = () => {
   const { auth, baseApi } = useAuthContext();
   const token = auth?.accessToken;
+
+  const navigate = useNavigate();
 
   const [contacts, setContacts] = useState([]);
   const [selectedContactId, setSelectedContactId] = useState(null);
@@ -54,6 +56,10 @@ export const ContactPage = () => {
 
   return (
     <div style={{ height: 600, width: "100%", padding: 20 }}>
+      {/* Back button */}
+      <button className="btn btn-secondary mb-6" onClick={() => navigate(-1)}>
+        Back <i className="ki-filled ki-arrow-left"></i>
+      </button>
       <h1 className="text-3xl font-bold mb-6">Contacts</h1>
 
       <p className="text-sm text-gray-500 mb-4">

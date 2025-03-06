@@ -66,7 +66,6 @@ const DataGridTable = () => {
         {table.getRowModel().rows.length ? (
           table.getRowModel().rows.map((row) => {
             const highlightClass = props.getRowClassName?.(row.original);
-            console.log("highlightClass", highlightClass);
             
             return (
               <tr

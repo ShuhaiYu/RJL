@@ -23,6 +23,7 @@ export default function Tasks() {
 
   // 从 state 中获取 agency_id（如果有）
   const agencyIdFromState = location.state?.agency_id;
+  const agencyNameFromQuery = location.state?.agency_name;
 
   // 根据查询参数动态构造 h1 标题
   let h1Title = "Job Orders";
@@ -30,10 +31,10 @@ export default function Tasks() {
     const parts = [];
     if (statusQuery) parts.push(`Status: ${statusQuery}`);
     if (typeQuery) parts.push(`Type: ${typeQuery}`);
-    h1Title = `Tasks (${parts.join(", ")})`;
+    h1Title = `Job Orders (${parts.join(", ")})`;
   }
   if (agencyIdFromState) {
-    h1Title = h1Title + " for Agency";
+    h1Title = h1Title + ` for Agency: ${agencyNameFromQuery}`;
   }
 
   const fetchTasks = () => {

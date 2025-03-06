@@ -44,6 +44,13 @@ export default function CreatePropertyPage() {
 
   return (
     <div className="container mx-auto p-4 max-w-xl">
+      {/* Back button */}
+      <button
+        className="btn btn-secondary mb-6"
+        onClick={() => navigate(-1)}
+      >
+        Back <i className="ki-filled ki-arrow-left"></i>
+      </button>
       <div className="card-header py-5">
         <h3 className="card-title text-xl font-bold">Create New Property</h3>
       </div>

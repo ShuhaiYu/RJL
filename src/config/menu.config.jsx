@@ -15,28 +15,70 @@ export const MENU_SIDEBAR = [
   {
     title: "Users",
     icon: "users",
-    path: "/users",
-    permissions: {
-      user: ["create"],
-    }
+    children: [
+      {
+        title: "All Users",
+        icon: "users",
+        path: "/users",
+        permissions: {
+          user: ["read"],
+        }
+      },
+      {
+        title: "Create User",
+        icon: "plus-circle",
+        path: "/public-profile/profiles/create",
+        permissions: {
+          user: ["create"],
+        }
+      },
+    ],    
   },
 
   {
     title: "Agencies",
     icon: "people",
-    path: "/agencies/my-agencies",
-    permissions: {
-      agency: ["create"],
-    },
+    children: [
+      {
+        title: "My Agencies",
+        icon: "users",
+        path: "/agencies/my-agencies",
+        permissions: {
+          agency: ["read"],
+        }
+      },
+      {
+        title: "Create Agency",
+        icon: "plus-circle",
+        path: "/agencies/create-agency",
+        permissions: {
+          agency: ["create"],
+        }
+      },
+    ],
   },
 
   {
     title: "Properties",
     icon: "home-3",
-    path: "/property/my-properties",
-    permissions: {
-      property: ["read"],
-    },
+    children: [
+      {
+        title: "My Properties",
+        icon: "home-3",
+        path: "/property/my-properties",
+        permissions: {
+          property: ["read"],
+        }
+      },
+      {
+        title: "Create Property",
+        icon: "plus-circle",
+        path: "/property/create",
+        permissions: {
+          property: ["create"],
+        }
+      },
+    ],
   },
   {
     title: "Job Orders",
@@ -94,49 +136,20 @@ export const MENU_SIDEBAR = [
         icon: "plus-circle",
         path: "/property/tasks?type=gas_%26_electric",
       },
+      {
+        title: "Create Job Order",
+        icon: "plus-circle",
+        path: "/property/tasks/create",
+        permissions: {
+          task: ["create"],
+        },
+      },
     ],
   },
   {
     title: "Emails",
     icon: "sms",
     path: "/emails",
-  },
-  // {
-  //   title: "Contacts",
-  //   icon: "address-book",
-  //   path: "/contacts",
-  // },
-  {
-    title: "Create Agency",
-    icon: "plus-circle",
-    path: "/agencies/create-agency",
-    permissions: {
-      agency: ["create"],
-    },
-  },
-  {
-    title: "Create User",
-    icon: "plus-circle",
-    path: "/public-profile/profiles/create",
-    permissions: {
-      user: ["create"],
-    },
-  },
-  {
-    title: "Create Property",
-    icon: "plus-circle",
-    path: "/property/create",
-    permissions: {
-      property: ["create"],
-    },
-  },
-  {
-    title: "Create Job Order",
-    icon: "plus-circle",
-    path: "/property/tasks/create",
-    permissions: {
-      task: ["create"],
-    },
   },
   // {
   //   title: "Settings",

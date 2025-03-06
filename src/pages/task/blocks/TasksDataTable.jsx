@@ -197,7 +197,6 @@ export default function TasksDataTable({
         pagination={{ size: 100 }}
         // 将 onFilteredDataChange 回调传递给 DataGrid
         onFilteredDataChange={(count) => setFilteredCount(count)}
-        sorting={[{ id: "updated_at", desc: true }]}
         getRowClassName={(task) => {
           // 如果该条任务本身不在 [UNKNOWN, INCOMPLETE, PROCESSING], 不标红
           if (!pendingStatuses.has(task.status)) {

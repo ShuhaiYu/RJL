@@ -10,9 +10,15 @@ import { Checkbox } from "@/components/ui/checkbox"; // Using the provided Check
 const permissionOptions = {
   agency: ["create", "read", "update", "delete"],
   property: ["create", "read", "update", "delete"],
-  task: ["create", "read", "update", "delete"],
+  task: ["create", "read", "update", "delete"], // 这里 key 仍是 "task" 不变
   contact: ["create", "read", "update", "delete"],
   role: ["create", "read", "update", "delete"],
+};
+
+// 如果有更多需要特殊显示的，可以继续加
+const scopeDisplayNameMap = {
+  task: "Job Order",
+  // 其他不变的话，就不需要映射，直接显示 scope 自己
 };
 
 export const ModifyUserPermissionPage = () => {
@@ -129,44 +135,49 @@ export const ModifyUserPermissionPage = () => {
         </p>
       </div>
       <form onSubmit={handleSubmit} className="space-y-8">
-        {Object.keys(permissionOptions).map((scope) => (
-          <div key={scope} className="border p-4 rounded-md">
-            <h2 className="text-xl font-semibold mb-4 capitalize">
-              {scope} Permissions
-            </h2>
-            <div className="flex flex-wrap gap-6">
-              {permissionOptions[scope].map((perm) => {
-                const isChecked = permissions[scope]?.includes(perm) || false;
-                const disabled = getCheckboxDisabled(scope, perm);
-                return (
-                  <label
-                    key={perm}
-                    className="flex items-center gap-2 cursor-pointer"
-                    title={disabled ? "You do not have permission to modify this permission" : ""}
-                  >
-                    <Checkbox
-                      checked={isChecked}
-                      disabled={disabled}
-                      onCheckedChange={(checked) =>
-                        handleCheckboxChange(scope, perm, checked)
+        {Object.keys(permissionOptions).map((scope) => {
+          // 如果在 scopeDisplayNameMap 中有映射，就用对应名字，否则用 scope 本身
+          const displayName = scopeDisplayNameMap[scope] || scope;
+
+          return (
+            <div key={scope} className="border p-4 rounded-md">
+              <h2 className="text-xl font-semibold mb-4 capitalize">
+                {displayName} Permissions
+              </h2>
+              <div className="flex flex-wrap gap-6">
+                {permissionOptions[scope].map((perm) => {
+                  const isChecked = permissions[scope]?.includes(perm) || false;
+                  const disabled = getCheckboxDisabled(scope, perm);
+                  return (
+                    <label
+                      key={perm}
+                      className="flex items-center gap-2 cursor-pointer"
+                      title={
+                        disabled
+                          ? "You do not have permission to modify this permission"
+                          : ""
                       }
-                    />
-                    <span className="capitalize">{perm}</span>
-                  </label>
-                );
-              })}
+                    >
+                      <Checkbox
+                        checked={isChecked}
+                        disabled={disabled}
+                        onCheckedChange={(checked) =>
+                          handleCheckboxChange(scope, perm, checked)
+                        }
+                      />
+                      <span className="capitalize">{perm}</span>
+                    </label>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
         <div className="flex gap-4">
           <Button variant="edit" type="submit" disabled={loading || isEditingSelf}>
             {loading ? "Saving..." : "Save"}
           </Button>
-          <Button
-            variant="default"
-            type="button"
-            onClick={() => navigate("/users")}
-          >
+          <Button variant="default" type="button" onClick={() => navigate("/users")}>
             Cancel
           </Button>
         </div>

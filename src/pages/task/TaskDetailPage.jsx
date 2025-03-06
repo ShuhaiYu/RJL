@@ -430,7 +430,7 @@ export default function TaskDetailPage() {
           <Button
             variant="edit"
             onClick={() => setShowEditModal(true)}
-            disabled={task.status === "COMPLETED"}
+            disabled={task.status === "COMPLETED" || task.status === "HISTORY"}
           >
             Edit
           </Button>
@@ -676,7 +676,7 @@ export default function TaskDetailPage() {
                 })()}
                 <div className="mt-4 flex justify-end gap-2">
                   <Button
-                    type="button"
+                    type="button button-secondary"
                     onClick={() => setShowStatusModal(false)}
                   >
                     Cancel

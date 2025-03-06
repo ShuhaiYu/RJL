@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
 import AsyncAgencySelect from "../../components/custom/AsyncAgencySelect";
+import { useNavigate } from "react-router-dom";
 
 // Available permission scopes/values
 const permissionOptions = {
@@ -59,6 +60,8 @@ function clampPermissionsToCurrentUser(creatorPermissions, newUserPermissions) {
 export default function CreateUserPage() {
   const { auth, currentUser, baseApi } = useAuthContext();
   const token = auth?.accessToken;
+
+  const navigate = useNavigate();
 
   // Current user’s own permissions
   const currentUserPermissions = currentUser?.permissions || {};
@@ -251,6 +254,14 @@ export default function CreateUserPage() {
 
   return (
     <div className="container mx-auto p-4 max-w-xl">
+      {/* Back button */}
+      <button
+        className="btn btn-secondary mb-6"
+        onClick={() => navigate(-1)}
+      >
+        Back <i className="ki-filled ki-arrow-left"></i>
+      </button>
+
       <div className="card-header py-5">
         <h3 className="card-title text-xl font-bold">Create New User</h3>
       </div>

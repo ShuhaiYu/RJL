@@ -59,7 +59,7 @@ export default function AgenciesMetricsDataGrid({ agencies }) {
             <Button
               variant="link"
               onClick={() =>
-                navigate("/users", { state: { agency_id: agency.id } })
+                navigate("/users", { state: { agency_id: agency.id, agency_name: agency.agency_name } })
               }
             >
               {agency.total_users || 0}
@@ -73,7 +73,7 @@ export default function AgenciesMetricsDataGrid({ agencies }) {
         header: ({ header }) => (
           <DataGridColumnHeader
             column={header.column}
-            title="Total Property"
+            title="Property #"
             filter={<ColumnInputFilter column={header.column} />}
           />
         ),
@@ -83,7 +83,7 @@ export default function AgenciesMetricsDataGrid({ agencies }) {
             <Button
               variant="link"
               onClick={() =>
-                navigate("/property/my-properties", { state: { agency_id: agency.id } })
+                navigate("/property/my-properties", { state: { agency_id: agency.id, agency_name: agency.agency_name } })
               }
             >
               {agency.total_properties || 0}
@@ -97,7 +97,7 @@ export default function AgenciesMetricsDataGrid({ agencies }) {
         header: ({ header }) => (
           <DataGridColumnHeader
             column={header.column}
-            title="Total Unknown Job Order"
+            title="Unknown #"
             filter={<ColumnInputFilter column={header.column} />}
           />
         ),
@@ -108,7 +108,7 @@ export default function AgenciesMetricsDataGrid({ agencies }) {
               variant="link"
               onClick={() =>
                 navigate("/property/tasks?status=UNKNOWN", {
-                  state: { agency_id: agency.id },
+                  state: { agency_id: agency.id, agency_name: agency.agency_name },
                 })
               }
             >
@@ -123,7 +123,7 @@ export default function AgenciesMetricsDataGrid({ agencies }) {
         header: ({ header }) => (
           <DataGridColumnHeader
             column={header.column}
-            title="Total Incomplete Job Order"
+            title="Incomplete #"
             filter={<ColumnInputFilter column={header.column} />}
           />
         ),
@@ -134,7 +134,7 @@ export default function AgenciesMetricsDataGrid({ agencies }) {
               variant="link"
               onClick={() =>
                 navigate("/property/tasks?status=INCOMPLETE", {
-                  state: { agency_id: agency.id },
+                  state: { agency_id: agency.id, agency_name: agency.agency_name },
                 })
               }
             >
@@ -149,7 +149,7 @@ export default function AgenciesMetricsDataGrid({ agencies }) {
         header: ({ header }) => (
           <DataGridColumnHeader
             column={header.column}
-            title="Total Processing Job Order"
+            title="Processing #"
             filter={<ColumnInputFilter column={header.column} />}
           />
         ),
@@ -160,7 +160,7 @@ export default function AgenciesMetricsDataGrid({ agencies }) {
               variant="link"
               onClick={() =>
                 navigate("/property/tasks?status=PROCESSING", {
-                  state: { agency_id: agency.id },
+                  state: { agency_id: agency.id, agency_name: agency.agency_name },
                 })
               }
             >
@@ -175,7 +175,7 @@ export default function AgenciesMetricsDataGrid({ agencies }) {
         header: ({ header }) => (
           <DataGridColumnHeader
             column={header.column}
-            title="Total DUE SOON Job Order"
+            title="Due Soon #"
             filter={<ColumnInputFilter column={header.column} />}
           />
         ),
@@ -186,7 +186,7 @@ export default function AgenciesMetricsDataGrid({ agencies }) {
               variant="link"
               onClick={() =>
                 navigate("/property/tasks?status=DUE_SOON", {
-                  state: { agency_id: agency.id },
+                  state: { agency_id: agency.id, agency_name: agency.agency_name },
                 })
               }
             >
@@ -201,7 +201,7 @@ export default function AgenciesMetricsDataGrid({ agencies }) {
         header: ({ header }) => (
           <DataGridColumnHeader
             column={header.column}
-            title="Total EXPIRED Job Order"
+            title="Expired #"
             filter={<ColumnInputFilter column={header.column} />}
           />
         ),
@@ -212,7 +212,7 @@ export default function AgenciesMetricsDataGrid({ agencies }) {
               variant="link"
               onClick={() =>
                 navigate("/property/tasks?status=EXPIRED", {
-                  state: { agency_id: agency.id },
+                  state: { agency_id: agency.id, agency_name: agency.agency_name },
                 })
               }
             >
