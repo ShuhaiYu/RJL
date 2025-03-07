@@ -107,41 +107,41 @@ const Agencies = () => {
 
         <AgenciesMetricsDataGrid agencies={agencies} />
 
-        <div className="btn-tabs" data-tabs="true">
-          <a
-            href="#"
-            className={`btn btn-icon ${activeView === "cards" ? "active" : ""}`}
-            data-tab-toggle="#projects_cards"
-            onClick={() => setActiveView("cards")}
-          >
-            <KeenIcon icon="category" />
-          </a>
-          <a
-            href="#"
-            className={`btn btn-icon ${activeView === "list" ? "active" : ""}`}
-            data-tab-toggle="#projects_list"
-            onClick={() => setActiveView("list")}
-          >
-            <KeenIcon icon="row-horizontal" />
-          </a>
-        </div>
+        {/*<div className="btn-tabs" data-tabs="true">*/}
+        {/*  <a*/}
+        {/*    href="#"*/}
+        {/*    className={`btn btn-icon ${activeView === 'cards' ? 'active' : ''}`}*/}
+        {/*    data-tab-toggle="#projects_cards"*/}
+        {/*    onClick={() => setActiveView('cards')}*/}
+        {/*  >*/}
+        {/*    <KeenIcon icon="category" />*/}
+        {/*  </a>*/}
+        {/*  <a*/}
+        {/*    href="#"*/}
+        {/*    className={`btn btn-icon ${activeView === 'list' ? 'active' : ''}`}*/}
+        {/*    data-tab-toggle="#projects_list"*/}
+        {/*    onClick={() => setActiveView('list')}*/}
+        {/*  >*/}
+        {/*    <KeenIcon icon="row-horizontal" />*/}
+        {/*  </a>*/}
+        {/*</div>*/}
       </div>
 
-      {activeView === "cards" && (
-        <div id="projects_cards">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-7.5">
-            {agencies.map((agency, index) => renderProject(agency, index))}
-          </div>
-        </div>
-      )}
+      {/*{activeView === 'cards' && (*/}
+      {/*  <div id="projects_cards">*/}
+      {/*    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-7.5">*/}
+      {/*      {agencies.map((agency, index) => renderProject(agency, index))}*/}
+      {/*    </div>*/}
+      {/*  </div>*/}
+      {/*)}*/}
 
-      {activeView === "list" && (
-        <div id="projects_list">
-          <div className="flex flex-col gap-5 lg:gap-7.5">
-            {agencies.map((agency, index) => renderItem(agency, index))}
-          </div>
-        </div>
-      )}
+      {/*{activeView === 'list' && (*/}
+      {/*  <div id="projects_list">*/}
+      {/*    <div className="flex flex-col gap-5 lg:gap-7.5">*/}
+      {/*      {agencies.map((agency, index) => renderItem(agency, index))}*/}
+      {/*    </div>*/}
+      {/*  </div>*/}
+      {/*)}*/}
     </div>
   );
 };

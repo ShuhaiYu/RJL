@@ -13,11 +13,11 @@ export const MENU_SIDEBAR = [
   //   path: "/public-profile/profiles/crm",
   // },
   {
-    title: "Users",
+    title: "User",
     icon: "users",
     children: [
       {
-        title: "All Users",
+        title: "User List",
         icon: "users",
         path: "/users",
         permissions: {
@@ -32,15 +32,15 @@ export const MENU_SIDEBAR = [
           user: ["create"],
         }
       },
-    ],    
+    ],
   },
 
   {
-    title: "Agencies",
+    title: "Agency",
     icon: "people",
     children: [
       {
-        title: "My Agencies",
+        title: "Agency List",
         icon: "users",
         path: "/agencies/my-agencies",
         permissions: {
@@ -59,11 +59,11 @@ export const MENU_SIDEBAR = [
   },
 
   {
-    title: "Properties",
+    title: "Property",
     icon: "home-3",
     children: [
       {
-        title: "My Properties",
+        title: "Property List",
         icon: "home-3",
         path: "/property/my-properties",
         permissions: {
@@ -81,7 +81,7 @@ export const MENU_SIDEBAR = [
     ],
   },
   {
-    title: "Job Orders",
+    title: "Job Order",
     icon: "scroll",
     permissions: {
       task: ["create"],
@@ -110,7 +110,7 @@ export const MENU_SIDEBAR = [
         icon: "plus-circle",
         path: "/property/tasks?status=PROCESSING",
       },
-      
+
       {
         title: "Completed",
         icon: "plus-circle",
@@ -147,7 +147,7 @@ export const MENU_SIDEBAR = [
     ],
   },
   {
-    title: "Emails",
+    title: "Email List",
     icon: "sms",
     path: "/emails",
   },
