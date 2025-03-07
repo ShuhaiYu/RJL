@@ -48,11 +48,11 @@ const cardConfigs = [
     label: "Expired",
     route: "/property/tasks?status=EXPIRED",
   },
-  {
-    key: "HISTORY",
-    label: "History",
-    route: "/property/tasks?status=HISTORY",
-  },
+  // {
+  //   key: "HISTORY",
+  //   label: "History",
+  //   route: "/property/tasks?status=HISTORY",
+  // },
   {
     key: "smoke alarm",
     label: "Smoke Alarm",
@@ -61,7 +61,7 @@ const cardConfigs = [
   {
     key: "gas & electric",
     label: "Gas & Electric",
-    route: "/property/tasks?type=gas_electric",
+    route: "/property/tasks?type=gas_%26_electric",
   },
 ];
 
@@ -80,7 +80,7 @@ export default function TasksDashboard() {
     COMPLETED: 0,
     DUE_SOON: 0,
     EXPIRED: 0,
-    HISTORY: 0,
+    // HISTORY: 0,
     "smoke alarm": 0,
     "gas & electric": 0,
   });
@@ -109,7 +109,7 @@ export default function TasksDashboard() {
         COMPLETED: data.completed_count || 0,
         DUE_SOON: data.due_soon_count || 0,
         EXPIRED: data.expired_count || 0,
-        HISTORY: data.history_count || 0,
+        // HISTORY: data.history_count || 0,
         "smoke alarm": data.smoke_alarm_count || 0,
         "gas & electric": data.gas_electric_count || 0,
       });
