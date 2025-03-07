@@ -1,21 +1,24 @@
 // src/pages/Agencies.jsx
-import { useState, useEffect } from 'react';
-import { KeenIcon } from '@/components';
-import { CardProjectExtended, CardProjectExtendedRow } from '@/partials/cards';
-import axios from 'axios';
-import { useAuthContext } from '@/auth';
+import { useState, useEffect } from "react";
+import { KeenIcon } from "@/components";
+import { CardProjectExtended, CardProjectExtendedRow } from "@/partials/cards";
+import axios from "axios";
+import { useAuthContext } from "@/auth";
 import { Box, CircularProgress } from "@mui/material";
-import AgenciesMetricsDataGrid from './AgenciesMetricsDataGrid';
-
+import AgenciesMetricsDataGrid from "./AgenciesMetricsDataGrid";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const Agencies = () => {
-  const [activeView, setActiveView] = useState('cards');
+  const [activeView, setActiveView] = useState("cards");
   const [agencies, setAgencies] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // 从 AuthContext 中获取 token 与基础 API 路径（例如：`${import.meta.env.VITE_API_BASE_URL}/superuser`）
-  const { auth, baseApi } = useAuthContext();
+  const { auth, baseApi, currentUser } = useAuthContext();
   const token = auth?.accessToken;
+
+  const navigate = useNavigate();
 
   const fetchAgencies = async () => {
     if (!token) return;
@@ -27,7 +30,7 @@ const Agencies = () => {
       setAgencies(response.data);
       setLoading(false);
     } catch (err) {
-      console.error('Failed to fetch agencies:', err);
+      console.error("Failed to fetch agencies:", err);
       setLoading(false);
     }
   };
@@ -83,37 +86,48 @@ const Agencies = () => {
     );
   }
 
+  const canCreateAgency = currentUser?.permissions?.agency?.includes("create");
+
   return (
     <div className="flex flex-col items-stretch gap-5 lg:gap-7.5">
       <div className="flex flex-wrap items-center gap-5 justify-between">
         <h3 className="text-lg text-gray-900 font-semibold">
           {agencies.length} Agencies
         </h3>
+        <div className="mb-4 flex justify-end">
+          {canCreateAgency && (
+            <Button
+              variant="create"
+              onClick={() => navigate("/agencies/create-agency")}
+            >
+              Create Agency
+            </Button>
+          )}
+        </div>
 
         <AgenciesMetricsDataGrid agencies={agencies} />
-
 
         <div className="btn-tabs" data-tabs="true">
           <a
             href="#"
-            className={`btn btn-icon ${activeView === 'cards' ? 'active' : ''}`}
+            className={`btn btn-icon ${activeView === "cards" ? "active" : ""}`}
             data-tab-toggle="#projects_cards"
-            onClick={() => setActiveView('cards')}
+            onClick={() => setActiveView("cards")}
           >
             <KeenIcon icon="category" />
           </a>
           <a
             href="#"
-            className={`btn btn-icon ${activeView === 'list' ? 'active' : ''}`}
+            className={`btn btn-icon ${activeView === "list" ? "active" : ""}`}
             data-tab-toggle="#projects_list"
-            onClick={() => setActiveView('list')}
+            onClick={() => setActiveView("list")}
           >
             <KeenIcon icon="row-horizontal" />
           </a>
         </div>
       </div>
 
-      {activeView === 'cards' && (
+      {activeView === "cards" && (
         <div id="projects_cards">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-7.5">
             {agencies.map((agency, index) => renderProject(agency, index))}
@@ -121,7 +135,7 @@ const Agencies = () => {
         </div>
       )}
 
-      {activeView === 'list' && (
+      {activeView === "list" && (
         <div id="projects_list">
           <div className="flex flex-col gap-5 lg:gap-7.5">
             {agencies.map((agency, index) => renderItem(agency, index))}

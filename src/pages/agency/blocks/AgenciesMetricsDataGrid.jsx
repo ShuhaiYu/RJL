@@ -222,6 +222,23 @@ export default function AgenciesMetricsDataGrid({ agencies }) {
         },
         enableSorting: true,
       },
+      {
+        id: "actions",
+        header: "Actions",
+        cell: ({ row }) => {
+          const agency = row.original;
+          return (
+            <Button
+              variant="view"
+              onClick={() => {
+                navigate(`/agencies/${agency.id}`);
+              }}
+            >
+              <span className="flex gap-1 items-center">View</span>
+            </Button>
+          );
+        },
+      },
     ],
     [navigate]
   );
