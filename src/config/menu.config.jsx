@@ -151,11 +151,14 @@ export const MENU_SIDEBAR = [
     icon: "sms",
     path: "/emails",
   },
-  // {
-  //   title: "Settings",
-  //   icon: "setting-2",
-  //   path: "/settings",
-  // }
+  {
+    title: "Settings",
+    icon: "setting-2",
+    path: "/settings",
+    permissions: {
+      setting: ["update"],
+    },
+  }
   // {
   //   title: "Create Contact",
   //   icon: "plus-circle",

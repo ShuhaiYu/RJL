@@ -10,6 +10,12 @@ export default function SettingsPage() {
   const token = auth?.accessToken;
 
   const [settings, setSettings] = useState({
+    imap_host: "",
+    imap_port: "",
+    imap_user: "",
+    imap_password: "",
+    gmail_user: "",
+    gmail_password: "",
     email_api_key: "",
     google_map_key: "",
   });
@@ -23,10 +29,17 @@ export default function SettingsPage() {
       })
       .then((res) => {
         if (res.data) {
-          setSettings({
+          setSettings((prev) => ({
+            ...prev,
+            imap_host: res.data.imap_host || "",
+            imap_port: res.data.imap_port || "",
+            imap_user: res.data.imap_user || "",
+            imap_password: res.data.imap_password || "",
+            gmail_user: res.data.gmail_user || "",
+            gmail_password: res.data.gmail_password || "",
             email_api_key: res.data.email_api_key || "",
             google_map_key: res.data.google_map_key || "",
-          });
+          }));
         }
       })
       .catch((err) => {
@@ -60,6 +73,67 @@ export default function SettingsPage() {
     <div className="container mx-auto p-4 max-w-xl">
       <h1 className="text-2xl font-bold mb-6">System Settings</h1>
       <form onSubmit={handleSubmit} className="space-y-5 bg-white p-5 rounded shadow">
+      <div>
+          <label className="block mb-2 font-medium">IMAP Host</label>
+          <Input
+            type="text"
+            name="imap_host"
+            value={settings.imap_host}
+            onChange={handleChange}
+            placeholder="imap.gmail.com"
+          />
+        </div>
+        <div>
+          <label className="block mb-2 font-medium">IMAP Port</label>
+          <Input
+            type="text"
+            name="imap_port"
+            value={settings.imap_port}
+            onChange={handleChange}
+            placeholder="993"
+          />
+        </div>
+        <div>
+          <label className="block mb-2 font-medium">IMAP User</label>
+          <Input
+            type="text"
+            name="imap_user"
+            value={settings.imap_user}
+            onChange={handleChange}
+            placeholder="your@gmail.com"
+          />
+        </div>
+        <div>
+          <label className="block mb-2 font-medium">IMAP Password</label>
+          <Input
+            type="password"
+            name="imap_password"
+            value={settings.imap_password}
+            onChange={handleChange}
+            placeholder="application-specific password"
+          />
+        </div>
+
+        <div>
+          <label className="block mb-2 font-medium">Gmail User</label>
+          <Input
+            type="text"
+            name="gmail_user"
+            value={settings.gmail_user}
+            onChange={handleChange}
+            placeholder="your@gmail.com"
+          />
+        </div>
+        <div>
+          <label className="block mb-2 font-medium">Gmail Password</label>
+          <Input
+            type="password"
+            name="gmail_password"
+            value={settings.gmail_password}
+            onChange={handleChange}
+            placeholder="application-specific password"
+          />
+        </div>
         <div>
           <label className="block mb-2 font-medium">Email API Key</label>
           <Input
