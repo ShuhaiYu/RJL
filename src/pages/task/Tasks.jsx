@@ -29,9 +29,9 @@ export default function Tasks() {
   let h1Title = "Job Orders";
   if (statusQuery || typeQuery) {
     const parts = [];
-    if (statusQuery) parts.push(`Status: ${statusQuery}`);
-    if (typeQuery) parts.push(`Type: ${typeQuery}`);
-    h1Title = `Job Orders (${parts.join(", ")})`;
+    if (statusQuery) parts.push(`: ${statusQuery.replace("_", " ")}`);
+    if (typeQuery) parts.push(`Type: ${typeQuery.replace("_", " ")}`);
+    h1Title = `Job Orders ${parts.join(", ")}`;
   }
   if (agencyIdFromState) {
     h1Title = h1Title + ` for Agency: ${agencyNameFromQuery}`;
@@ -69,6 +69,17 @@ export default function Tasks() {
     navigate(`/property/tasks/${taskId}`);
   };
 
+  const handleCreate = () => {
+    let finalType = "";
+    if (typeQuery) {
+      // 将查询参数中的下划线转换为空格，例如 "smoke_alarm" -> "smoke alarm"
+      finalType = typeQuery.replace(/_/g, " ");
+    }
+    // 将预填数据放入 originalTask 对象中
+    const state = finalType ? { originalTask: { type: finalType } } : {};
+    navigate("/property/tasks/create", { state });
+  };
+
   if (loading) {
     return (
       <Box className="flex justify-center items-center h-40">
@@ -89,10 +100,7 @@ export default function Tasks() {
       <h1 className="text-3xl font-bold mb-6 text-gray-800">{h1Title}</h1>
       <div className="mb-4 flex justify-end">
         {canCreateTask && (
-          <Button
-            variant="create"
-            onClick={() => navigate("/property/tasks/create")}
-          >
+          <Button variant="create" onClick={handleCreate}>
             Create Job Order
           </Button>
         )}

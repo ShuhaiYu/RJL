@@ -49,6 +49,8 @@ export default function MyPropertiesDataTable({
       },
       {
         id: "agency_name",
+        // 通过 accessorFn 取出嵌套的 agency_name
+        accessorFn: (row) => row.agency?.agency_name || "",
         header: ({ header }) => (
           <DataGridColumnHeader
             column={header.column}
@@ -56,14 +58,14 @@ export default function MyPropertiesDataTable({
             filter={<ColumnInputFilter column={header.column} />}
           />
         ),
-        cell: ({ row }) => {
-          const property = row.original;
+        cell: ({ row, getValue }) => {
+          const agencyName = getValue();
           return (
             <Link
               className="btn btn-link"
-              to={`/agencies/${property.agency?.id}`}
+              to={`/agencies/${row.original.agency?.id}`}
             >
-              {property.agency?.agency_name}
+              {agencyName}
             </Link>
           );
         },
@@ -99,8 +101,6 @@ export default function MyPropertiesDataTable({
     });
   }, [baseColumns, hideColumns]);
 
-  
-
   return (
     <div>
       <p className="text-sm text-gray-500 mb-4">
@@ -115,7 +115,6 @@ export default function MyPropertiesDataTable({
         pagination={{ size: 100 }}
         onFilteredDataChange={(count) => setFilteredCount(count)}
         sorting={[{ id: "updated_at", desc: true }]}
-        
       />
     </div>
   );

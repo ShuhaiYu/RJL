@@ -112,9 +112,8 @@ export default function CreateTaskPage() {
           <div>
             <label className="block mb-2 font-medium">Select Property</label>
             <AsyncPropertySelect
-              onChange={(option) => {
-                setSelectedPropertyId(option);
-              }}
+              defaultPropertyId={originalTask?.property_id}
+              onChange={(option) => setSelectedPropertyId(option)}
             />
           </div>
 
@@ -132,7 +131,9 @@ export default function CreateTaskPage() {
 
           {/* Task Description */}
           <div>
-            <label className="block mb-2 font-medium">Job Order Description</label>
+            <label className="block mb-2 font-medium">
+              Job Order Description
+            </label>
             <textarea
               rows={3}
               className="textarea textarea-bordered w-full"

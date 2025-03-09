@@ -195,14 +195,14 @@ export default function PropertyDetailModal({ propertyId, onClose }) {
             </div>
 
             {/* 显示任务列表 */}
-            {propertyDetail.tasks && propertyDetail.tasks.length > 0 ? (
+            {/* {propertyDetail.tasks && propertyDetail.tasks.length > 0 ? (
               <TasksDataTable
                 tasks={propertyDetail.tasks}
                 onTaskClick={handleTaskClick}
               />
             ) : (
               <p>No tasks found for this property.</p>
-            )}
+            )} */}
           </>
         ) : (
           <div>No data</div>

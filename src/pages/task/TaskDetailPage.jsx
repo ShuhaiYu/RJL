@@ -33,7 +33,6 @@ export default function TaskDetailPage() {
   const [statusModalInput, setStatusModalInput] = useState("");
   const [archiveConflicts, setArchiveConflicts] = useState(true);
 
-
   // ========== 联系人相关状态 ==========
   const [selectedContactId, setSelectedContactId] = useState(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -196,7 +195,11 @@ export default function TaskDetailPage() {
           : statusModalInput;
     }
     // 如果是 UNKNOWN -> INCOMPLETE，并且用户勾选了“Archive conflicting job orders”
-    if (task.status === "UNKNOWN" && nextStatus === "INCOMPLETE" && archiveConflicts) {
+    if (
+      task.status === "UNKNOWN" &&
+      nextStatus === "INCOMPLETE" &&
+      archiveConflicts
+    ) {
       payload.archive_conflicts = true;
     }
 
@@ -593,100 +596,106 @@ export default function TaskDetailPage() {
 
       {/* 新增状态更新弹窗，根据任务当前状态决定下一步操作 */}
       {showStatusModal && (
-        <Modal open={showStatusModal} onClose={() => setShowStatusModal(false)}>
-          <ModalContent>
-            <ModalHeader>
-              <ModalTitle>Update Task Status</ModalTitle>
-            </ModalHeader>
-            <ModalBody>
-              <form onSubmit={handleStatusModalSubmit}>
-                {(() => {
-                  const { fieldLabel, inputType } = getNextStatusAndField(
-                    task.status
-                  );
-                  if (fieldLabel) {
-                    // 如果有必填字段，则显示输入控件
-                    if (inputType === "select") {
-                      return (
-                        <div className="mb-4">
-                          <label className="block mb-2 font-medium">
-                            {fieldLabel}
-                          </label>
-                          <select
-                            className="select select-bordered w-full"
-                            value={statusModalInput}
-                            onChange={(e) =>
-                              setStatusModalInput(e.target.value)
-                            }
-                          >
-                            <option value="">Select an option</option>
-                            <option value="smoke alarm">smoke alarm</option>
-                            <option value="gas & electric">
-                              gas & electric
-                            </option>
-                          </select>
-
-                          {/* 如果是 UNKNOWN -> INCOMPLETE，再显示复选框 */}
-                          {task.status === "UNKNOWN" && (
-                            <div className="flex items-center mt-3">
-                              <input
-                                type="checkbox"
-                                id="archiveConflicts"
-                                className="checkbox mr-2"
-                                checked={archiveConflicts}
-                                onChange={(e) =>
-                                  setArchiveConflicts(e.target.checked)
-                                }
-                              />
-                              <label htmlFor="archiveConflicts">
-                                Archive conflicting job orders
-                              </label>
-                            </div>
-                          )}
-                        </div>
-                      );
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30"
+          onClick={() => setShowStatusModal(false)}
+        >
+          <div
+            className="bg-white p-6 rounded shadow-lg max-w-xl w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <ModalContent>
+              <ModalHeader>
+                <ModalTitle className="text-xl font-semibold">Update Task Status</ModalTitle>
+              </ModalHeader>
+              <ModalBody>
+                <form onSubmit={handleStatusModalSubmit}>
+                  {(() => {
+                    const { fieldLabel, inputType } = getNextStatusAndField(
+                      task.status
+                    );
+                    if (fieldLabel) {
+                      if (inputType === "select") {
+                        return (
+                          <div className="mb-4">
+                            <label className="block mb-2 font-medium">
+                              {fieldLabel}
+                            </label>
+                            <select
+                              className="select select-bordered w-full"
+                              value={statusModalInput}
+                              onChange={(e) =>
+                                setStatusModalInput(e.target.value)
+                              }
+                            >
+                              <option value="">Select an option</option>
+                              <option value="smoke alarm">smoke alarm</option>
+                              <option value="gas & electric">
+                                gas & electric
+                              </option>
+                            </select>
+                            {task.status === "UNKNOWN" && (
+                              <div className="flex items-center mt-3">
+                                <input
+                                  type="checkbox"
+                                  id="archiveConflicts"
+                                  className="checkbox mr-2"
+                                  checked={archiveConflicts}
+                                  onChange={(e) =>
+                                    setArchiveConflicts(e.target.checked)
+                                  }
+                                />
+                                <label htmlFor="archiveConflicts">
+                                  Archive conflicting job orders
+                                </label>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      } else {
+                        return (
+                          <div className="mb-4">
+                            <label className="block mb-2 font-medium">
+                              {fieldLabel}
+                            </label>
+                            <input
+                              type={inputType}
+                              className="input input-bordered w-full"
+                              value={statusModalInput}
+                              onChange={(e) =>
+                                setStatusModalInput(e.target.value)
+                              }
+                              placeholder={fieldLabel}
+                            />
+                          </div>
+                        );
+                      }
                     } else {
                       return (
                         <div className="mb-4">
-                          <label className="block mb-2 font-medium">
-                            {fieldLabel}
-                          </label>
-                          <input
-                            type={inputType}
-                            className="input input-bordered w-full"
-                            value={statusModalInput}
-                            onChange={(e) =>
-                              setStatusModalInput(e.target.value)
-                            }
-                            placeholder={fieldLabel}
-                          />
+                          <p className="text-sm">
+                            Are you sure you want to archive this task?
+                          </p>
                         </div>
                       );
                     }
-                  } else {
-                    // fieldLabel 为空，说明是归档操作，显示确认信息
-                    return (
-                      <div className="mb-4">
-                        <p className="text-sm">
-                          Are you sure you want to archive this task?
-                        </p>
-                      </div>
-                    );
-                  }
-                })()}
-                <div className="mt-4 flex justify-end gap-2">
-                  <Button
-                    type="button button-secondary"
-                    onClick={() => setShowStatusModal(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button type="submit">Confirm</Button>
-                </div>
-              </form>
-            </ModalBody>
-          </ModalContent>
-        </Modal>
+                  })()}
+                  <div className="mt-4 flex justify-end gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowStatusModal(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button variant="default" type="submit">
+                      Confirm
+                    </Button>
+                  </div>
+                </form>
+              </ModalBody>
+            </ModalContent>
+          </div>
+        </div>
       )}
     </div>
   );

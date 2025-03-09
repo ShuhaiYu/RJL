@@ -94,7 +94,7 @@ export default function PropertyDetailPage() {
       {/* Back Button */}
       <button
         className="btn btn-secondary mb-6"
-        onClick={() => navigate("/property/my-properties")}
+        onClick={() => navigate(-1)}
       >
         Back <i className="ki-filled ki-arrow-left"></i>
       </button>
