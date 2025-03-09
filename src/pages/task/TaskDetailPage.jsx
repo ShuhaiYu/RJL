@@ -606,7 +606,9 @@ export default function TaskDetailPage() {
           >
             <ModalContent>
               <ModalHeader>
-                <ModalTitle className="text-xl font-semibold">Update Task Status</ModalTitle>
+                <ModalTitle className="text-xl font-semibold">
+                  Update Task Status
+                </ModalTitle>
               </ModalHeader>
               <ModalBody>
                 <form onSubmit={handleStatusModalSubmit}>
@@ -629,10 +631,10 @@ export default function TaskDetailPage() {
                               }
                             >
                               <option value="">Select an option</option>
-                              <option value="smoke alarm">smoke alarm</option>
-                              <option value="gas & electric">
-                                gas & electric
+                              <option value="GAS & ELECTRIC">
+                                Gas & Electric
                               </option>
+                              <option value="SMOKE ALARM">Smoke Alarm</option>
                             </select>
                             {task.status === "UNKNOWN" && (
                               <div className="flex items-center mt-3">

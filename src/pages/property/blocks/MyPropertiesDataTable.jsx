@@ -114,7 +114,6 @@ export default function MyPropertiesDataTable({
         // 其它 DataGrid 配置，如 toolbar, pagination, etc.
         pagination={{ size: 100 }}
         onFilteredDataChange={(count) => setFilteredCount(count)}
-        sorting={[{ id: "updated_at", desc: true }]}
       />
     </div>
   );

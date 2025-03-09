@@ -129,12 +129,12 @@ export const MENU_SIDEBAR = [
       {
         title: "Smoke Alarm",
         icon: "plus-circle",
-        path: "/property/tasks?type=smoke_alarm",
+        path: "/property/tasks?type=SMOKE_ALARM",
       },
       {
         title: "Gas & Electric",
         icon: "plus-circle",
-        path: "/property/tasks?type=gas_%26_electric",
+        path: "/property/tasks?type=GAS_%26_ELECTRIC",
       },
       {
         title: "Create Job Order",

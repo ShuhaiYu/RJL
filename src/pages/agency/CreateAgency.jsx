@@ -89,6 +89,13 @@ export default function CreateAgency() {
     <TooltipProvider delayDuration={0}>
       {/* TooltipProvider 包住整个表单或者根元素 */}
       <div className="container mx-auto p-4 max-w-xl">
+        {/* Back button */}
+      <button
+        className="btn btn-secondary mb-6"
+        onClick={() => navigate(-1)}
+      >
+        Back <i className="ki-filled ki-arrow-left"></i>
+      </button>
         <h1 className="text-2xl font-bold mb-6">Create Agency</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Agency Name */}

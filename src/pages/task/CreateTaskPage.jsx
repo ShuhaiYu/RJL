@@ -103,6 +103,13 @@ export default function CreateTaskPage() {
 
   return (
     <div className="container mx-auto p-4 max-w-xl">
+      {/* Back button */}
+      <button
+        className="btn btn-secondary mb-6"
+        onClick={() => navigate(-1)}
+      >
+        Back <i className="ki-filled ki-arrow-left"></i>
+      </button>
       <div className="card-header py-5">
         <h3 className="card-title text-xl font-bold">Create New Job Order</h3>
       </div>
@@ -151,8 +158,8 @@ export default function CreateTaskPage() {
               value={taskType}
               onChange={(e) => setTaskType(e.target.value)}
             >
-              <option value="gas & electric">Gas & Electricity</option>
-              <option value="smoke alarm">Smoke Alarm</option>
+              <option value="GAS & ELECTRIC">Gas & Electric</option>
+              <option value="SMOKE ALARM">Smoke Alarm</option>
             </select>
           </div>
 
