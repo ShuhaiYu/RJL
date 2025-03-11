@@ -278,6 +278,23 @@ export default function TaskDetailPage() {
     }
   };
 
+  // 删除函数 handleDeleteTask
+  async function handleDeleteTask() {
+    if (!window.confirm("Are you sure you want to delete this job order?")) {
+      return;
+    }
+    try {
+      await axios.delete(`${baseApi}/tasks/${task.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      toast.success("Job Order deleted successfully");
+      navigate("/property/tasks");
+    } catch (error) {
+      console.error("Failed to delete task:", error);
+      toast.error("Failed to delete Job Order");
+    }
+  }
+
   /**
    * 打开文件（通过后端获取预签名URL）
    */
@@ -442,6 +459,9 @@ export default function TaskDetailPage() {
               {getStatusButtonLabel()}
             </Button>
           )}
+          <Button variant="delete" onClick={handleDeleteTask}>
+            Delete
+          </Button>
         </div>
       </div>
 

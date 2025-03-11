@@ -30,11 +30,11 @@ export default function Tasks() {
   if (statusQuery || typeQuery) {
     const parts = [];
     if (statusQuery) parts.push(`: ${statusQuery.replace("_", " ")}`);
-    if (typeQuery) parts.push(`Type: ${typeQuery.replace("_", " ")}`);
+    if (typeQuery) parts.push(`Type: ${typeQuery.replace(/_/g, " ")}`);
     h1Title = `Job Orders ${parts.join(", ")}`;
   }
   if (agencyIdFromState) {
-    h1Title = h1Title + ` for Agency: ${agencyNameFromQuery}`;
+    h1Title = h1Title + ` Agency: ${agencyNameFromQuery}`;
   }
 
   const fetchTasks = () => {
