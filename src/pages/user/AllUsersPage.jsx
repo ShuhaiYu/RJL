@@ -86,7 +86,7 @@ export const AllUsersPage = () => {
         header: ({ header }) => (
           <DataGridColumnHeader
             column={header.column}
-            title="Agency Name"
+            title="Agency"
             filter={<ColumnInputFilter column={header.column} />}
           />
         ),
@@ -167,9 +167,9 @@ export const AllUsersPage = () => {
 
   return (
     <div className="p-4">
-      
+
       <h1 className="text-3xl font-bold mb-6">Users</h1>
-      
+
       <div className="mb-4 flex justify-end">
         <Button
           variant="create"

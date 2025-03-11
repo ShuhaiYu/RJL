@@ -27,7 +27,7 @@ export default function AgenciesMetricsDataGrid({ agencies }) {
         header: ({ header }) => (
           <DataGridColumnHeader
             column={header.column}
-            title="Agency Name"
+            title="Agency"
             filter={<ColumnInputFilter column={header.column} />}
           />
         ),

@@ -7,11 +7,11 @@ export const MENU_SIDEBAR = [
     icon: "home",
     path: "/",
   },
-  // {
-  //   title: "My Profile",
-  //   icon: "profile-circle",
-  //   path: "/public-profile/profiles/crm",
-  // },
+  {
+    title: "My Profile",
+    icon: "profile-circle",
+    path: "/public-profile/profiles/crm",
+  },
   {
     title: "User",
     icon: "users",

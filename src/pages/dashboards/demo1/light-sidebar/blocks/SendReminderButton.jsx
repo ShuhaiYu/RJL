@@ -27,7 +27,7 @@ export default function SendReminderButton() {
       </div>
       <p className="text-sm text-gray-500 mt-2">
         This button simulates sending an email reminder immediately.
-        (Normally done at 9am by CRON)
+        (Normally done at 4am by CRON)
       </p>
       {error && <div className="text-red-500 mt-2">{error}</div>}
       <button

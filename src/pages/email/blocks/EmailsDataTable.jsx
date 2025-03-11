@@ -31,7 +31,7 @@ export default function EmailsDataTable({ emails }) {
         header: ({ header }) => (
           <DataGridColumnHeader
             column={header.column}
-            title="Property Address"
+            title="Address"
             filter={<ColumnInputFilter column={header.column} />}
           />
         ),

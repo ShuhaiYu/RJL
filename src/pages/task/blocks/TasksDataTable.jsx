@@ -48,7 +48,7 @@ export default function TasksDataTable({
         header: ({ header }) => (
           <DataGridColumnHeader
             column={header.column}
-            title="Property Address"
+            title="Address"
             filter={<ColumnInputFilter column={header.column} />}
           />
         ),
@@ -67,7 +67,7 @@ export default function TasksDataTable({
         header: ({ header }) => (
           <DataGridColumnHeader
             column={header.column}
-            title="Agency Name"
+            title="Agency"
             filter={<ColumnInputFilter column={header.column} />}
           />
         ),

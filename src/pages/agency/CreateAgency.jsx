@@ -101,7 +101,7 @@ export default function CreateAgency() {
           {/* Agency Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Agency Name <span className="text-red-500">*</span>
+              Agency <span className="text-red-500">*</span>
             </label>
             <Input
               type="text"

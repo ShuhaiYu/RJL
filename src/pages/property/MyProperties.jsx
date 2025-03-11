@@ -59,11 +59,11 @@ export default function MyProperties() {
   };
 
   // check user has create property permission
-  const canCreateProperty = currentUser?.permissions?.property?.includes("create");  
+  const canCreateProperty = currentUser?.permissions?.property?.includes("create");
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6 text-gray-800">My Properties</h1>
+      <h1 className="text-3xl font-bold mb-6 text-gray-800">Properties</h1>
       <div className="mb-4 flex justify-end">
         {canCreateProperty && (
           <Button
