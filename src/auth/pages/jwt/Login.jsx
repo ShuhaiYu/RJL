@@ -65,6 +65,7 @@ const Login = () => {
   return <div className="card max-w-[390px] w-full">
       <form className="card-body flex flex-col gap-5 p-10" onSubmit={formik.handleSubmit} noValidate>
         <div className="text-center mb-2.5">
+          <img src="/media/app/RJL.png" className="h-[100px] max-w-none w-[100px]" alt="logo"/>
           <h3 className="text-lg font-semibold text-gray-900 leading-none mb-2.5">Sign in</h3>
           {/* <div className="flex items-center justify-center font-medium">
             <span className="text-2sm text-gray-600 me-1.5">Need an account?</span>
@@ -93,10 +94,10 @@ const Login = () => {
          <span className="border-t border-gray-200 w-full"></span>
         </div> */}
 
-        <Alert variant="primary">
-          Use <span className="font-semibold text-gray-900">demo@email.com</span> username and{' '}
-          <span className="font-semibold text-gray-900">123456</span> password.
-        </Alert>
+        {/*<Alert variant="primary">*/}
+        {/*  Use <span className="font-semibold text-gray-900">demo@email.com</span> username and{' '}*/}
+        {/*  <span className="font-semibold text-gray-900">123456</span> password.*/}
+        {/*</Alert>*/}
 
         {formik.status && <Alert variant="danger">{formik.status}</Alert>}
 
