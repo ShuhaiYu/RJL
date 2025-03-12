@@ -21,7 +21,7 @@ export const MENU_SIDEBAR = [
         icon: "users",
         path: "/users",
         permissions: {
-          user: ["read"],
+          user: ["create"],
         }
       },
       {
@@ -44,7 +44,7 @@ export const MENU_SIDEBAR = [
         icon: "users",
         path: "/agencies/my-agencies",
         permissions: {
-          agency: ["read"],
+          agency: ["create"],
         }
       },
       {
@@ -84,7 +84,7 @@ export const MENU_SIDEBAR = [
     title: "Job Order",
     icon: "scroll",
     permissions: {
-      task: ["create"],
+      task: ["read"],
     },
     children: [
       {
@@ -97,44 +97,65 @@ export const MENU_SIDEBAR = [
         icon: "plus-circle",
         path: "/property/tasks?status=UNKNOWN",
         permissions: {
-          role: ["create"],
+          agency: ["create"],
         },
       },
       {
         title: "Incomplete",
         icon: "plus-circle",
         path: "/property/tasks?status=INCOMPLETE",
+        permissions: {
+          task: ["read"],
+        },
       },
       {
         title: "Processing",
         icon: "plus-circle",
         path: "/property/tasks?status=PROCESSING",
+        permissions: {
+          task: ["read"],
+        },
       },
 
       {
         title: "Completed",
         icon: "plus-circle",
         path: "/property/tasks?status=COMPLETED",
+        permissions: {
+          task: ["read"],
+        },
       },
       {
         title: "Due Soon",
         icon: "plus-circle",
         path: "/property/tasks?status=DUE_SOON",
+        permissions: {
+          task: ["read"],
+        },
       },
       {
         title: "Expired",
         icon: "plus-circle",
         path: "/property/tasks?status=EXPIRED",
+        permissions: {
+          task: ["read"],
+        },
       },
       {
         title: "Smoke Alarm",
         icon: "plus-circle",
         path: "/property/tasks?type=SMOKE_ALARM",
+        permissions: {
+          task: ["read"],
+        },
       },
       {
         title: "Gas & Electric",
         icon: "plus-circle",
         path: "/property/tasks?type=GAS_%26_ELECTRIC",
+        permissions: {
+          task: ["read"],
+        },
       },
       {
         title: "Create Job Order",
