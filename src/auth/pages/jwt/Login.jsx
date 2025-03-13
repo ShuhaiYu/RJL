@@ -7,6 +7,7 @@ import { KeenIcon } from '@/components';
 import { useAuthContext } from '@/auth';
 import { useLayout } from '@/providers';
 import { Alert } from '@/components';
+import {toAbsoluteUrl} from "@/utils/index.js";
 const loginSchema = Yup.object().shape({
   email: Yup.string().email('Wrong email format').min(3, 'Minimum 3 characters').max(50, 'Maximum 50 characters').required('Email is required'),
   password: Yup.string().min(6, 'Password must be at least 6 characters long').max(50, 'Maximum 50 characters').required('Password is required'),
@@ -62,11 +63,11 @@ const Login = () => {
     event.preventDefault();
     setShowPassword(!showPassword);
   };
-  return <div className="card max-w-[390px] w-full">
+  return <div className="card max-w-[590px] w-full p-large">
       <form className="card-body flex flex-col gap-5 p-10" onSubmit={formik.handleSubmit} noValidate>
         <div className="text-center mb-2.5">
           <img src="/media/app/RJL.png" className="h-[100px] max-w-none w-[100px]" alt="logo"/>
-          <h3 className="text-lg font-semibold text-gray-900 leading-none mb-2.5">Sign in</h3>
+          <h3 className="fs-large font-semibold text-gray-900 leading-none mb-2.5">Sign in</h3>
           {/* <div className="flex items-center justify-center font-medium">
             <span className="text-2sm text-gray-600 me-1.5">Need an account?</span>
             <Link to={currentLayout?.name === 'auth-branded' ? '/auth/signup' : '/auth/classic/signup'} className="text-2sm link">
@@ -101,8 +102,8 @@ const Login = () => {
 
         {formik.status && <Alert variant="danger">{formik.status}</Alert>}
 
-        <div className="flex flex-col gap-1">
-          <label className="form-label text-gray-900">Email</label>
+        <div className="flex flex-col gap-1 mt-4">
+          <label className="form-label text-gray-900 fs-medium">Email</label>
           <label className="input">
             <input placeholder="Enter username" autoComplete="off" {...formik.getFieldProps('email')} className={clsx('form-control', {
             'is-invalid': formik.touched.email && formik.errors.email
@@ -114,8 +115,8 @@ const Login = () => {
         </div>
 
         <div className="flex flex-col gap-1">
-          <div className="flex items-center justify-between gap-1">
-            <label className="form-label text-gray-900">Password</label>
+          <div className="flex items-center justify-between gap-1 mt-4">
+            <label className="form-label text-gray-900 fs-medium">Password</label>
             <Link to={currentLayout?.name === 'auth-branded' ? '/auth/reset-password' : '/auth/classic/reset-password'} className="text-2sm link shrink-0">
               Forgot Password?
             </Link>
@@ -138,15 +139,29 @@ const Login = () => {
             </span>}
         </div>
 
-        <label className="checkbox-group">
+        <label className="checkbox-group mt-4">
           <input className="checkbox checkbox-sm" type="checkbox" {...formik.getFieldProps('remember')} />
           <span className="checkbox-label">Remember me</span>
         </label>
 
-        <button type="submit" className="btn btn-primary flex justify-center grow" disabled={loading || formik.isSubmitting}>
+        <button type="submit" className="btn btn-primary flex justify-center grow mt-4" disabled={loading || formik.isSubmitting}>
           {loading ? 'Please wait...' : 'Sign In'}
         </button>
       </form>
+
+    <style>
+      {`
+        .p-large {
+          padding:100px 40px;
+        }
+        .fs-large {
+          font-size: 24px;
+        }
+        .fs-medium {
+          font-size: 18px;
+        }
+      `}
+    </style>
     </div>;
 };
 export { Login };
