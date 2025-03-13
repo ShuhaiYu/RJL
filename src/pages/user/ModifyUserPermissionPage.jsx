@@ -115,6 +115,13 @@ export const ModifyUserPermissionPage = () => {
 
   return (
     <div className="container mx-auto p-6 max-w-3xl bg-white shadow rounded-md">
+      {/* Back button */}
+      <button
+        className="btn btn-secondary mb-6"
+        onClick={() => navigate(-1)}
+      >
+        Back <i className="ki-filled ki-arrow-left"></i>
+      </button>
       <h1 className="text-3xl font-bold mb-6">Modify User Permissions</h1>
       {isEditingSelf && (
         <div className="mb-4 p-4 bg-gray-100 rounded">

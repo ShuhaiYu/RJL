@@ -117,29 +117,37 @@ export const AllUsersPage = () => {
               >
                 {canUpdateUser ? "Edit" : "View"}
               </Button>
-              <Button
-                variant="delete"
-                size="sm"
-                disabled={!canUpdateUser}
-                onClick={async () => {
-                  if (
-                    window.confirm("Are you sure you want to delete this user?")
-                  ) {
-                    try {
-                      await axios.delete(`${baseApi}/users/${user.id}`, {
-                        headers: { Authorization: `Bearer ${token}` },
-                      });
-                      toast.success("User deleted successfully");
-                      fetchUsers();
-                    } catch (error) {
-                      console.error("Delete user error:", error);
-                      toast.error("Failed to delete user");
-                    }
-                  }
-                }}
-              >
-                Delete
-              </Button>
+              {
+                /* 只有当被遍历的 user 不是当前登录用户时，才展示 Delete 按钮 */
+                user.id !== currentUser.id && (
+                  <Button
+                    variant="delete"
+                    size="sm"
+                    disabled={!canUpdateUser}
+                    onClick={async () => {
+                      if (
+                        window.confirm(
+                          "Are you sure you want to delete this user?"
+                        )
+                      ) {
+                        try {
+                          await axios.delete(`${baseApi}/users/${user.id}`, {
+                            headers: { Authorization: `Bearer ${token}` },
+                          });
+                          toast.success("User deleted successfully");
+                          fetchUsers();
+                        } catch (error) {
+                          console.error("Delete user error:", error);
+                          toast.error("Failed to delete user");
+                        }
+                      }
+                    }}
+                  >
+                    Delete
+                  </Button>
+                )
+              }
+
               {user.id !== currentUser.id && (
                 <Button
                   className="btn btn-secondary btn-sm"
@@ -167,7 +175,6 @@ export const AllUsersPage = () => {
 
   return (
     <div className="p-4">
-
       <h1 className="text-3xl font-bold mb-6">Users</h1>
 
       <div className="mb-4 flex justify-end">

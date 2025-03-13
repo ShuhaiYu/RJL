@@ -93,7 +93,7 @@ export function setupAxios(axios) {
       if (error.response?.data?.message) {
         toast.error(error.response.data.message);
       } else {
-        toast.error("请求失败，请稍后再试");
+        toast.error("An error occurred");
       }
       return Promise.reject(error);
     }

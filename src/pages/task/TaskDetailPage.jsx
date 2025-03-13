@@ -20,7 +20,7 @@ import TaskDetailModal from "./blocks/TaskDetailModal";
 export default function TaskDetailPage() {
   const navigate = useNavigate();
   const { id: taskId } = useParams();
-  const { auth, baseApi } = useAuthContext();
+  const { auth, baseApi, currentUser } = useAuthContext();
   const token = auth?.accessToken;
 
   const [task, setTask] = useState(null);
@@ -374,6 +374,9 @@ export default function TaskDetailPage() {
     );
   }
 
+  const userPermissions = currentUser?.permissions || {};
+  const hasDeletePermission = userPermissions.task?.includes("delete");
+
   return (
     <div className="container mx-auto p-4">
       {/* Back Button */}
@@ -459,9 +462,15 @@ export default function TaskDetailPage() {
               {getStatusButtonLabel()}
             </Button>
           )}
-          <Button variant="delete" onClick={handleDeleteTask}>
-            Delete
-          </Button>
+          {
+            // 如果用户有权限，则显示 Delete 按钮
+
+            hasDeletePermission && (
+              <Button variant="delete" onClick={handleDeleteTask}>
+                Delete
+              </Button>
+            )
+          }
         </div>
       </div>
 
