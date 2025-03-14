@@ -135,7 +135,7 @@ export default function SettingsPage() {
           />
         </div>
         <div>
-          <label className="block mb-2 font-medium">Email API Key</label>
+          <label className="block mb-2 font-medium">Email Host</label>
           <Input
             type="text"
             name="email_host"
