@@ -14,9 +14,9 @@ export default function SettingsPage() {
     imap_port: "",
     imap_user: "",
     imap_password: "",
-    gmail_user: "",
-    gmail_password: "",
-    email_api_key: "",
+    email_user: "",
+    email_password: "",
+    email_host: "",
     google_map_key: "",
   });
   const [loading, setLoading] = useState(false);
@@ -35,9 +35,9 @@ export default function SettingsPage() {
             imap_port: res.data.imap_port || "",
             imap_user: res.data.imap_user || "",
             imap_password: res.data.imap_password || "",
-            gmail_user: res.data.gmail_user || "",
-            gmail_password: res.data.gmail_password || "",
-            email_api_key: res.data.email_api_key || "",
+            email_user: res.data.email_user || "",
+            email_password: res.data.email_password || "",
+            email_host: res.data.email_host || "",
             google_map_key: res.data.google_map_key || "",
           }));
         }
@@ -115,21 +115,21 @@ export default function SettingsPage() {
         </div>
 
         <div>
-          <label className="block mb-2 font-medium">Gmail User</label>
+          <label className="block mb-2 font-medium">Email User</label>
           <Input
             type="text"
-            name="gmail_user"
-            value={settings.gmail_user}
+            name="email_user"
+            value={settings.email_user}
             onChange={handleChange}
             placeholder="your@gmail.com"
           />
         </div>
         <div>
-          <label className="block mb-2 font-medium">Gmail Password</label>
+          <label className="block mb-2 font-medium">Email Password</label>
           <Input
             type="password"
-            name="gmail_password"
-            value={settings.gmail_password}
+            name="email_password"
+            value={settings.email_password}
             onChange={handleChange}
             placeholder="application-specific password"
           />
@@ -138,10 +138,10 @@ export default function SettingsPage() {
           <label className="block mb-2 font-medium">Email API Key</label>
           <Input
             type="text"
-            name="email_api_key"
-            value={settings.email_api_key}
+            name="email_host"
+            value={settings.email_host}
             onChange={handleChange}
-            placeholder="Enter email API key"
+            placeholder="Enter email host"
           />
         </div>
         <div>
