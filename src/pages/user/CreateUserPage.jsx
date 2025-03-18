@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { useAuthContext } from "@/auth";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,15 @@ const permissionOptions = {
 // Default permission sets for each role we can create
 // Adjust these defaults based on your actual needs
 const defaultRolePermissions = {
+  admin: {
+    user: ["create", "read", "update", "delete"],
+    agency: ["create", "read", "update", "delete"],
+    property: ["create", "read", "update", "delete"],
+    task: ["create", "read", "update", "delete"],
+    contact: ["create", "read", "update", "delete"],
+    role: ["create", "read", "update", "delete"],
+    setting: ["read", "update"],
+  },
   "agency-admin": {
     user: ["create", "read", "update"],
     agency: ["read", "update"],
@@ -72,14 +81,15 @@ export default function CreateUserPage() {
   // superuser/admin => can create ["agency-admin","agency-user"]
   // agency-admin => can create ["agency-user"]
   // else => can create none
-  if (currentUser?.role === "superuser" || currentUser?.role === "admin") {
+  if (currentUser?.role === "admin") {
     creatableRoles = ["agency-admin", "agency-user"];
+  } else if (currentUser?.role === "superuser") {
+    creatableRoles = ["admin", "agency-admin", "agency-user"];
   } else if (currentUser?.role === "agency-admin") {
     creatableRoles = ["agency-user"];
   }
 
   // Agency selection for superuser/admin
-  const [agencies, setAgencies] = useState([]);
   const [selectedAgencyId, setSelectedAgencyId] = useState("");
 
   // Basic user info form
@@ -98,22 +108,18 @@ export default function CreateUserPage() {
   // If creatableRoles is empty => the user cannot create anything
   const canCreate = creatableRoles.length > 0;
 
-  // Load agencies if superuser/admin
-  useEffect(() => {
-    if (currentUser?.role === "superuser" || currentUser?.role === "admin") {
-      axios
-        .get(`${baseApi}/agencies`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        .then((res) => setAgencies(res.data || []))
-        .catch((err) => console.error("Failed to load agencies", err));
-    }
-  }, [currentUser?.role, token, baseApi]);
-
   // Whenever the user selects a role, apply default permissions for that role
   // and clamp them to the current user's own permission set
   const handleRoleChange = (newRole) => {
     setForm((prev) => ({ ...prev, role: newRole }));
+    // If selecting "admin", clear selected agency and show a message
+    if (newRole === "admin" && selectedAgencyId) {
+      toast.warning(
+        "Admin does not belong to any agency. Agency selection has been cleared."
+      );
+      setSelectedAgencyId(""); // Clear agency selection
+    }
+
     if (defaultRolePermissions[newRole]) {
       // Make a copy of the default
       const rawDefaults = JSON.parse(
@@ -184,20 +190,31 @@ export default function CreateUserPage() {
       setLoading(false);
       return;
     }
+    
+    // Prevent admin from having an agency
+    if (form.role === "admin" && selectedAgencyId) {
+      toast.warning(
+        "Admin does not belong to any agency. Agency selection has been removed."
+      );
+      setSelectedAgencyId(""); // Auto-clear agency selection
+    }
 
     // If superuser/admin => must choose an agency
     let finalAgencyId = null;
-    if (currentUser?.role === "superuser" || currentUser?.role === "admin") {
-      if (!selectedAgencyId) {
-        setError("Please select an agency.");
-        setLoading(false);
-        return;
+    if (form.role !== "admin") {
+      // If superuser/admin => must choose an agency (except when creating admin)
+      if (currentUser?.role === "superuser" || currentUser?.role === "admin") {
+        if (!selectedAgencyId) {
+          setError("Please select an agency.");
+          setLoading(false);
+          return;
+        }
+        finalAgencyId = selectedAgencyId;
       }
-      finalAgencyId = selectedAgencyId;
-    }
-    // If agency-admin => use their own agency
-    else if (currentUser?.role === "agency-admin") {
-      finalAgencyId = currentUser?.agency_id || null;
+      // If agency-admin => use their own agency
+      else if (currentUser?.role === "agency-admin") {
+        finalAgencyId = currentUser?.agency_id || null;
+      }
     }
 
     // Double-check final permission set
@@ -255,10 +272,7 @@ export default function CreateUserPage() {
   return (
     <div className="container mx-auto p-4 max-w-xl">
       {/* Back button */}
-      <button
-        className="btn btn-secondary mb-6"
-        onClick={() => navigate(-1)}
-      >
+      <button className="btn btn-secondary mb-6" onClick={() => navigate(-1)}>
         Back <i className="ki-filled ki-arrow-left"></i>
       </button>
 
@@ -277,7 +291,9 @@ export default function CreateUserPage() {
           {/* If superuser/admin => select agency */}
           {(currentUser?.role === "superuser" ||
             currentUser?.role === "admin") && (
-            <AsyncAgencySelect onChange={(option) => setSelectedAgencyId(option)} />
+            <AsyncAgencySelect
+              onChange={(option) => setSelectedAgencyId(option)}
+            />
           )}
 
           <div>
