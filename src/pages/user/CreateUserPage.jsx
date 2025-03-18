@@ -28,7 +28,6 @@ const defaultRolePermissions = {
     task: ["create", "read", "update", "delete"],
     contact: ["create", "read", "update", "delete"],
     role: ["create", "read", "update", "delete"],
-    setting: ["read", "update"],
   },
   "agency-admin": {
     user: ["create", "read", "update"],
@@ -190,7 +189,7 @@ export default function CreateUserPage() {
       setLoading(false);
       return;
     }
-    
+
     // Prevent admin from having an agency
     if (form.role === "admin" && selectedAgencyId) {
       toast.warning(
