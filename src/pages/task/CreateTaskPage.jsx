@@ -120,7 +120,7 @@ export default function CreateTaskPage() {
             <label className="block mb-2 font-medium">Select Property</label>
             <AsyncPropertySelect
               defaultPropertyId={originalTask?.property_id}
-              onChange={(option) => setSelectedPropertyId(option)}
+              onChange={(option) => setSelectedPropertyId(option.value)}
             />
           </div>
 
