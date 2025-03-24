@@ -17,20 +17,20 @@ const SidebarHeader = React.forwardRef((props, ref) => {
   const lightLogo = () => (
     <>
       <Link to="/" className="dark:hidden">
-        <img src={logoUrl} className="default-logo min-h-[22px] max-h-[50px] max-w-none" alt="logo" />
-        <img src={logoUrl} className="small-logo min-h-[22px] max-h-[50px] max-w-none" alt="logo" />
+        <img src={logoUrl} className="default-logo min-h-[22px] max-h-[50px] max-w-[50px]" alt="logo" />
+        <img src={logoUrl} className="small-logo min-h-[22px] max-h-[50px] max-w-[50px]" alt="logo" />
       </Link>
       <Link to="/" className="hidden dark:block">
-        <img src={logoUrl} className="default-logo min-h-[22px] max-h-[50px] max-w-none" alt="logo" />
-        <img src={logoUrl} className="small-logo min-h-[22px] max-h-[50px] max-w-none" alt="logo" />
+        <img src={logoUrl} className="default-logo min-h-[22px] max-h-[50px] max-w-[50px]" alt="logo" />
+        <img src={logoUrl} className="small-logo min-h-[22px] max-h-[50px] max-w-[50px]" alt="logo" />
       </Link>
     </>
   );
 
   const darkLogo = () => (
     <Link to="/">
-      <img src={logoUrl} className="default-logo min-h-[22px] max-w-none" alt="logo" />
-      <img src={logoUrl} className="small-logo min-h-[22px] max-w-none" alt="logo" />
+      <img src={logoUrl} className="default-logo min-h-[22px] max-w-[50px]" alt="logo" />
+      <img src={logoUrl} className="small-logo min-h-[22px] max-w-[50px]" alt="logo" />
     </Link>
   );
 
