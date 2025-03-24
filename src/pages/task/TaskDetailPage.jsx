@@ -457,9 +457,9 @@ export default function TaskDetailPage() {
           >
             Edit
           </Button>
-          <Button variant="delete" onClick={handleDeleteTask}>
-            Delete
-          </Button>
+          {/*<Button variant="delete" onClick={handleDeleteTask}>*/}
+          {/*  Delete*/}
+          {/*</Button>*/}
           {task.status !== "HISTORY" && (
             <Button onClick={handleOpenStatusModal}>
               {getStatusButtonLabel()}
