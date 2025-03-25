@@ -174,8 +174,8 @@ export const AllUsersPage = () => {
   }
 
   return (
-    <div className="p-4">
-      <h1 className="text-3xl font-bold mb-6">Users</h1>
+    <div className="container mx-auto p-4">
+      <h1 className="text-3xl font-bold mb-6 text-gray-800">Users</h1>
 
       <div className="mb-4 flex justify-end">
         <Button

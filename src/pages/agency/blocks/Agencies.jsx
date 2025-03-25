@@ -89,7 +89,8 @@ const Agencies = () => {
   const canCreateAgency = currentUser?.permissions?.agency?.includes("create");
 
   return (
-    <div className="flex flex-col items-stretch gap-5 lg:gap-7.5">
+    <div className="container mx-auto p-4">
+      <h1 className="text-3xl font-bold mb-6 text-gray-800">Agencies</h1>
       <div className="flex flex-wrap items-center gap-5 justify-between">
         <h3 className="text-lg text-gray-900 font-semibold">
           {agencies.length} Agencies
