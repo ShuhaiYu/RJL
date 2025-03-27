@@ -15,6 +15,7 @@ export const CreateContactPage = () => {
 
   // 如果从页面导航中传入了 propertyId，则预填充 formData.property_id
   const propertyIdFromState = location.state?.propertyId;
+  const propertyAddressFromState = location.state?.propertyAddress;
 
   const [formData, setFormData] = useState({
     name: "",
@@ -151,7 +152,7 @@ export const CreateContactPage = () => {
             {propertyIdFromState ? (
               <input
                 type="text"
-                value={formData.property_id}
+                value={propertyAddressFromState}
                 className="input input-bordered w-full"
                 disabled
               />

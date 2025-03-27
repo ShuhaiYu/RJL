@@ -157,7 +157,10 @@ export default function PropertyDetailPage() {
             className="mb-4"
             onClick={() =>
               navigate("/contacts/create", {
-                state: { propertyId: property.id },
+                state: { 
+                  propertyId: property.id,
+                  propertyAddress: property.address,
+                 },
               })
             }
           >
