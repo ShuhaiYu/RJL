@@ -21,7 +21,7 @@ import { EditContactForm } from "../contact/blocks/EditContactForm";
 
 export default function PropertyDetailPage() {
   const { id: propertyId } = useParams();
-  const { auth, baseApi } = useAuthContext();
+  const { auth, baseApi, currentUser } = useAuthContext();
   const token = auth?.accessToken;
 
   const [property, setProperty] = useState(null);
@@ -89,13 +89,30 @@ export default function PropertyDetailPage() {
     ["COMPLETED", "HISTORY"].includes(task.status.toUpperCase())
   );
 
+  const onDelete = (propertyId) => {
+    if (!window.confirm("Are you sure to delete this property?")) return;
+
+    axios
+      .delete(`${baseApi}/properties/${propertyId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then(() => {
+        toast.success("Property deleted successfully");
+        navigate("/property/my-properties");
+      })
+      .catch((err) => {
+        console.error("Failed to delete property", err);
+        toast.error("Failed to delete property");
+      });
+  };
+
+  const hasDeletePermission =
+    currentUser?.permissions?.property?.includes("delete");
+
   return (
     <div className="container mx-auto p-4">
       {/* Back Button */}
-      <button
-        className="btn btn-secondary mb-6"
-        onClick={() => navigate(-1)}
-      >
+      <button className="btn btn-secondary mb-6" onClick={() => navigate(-1)}>
         Back <i className="ki-filled ki-arrow-left"></i>
       </button>
       {/* 顶部区域 */}
@@ -129,6 +146,11 @@ export default function PropertyDetailPage() {
           >
             Create Job Order
           </Button>
+          {hasDeletePermission && (
+            <Button variant="delete" onClick={() => onDelete(propertyId)}>
+              Delete
+            </Button>
+          )}
         </div>
       </div>
 
@@ -157,10 +179,10 @@ export default function PropertyDetailPage() {
             className="mb-4"
             onClick={() =>
               navigate("/contacts/create", {
-                state: { 
+                state: {
                   propertyId: property.id,
                   propertyAddress: property.address,
-                 },
+                },
               })
             }
           >
@@ -174,8 +196,7 @@ export default function PropertyDetailPage() {
             setEditModalOpen(true);
           }}
           onDelete={(id) => {
-            if (!window.confirm("Are you sure to delete this contact?"))
-              return;
+            if (!window.confirm("Are you sure to delete this contact?")) return;
 
             // 删除联系人
             axios
