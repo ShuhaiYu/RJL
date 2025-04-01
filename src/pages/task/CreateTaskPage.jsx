@@ -22,7 +22,7 @@ export default function CreateTaskPage() {
   const [repeatFrequency, setRepeatFrequency] = useState("none");
 
   // 新增字段
-  const [taskType, setTaskType] = useState("gas & electric");
+  const [taskType, setTaskType] = useState("GAS & ELECTRIC");
   const [status, setStatus] = useState("INCOMPLETE");
 
   const [loading, setLoading] = useState(false);
