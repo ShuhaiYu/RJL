@@ -548,7 +548,10 @@ export default function TaskDetailPage() {
             className="mb-4"
             onClick={() =>
               navigate("/contacts/create", {
-                state: { propertyId: task.property_id },
+                state: {
+                  propertyId: task.property_id,
+                  propertyAddress: task.property_address,
+                },
               })
             }
           >
