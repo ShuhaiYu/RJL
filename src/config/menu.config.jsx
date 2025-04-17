@@ -152,7 +152,7 @@ export const MENU_SIDEBAR = [
       {
         title: "Gas & Electricity",
         icon: "plus-circle",
-        path: "/property/tasks?type=GAS_%26_ELECTRIC",
+        path: "/property/tasks?type=GAS_%26_ELECTRICITY",
         permissions: {
           task: ["read"],
         },
