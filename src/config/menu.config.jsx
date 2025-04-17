@@ -150,7 +150,7 @@ export const MENU_SIDEBAR = [
         },
       },
       {
-        title: "Gas & Electric",
+        title: "Gas & Electricity",
         icon: "plus-circle",
         path: "/property/tasks?type=GAS_%26_ELECTRIC",
         permissions: {

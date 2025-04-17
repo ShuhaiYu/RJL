@@ -22,7 +22,7 @@ export default function CreateTaskPage() {
   const [repeatFrequency, setRepeatFrequency] = useState("none");
 
   // 新增字段
-  const [taskType, setTaskType] = useState("GAS & ELECTRIC");
+  const [taskType, setTaskType] = useState("GAS & ELECTRICITY");
   const [status, setStatus] = useState("INCOMPLETE");
 
   const [loading, setLoading] = useState(false);
@@ -158,7 +158,7 @@ export default function CreateTaskPage() {
               value={taskType}
               onChange={(e) => setTaskType(e.target.value)}
             >
-              <option value="GAS & ELECTRIC">Gas & Electric</option>
+              <option value="GAS & ELECTRICITY">Gas & Electricity</option>
               <option value="SMOKE ALARM">Smoke Alarm</option>
             </select>
           </div>

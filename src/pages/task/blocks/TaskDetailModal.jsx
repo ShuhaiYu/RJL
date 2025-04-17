@@ -198,7 +198,7 @@ export default function TaskDetailModal({ task, onClose }) {
             value={type}
             onChange={(e) => setType(e.target.value)}
           >
-            <option value="GAS & ELECTRIC">Gas & Electric</option>
+            <option value="GAS & ELECTRICITY">Gas & Electricity</option>
             <option value="SMOKE ALARM">Smoke Alarm</option>
             <option value="">-</option>
           </select>

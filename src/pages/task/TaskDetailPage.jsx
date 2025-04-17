@@ -666,8 +666,8 @@ export default function TaskDetailPage() {
                               }
                             >
                               <option value="">Select an option</option>
-                              <option value="GAS & ELECTRIC">
-                                Gas & Electric
+                              <option value="GAS & ELECTRICITY">
+                                Gas & Electricity
                               </option>
                               <option value="SMOKE ALARM">Smoke Alarm</option>
                             </select>
