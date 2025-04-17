@@ -16,7 +16,10 @@ export default function TaskDetailModal({ task, onClose }) {
   const [inspectionDate, setInspectionDate] = useState(
     task.inspection_date || ""
   );
-  const [type, setType] = useState(task.type || "unknown");
+  const validTypes = ["GAS & ELECTRICITY", "SMOKE ALARM"];
+  const [type, setType] = useState(
+    validTypes.includes(task.type) ? task.type : "unknown"
+  );
   const [repeatFrequency, setRepeatFrequency] = useState(
     task.repeat_frequency || "none"
   );
@@ -198,9 +201,10 @@ export default function TaskDetailModal({ task, onClose }) {
             value={type}
             onChange={(e) => setType(e.target.value)}
           >
+            <option value="unknown" disabled>-- Select Type --</option>
+
             <option value="GAS & ELECTRICITY">Gas & Electricity</option>
             <option value="SMOKE ALARM">Smoke Alarm</option>
-            <option value="">-</option>
           </select>
         </div>
         <div className="mb-4">
