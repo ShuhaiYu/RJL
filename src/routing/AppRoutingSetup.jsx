@@ -61,7 +61,9 @@ const AppRoutingSetup = () => {
           <Route path="/emails" element={<Emails />} />
           <Route path="/contacts" element={<ContactPage />} />
           <Route path="/contacts/create" element={<CreateContactPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
+
+          <Route path="/setting/system" element={<SystemSettingPage />} />
+          <Route path="/setting/import" element={<DataImportPage />} />
         </Route>
       </Route>
       <Route path="error/*" element={<ErrorsRouting />} />

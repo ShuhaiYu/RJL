@@ -441,12 +441,16 @@ export default function TaskDetailPage() {
             {task.repeat_frequency}
           </p>
           <p className="mt-1 text-gray-600">
-            <span className="font-medium">Description: </span>
-            {task.task_description}
-          </p>
-          <p className="mt-1 text-gray-600">
             <span className="font-medium">Agency: </span>
             {task.agency_name || "N/A"}
+          </p>
+          <p className="mt-1 text-gray-600">
+            <span className="font-medium">Description: </span>
+            <span
+              dangerouslySetInnerHTML={{
+                __html: task.task_description?.replace(/\n/g, "<br />") || "",
+              }}
+            />
           </p>
         </div>
         <div className="mt-4 md:mt-0 flex flex-col gap-2">

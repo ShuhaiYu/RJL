@@ -167,19 +167,36 @@ export const MENU_SIDEBAR = [
       },
     ],
   },
+
   {
     title: "Email List",
     icon: "sms",
     path: "/emails",
   },
+
   {
     title: "Settings",
     icon: "setting-2",
-    path: "/settings",
-    permissions: {
-      setting: ["update"],
-    },
-  }
+    children: [
+      {
+        title: "System Setting",
+        icon: "setting-2",
+        path: "/setting/system",
+        permissions: {
+          setting: ["update"],
+        },
+      },
+      {
+        title: "Data Import",
+          icon: "setting-2",
+        path: "/setting/import",
+        permissions: {
+          task: ["create"],
+        },
+      }
+    ],
+  },
+
   // {
   //   title: "Create Contact",
   //   icon: "plus-circle",
