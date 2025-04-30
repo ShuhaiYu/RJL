@@ -21,7 +21,7 @@ const scopeDisplayNameMap = {
   // 其他不变的话，就不需要映射，直接显示 scope 自己
 };
 
-export const ModifyUserPermissionPage = () => {
+export default function ModifyUserPermissionPage() {
   const { id } = useParams(); // Target user id to modify
   const { auth, baseApi, currentUser } = useAuthContext();
   const token = auth?.accessToken;
@@ -36,7 +36,7 @@ export const ModifyUserPermissionPage = () => {
   const currentUserPermissions = currentUser?.permissions || {};
 
   // If a user is trying to edit their own permissions, disallow it.
-  const isEditingSelf = currentUser?.id === Number(id);  
+  const isEditingSelf = currentUser?.id === Number(id);
 
   // Fetch target user details and permissions
   useEffect(() => {

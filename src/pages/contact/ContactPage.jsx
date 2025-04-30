@@ -13,7 +13,7 @@ import ContactDataTable from "./blocks/ContactDataTable";
 import { Box, CircularProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
-export const ContactPage = () => {
+export default function ContactPage() {
   const { auth, baseApi } = useAuthContext();
   const token = auth?.accessToken;
 

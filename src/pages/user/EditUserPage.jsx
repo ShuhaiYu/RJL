@@ -7,7 +7,7 @@ import { useAuthContext } from "@/auth";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-export const EditUserPage = () => {
+export default function EditUserPage() {
   const { id } = useParams(); // User ID to edit
   const { auth, baseApi, currentUser } = useAuthContext();
   const token = auth?.accessToken;

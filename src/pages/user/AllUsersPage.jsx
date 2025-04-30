@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Box, CircularProgress } from "@mui/material";
 
-export const AllUsersPage = () => {
+export default function AllUsersPage() {
   const { auth, baseApi, currentUser } = useAuthContext();
   const token = auth?.accessToken;
   const navigate = useNavigate();

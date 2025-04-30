@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Box, CircularProgress } from "@mui/material";
 import AsyncPropertySelect from "../../components/custom/AsyncPropertySelect";
 
-export const CreateContactPage = () => {
+export default function CreateContactPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { auth, baseApi } = useAuthContext();

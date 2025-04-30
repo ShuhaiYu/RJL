@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from "react-router";
 import {Demo1DarkSidebarPage} from "@/pages/dashboards/demo1/dark-sidebar/Demo1DarkSidebarPage";
+import { DefaultPage } from "../pages/dashboards/default/DefaultPage";
 import { AuthPage } from "@/auth";
 import { RequireAuth } from "@/auth/RequireAuth";
 import { Demo1Layout } from "@/layouts/demo1";
@@ -12,17 +13,17 @@ import CreatePropertyPage from "../pages/property/CreatePropertyPage";
 import CreateTaskPage from "../pages/task/CreateTaskPage";
 import CreateUserPage from "../pages/user/CreateUserPage";
 import Emails from "../pages/email/Emails";
-import { ContactPage } from "../pages/contact/ContactPage";
-import { CreateContactPage } from "../pages/contact/CreateContactPage";
-import { AllUsersPage } from "../pages/user/AllUsersPage";
-import { ModifyUserPermissionPage } from "../pages/user/ModifyUserPermissionPage";
-import { EditUserPage } from "../pages/user/EditUserPage";
-import { ProfileCRMPage } from "../pages/public-profile/profiles/crm/ProfileCRMPage";
+import ContactPage from "../pages/contact/ContactPage";
+import CreateContactPage from "../pages/contact/CreateContactPage";
+import AllUsersPage from "../pages/user/AllUsersPage";
+import ModifyUserPermissionPage from "../pages/user/ModifyUserPermissionPage";
+import EditUserPage from "../pages/user/EditUserPage";
+import ProfileCRMPage from "../pages/public-profile/profiles/crm/ProfileCRMPage";
 import AgenciesList from "../pages/agency/AgenciesList";
 import Tasks from "../pages/task/Tasks";
 import PropertyDetailPage from "../pages/property/PeopertyDetailPage";
-import { DefaultPage } from "../pages/dashboards/default/DefaultPage";
-import SettingsPage from "../pages/setting/SettingsPage";
+import SystemSettingPage from "../pages/setting/SystemSettingPage.jsx";
+import DataImportPage from "../pages/setting/DataImportPage.jsx";
 
 const AppRoutingSetup = () => {
   return (
@@ -59,6 +60,7 @@ const AppRoutingSetup = () => {
           </Route>
 
           <Route path="/emails" element={<Emails />} />
+
           <Route path="/contacts" element={<ContactPage />} />
           <Route path="/contacts/create" element={<CreateContactPage />} />
 
