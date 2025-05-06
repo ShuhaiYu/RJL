@@ -1,6 +1,7 @@
 // src/pages/task/TaskDetailPage.jsx
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import { toast } from "sonner";
 import { useAuthContext } from "@/auth";
@@ -434,7 +435,9 @@ export default function TaskDetailPage() {
 
           <p className="mt-1 text-gray-600">
             <span className="font-medium">Type: </span>
-            {task.type}
+            <Link className="btn-link" to={`/property/tasks?type=${encodeURIComponent(task.type.replace(/\s/g, '_'))}`}>
+              {task.type}
+            </Link>
           </p>
           <p className="mt-1 text-gray-600">
             <span className="font-medium">Repeat Frequency: </span>
@@ -446,7 +449,9 @@ export default function TaskDetailPage() {
           </p>
           <p className="mt-1 text-gray-600">
             <span className="font-medium">Address: </span>
-            {task.property_address || "N/A"}
+            <Link className="btn-link" to={`/property/${task.property_id}`}>
+              {task.property_address || "N/A"}
+            </Link>
           </p>
           <p className="mt-1 text-gray-600">
             <span className="font-medium">Description: </span>
