@@ -445,6 +445,10 @@ export default function TaskDetailPage() {
             {task.agency_name || "N/A"}
           </p>
           <p className="mt-1 text-gray-600">
+            <span className="font-medium">Address: </span>
+            {task.property_address || "N/A"}
+          </p>
+          <p className="mt-1 text-gray-600">
             <span className="font-medium">Description: </span>
             <span
               dangerouslySetInnerHTML={{
