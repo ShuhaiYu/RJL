@@ -12,6 +12,7 @@ export default function TaskDetailModal({ task, onClose }) {
   const [taskDescription, setTaskDescription] = useState(
     task.task_description || ""
   );
+  const [freeCheckAvailable, setFreeCheckAvailable] = useState(task.free_check_available || false);
   const [dueDate, setDueDate] = useState("");
   const [inspectionDate, setInspectionDate] = useState(
     task.inspection_date || ""
@@ -97,6 +98,7 @@ export default function TaskDetailModal({ task, onClose }) {
           type: type,
           repeat_frequency: repeatFrequency,
           agency_id: selectedAgencyId,
+          free_check_available: freeCheckAvailable,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -150,6 +152,19 @@ export default function TaskDetailModal({ task, onClose }) {
             onChange={(e) => setTaskDescription(e.target.value)}
           />
         </div>
+        {!isAgencyUser && (
+          <div className="mb-4">
+            <label className="inline-flex items-center">
+              <input
+                type="checkbox"
+                className="form-checkbox"
+                checked={freeCheckAvailable}
+                onChange={(e) => setFreeCheckAvailable(e.target.checked)}
+              />
+              <span className="ml-2">Free Check Available</span>
+            </label>
+          </div>
+        )}
         <div className="mb-4">
           <label className="block mb-1 font-medium">Due Date</label>
           <input

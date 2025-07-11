@@ -461,6 +461,14 @@ export default function TaskDetailPage() {
               }}
             />
           </p>
+          <p className="mt-1 text-gray-600">
+            <span className="font-medium">Free Check Available: </span>
+            <span
+              dangerouslySetInnerHTML={{
+                __html: task.free_check_available ? 'Yes' : 'No'
+              }}
+            />
+          </p>
         </div>
         <div className="mt-4 md:mt-0 flex flex-col gap-2">
           <Button

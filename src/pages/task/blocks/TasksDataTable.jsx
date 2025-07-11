@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import StatusSelectCell from "./StatusSelectCell";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import {useAuthContext} from "@/auth/index.js";
 
 export default function TasksDataTable({
   tasks,
@@ -15,6 +16,8 @@ export default function TasksDataTable({
   hideColumns = [],
 }) {
   const [filteredCount, setFilteredCount] = useState(tasks.length);
+  const { auth, baseApi, currentUser } = useAuthContext();
+  const isAgencyUser = currentUser?.agency_id ? true : false;
 
   // ======= 修改 1：改用 pendingTaskCountMap，只统计 UNKNOWN/INCOMPLETE/PROCESSING 状态 =======
   const pendingStatuses = new Set(["UNKNOWN", "INCOMPLETE", "PROCESSING"]);
@@ -62,25 +65,40 @@ export default function TasksDataTable({
         },
         enableSorting: true,
       },
-      {
-        accessorKey: "agency_name",
-        header: ({ header }) => (
-          <DataGridColumnHeader
-            column={header.column}
-            title="Agency"
-            filter={<ColumnInputFilter column={header.column} />}
-          />
-        ),
-        cell: ({ row }) => {
-          const task = row.original;
-          return (
-            <Link className="btn btn-link" to={`/agencies/${task.agency_id}`}>
-              {task.agency_name}
-            </Link>
-          );
+      isAgencyUser
+        ? {
+          accessorKey: "free_check_available",
+          header: ({ header }) => (
+            <DataGridColumnHeader
+              column={header.column}
+              title="Free Check"
+              filter={false}
+            />
+          ),
+          cell: ({ row }) => {
+            const val = row.original.free_check_available;
+            return val === true ? "Available" : "";
+          },
+        }
+        : {
+          accessorKey: "agency_name",
+          header: ({ header }) => (
+            <DataGridColumnHeader
+              column={header.column}
+              title="Agency"
+              filter={<ColumnInputFilter column={header.column} />}
+            />
+          ),
+          cell: ({ row }) => {
+            const task = row.original;
+            return (
+              <Link className="btn btn-link" to={`/agencies/${task.agency_id}`}>
+                {task.agency_name}
+              </Link>
+            );
+          },
+          enableSorting: true,
         },
-        enableSorting: true, // 列启用排序
-      },
       // 新的 status 列
       {
         accessorKey: "status",
