@@ -12,9 +12,9 @@ export default function AddressInput({ value, onChange }) {
 
 
   useEffect(() => {
-    // 从后端获取系统设置，假设设置接口返回 { google_map_key: "xxx" }
+    // 从后端获取google_map_key，假设设置接口返回 { google_map_key: "xxx" }
     axios
-      .get(`${baseApi}/settings`, {
+      .get(`${baseApi}/google-map-key`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
