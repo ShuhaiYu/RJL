@@ -183,6 +183,7 @@ export const MENU_SIDEBAR = [
         icon: "setting-2",
         path: "/setting/system",
         permissions: {
+          // 需要setting: ["update"]权限才能显示system setting
           setting: ["update"],
         },
       },

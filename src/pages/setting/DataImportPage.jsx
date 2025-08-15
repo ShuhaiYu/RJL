@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Box, CircularProgress } from "@mui/material";
+import { KeenIcon } from "@/components";
 
 export default function DataImportPage() {
   const { baseApi, auth } = useAuthContext();
@@ -67,45 +68,162 @@ export default function DataImportPage() {
   };
 
   return (
-    <div>
-      <section className="container mx-auto p-4 max-w-xl">
-        <div className="space-y-5 bg-white p-5 rounded shadow">
-          <h2 className="text-xl font-bold mb-4">Data Import</h2>
-
-          <form onSubmit={handleFileSubmit} className="space-y-4">
-            {importError && (
-              <div className="text-red-500 text-sm mb-2 whitespace-pre-line">
-                {importError}
-              </div>
-            )}
-
-            <div>
-              <label className="block mb-2 font-medium">CSV File</label>
-              <Input
-                key={importLoading ? "loading" : "ready"}
-                type="file"
-                name="csv_file"
-                accept=".csv"
-                onChange={(e) => setSelectedFile(e.target.files[0])}
-                disabled={importLoading}
-              />
-              <p className="text-sm text-muted-foreground mt-1">
-                Only CSV files are accepted
-              </p>
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="container mx-auto px-4 max-w-4xl">
+        {/* 页面头部 */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+              <KeenIcon icon="file-up" className="text-xl text-green-600" />
             </div>
-
-            <Button type="submit" disabled={importLoading || !selectedFile}>
-              {importLoading ? (
-                <Box className="flex justify-center items-center h-40">
-                  <CircularProgress />
-                </Box>
-              ) : (
-                "Import Data"
-              )}
-            </Button>
-          </form>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Data Import</h1>
+              <p className="text-gray-600">Import job orders and other data from CSV files</p>
+            </div>
+          </div>
         </div>
-      </section>
+
+        {/* 导入表单 */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+          <div className="p-6 border-b border-gray-200">
+            <div className="flex items-center gap-2">
+              <KeenIcon icon="document" className="text-lg text-gray-600" />
+              <h2 className="text-lg font-semibold text-gray-900">CSV File Import</h2>
+            </div>
+            <p className="text-sm text-gray-600 mt-1">Upload CSV files to import job orders into the system</p>
+          </div>
+
+          <div className="p-6">
+            <form onSubmit={handleFileSubmit} className="space-y-6">
+              {/* 错误信息显示 */}
+              {importError && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <KeenIcon icon="information" className="text-red-500 text-lg mt-0.5" />
+                    <div>
+                      <h4 className="text-sm font-medium text-red-800 mb-1">Import Error</h4>
+                      <div className="text-sm text-red-700 whitespace-pre-line">
+                        {importError}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 文件上传区域 */}
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <KeenIcon icon="folder" className="inline mr-1" />
+                    Select CSV File
+                  </label>
+                  
+                  <div className="relative">
+                    <Input
+                      key={importLoading ? "loading" : "ready"}
+                      type="file"
+                      name="csv_file"
+                      accept=".csv"
+                      onChange={(e) => setSelectedFile(e.target.files[0])}
+                      disabled={importLoading}
+                      className="w-full file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                    />
+                  </div>
+                  
+                  <div className="mt-2 flex items-center gap-2 text-sm text-gray-500">
+                    <KeenIcon icon="information-2" className="text-xs" />
+                    <span>Only CSV files are accepted. Maximum file size: 10MB</span>
+                  </div>
+                </div>
+
+                {/* 文件信息显示 */}
+                {selectedFile && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <KeenIcon icon="document" className="text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-blue-900">{selectedFile.name}</p>
+                        <p className="text-xs text-blue-700">
+                          Size: {(selectedFile.size / 1024).toFixed(2)} KB
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* 导入说明 */}
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <KeenIcon icon="information-2" className="text-gray-500 text-lg mt-0.5" />
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-900 mb-2">Import Guidelines</h4>
+                    <ul className="text-sm text-gray-600 space-y-1">
+                      <li>• Ensure your CSV file contains the required columns</li>
+                      <li>• Data will be validated before import</li>
+                      <li>• Duplicate entries will be skipped</li>
+                      <li>• Import process may take a few minutes for large files</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* 提交按钮 */}
+              <div className="flex justify-end pt-4 border-t border-gray-200">
+                <Button 
+                  type="submit" 
+                  disabled={importLoading || !selectedFile}
+                  className="px-6 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white rounded-lg font-medium transition-colors duration-200 flex items-center gap-2"
+                >
+                  {importLoading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Importing...
+                    </>
+                  ) : (
+                    <>
+                      <KeenIcon icon="file-up" className="text-sm" />
+                      Import Data
+                    </>
+                  )}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        {/* 导入历史或统计信息（可选） */}
+        <div className="mt-6 bg-white rounded-xl shadow-sm border border-gray-200">
+          <div className="p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <KeenIcon icon="chart-line" className="text-lg text-gray-600" />
+              <h3 className="text-lg font-semibold text-gray-900">Import Tips</h3>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="text-center p-4 bg-blue-50 rounded-lg">
+                <KeenIcon icon="file-check" className="text-2xl text-blue-600 mb-2" />
+                <h4 className="font-medium text-blue-900">Supported Format</h4>
+                <p className="text-sm text-blue-700">CSV files only</p>
+              </div>
+              
+              <div className="text-center p-4 bg-green-50 rounded-lg">
+                <KeenIcon icon="shield-tick" className="text-2xl text-green-600 mb-2" />
+                <h4 className="font-medium text-green-900">Data Validation</h4>
+                <p className="text-sm text-green-700">Automatic validation</p>
+              </div>
+              
+              <div className="text-center p-4 bg-purple-50 rounded-lg">
+                <KeenIcon icon="rocket" className="text-2xl text-purple-600 mb-2" />
+                <h4 className="font-medium text-purple-900">Fast Processing</h4>
+                <p className="text-sm text-purple-700">Bulk import support</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

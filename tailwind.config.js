@@ -8,7 +8,12 @@ module.exports = {
     'ki-duotone',
     'ki-solid',
     { pattern: /^apexcharts-.*$/ },
-    { pattern: /^leaflet-.*$/ }
+    { pattern: /^leaflet-.*$/ },
+    // Dashboard status colors
+    { pattern: /^bg-dashboard-(unknown|incomplete|processing|completed|dueSoon|expired|agency|property)-(light|DEFAULT|text|border)$/ },
+    { pattern: /^text-dashboard-(unknown|incomplete|processing|completed|dueSoon|expired|agency|property)-(light|DEFAULT|text|border)?$/ },
+    { pattern: /^border-dashboard-(unknown|incomplete|processing|completed|dueSoon|expired|agency|property)-(light|DEFAULT|text|border)$/ },
+    { pattern: /^border-l-dashboard-(unknown|incomplete|processing|completed|dueSoon|expired|agency|property)$/ }
   ],
   darkMode: 'class',
   theme: {
@@ -326,6 +331,70 @@ module.exports = {
           600: '#0B0C10',
           black: '#000000',
           clarity: 'rgba(24, 25, 31, 0.50)'
+        },
+        // Dashboard status colors
+        dashboard: {
+          unknown: {
+            DEFAULT: '#f59e0b',
+            light: '#fef3c7',
+            text: '#92400e',
+            border: '#fde68a'
+          },
+          incomplete: {
+            DEFAULT: '#ea580c',
+            light: '#fed7aa',
+            text: '#c2410c',
+            border: '#fdba74'
+          },
+          processing: {
+            DEFAULT: '#0284c7',
+            light: '#e0f2fe',
+            text: '#0369a1',
+            border: '#7dd3fc'
+          },
+          completed: {
+            DEFAULT: '#059669',
+            light: '#d1fae5',
+            text: '#047857',
+            border: '#6ee7b7'
+          },
+          dueSoon: {
+            DEFAULT: '#dc2626',
+            light: '#fecaca',
+            text: '#b91c1c',
+            border: '#fca5a5'
+          },
+          expired: {
+            DEFAULT: '#b91c1c',
+            light: '#fee2e2',
+            text: '#991b1b',
+            border: '#fca5a5'
+          },
+          agency: {
+            DEFAULT: '#4f46e5',
+            light: '#e0e7ff',
+            text: '#3730a3',
+            border: '#c7d2fe'
+          },
+          property: {
+            DEFAULT: '#6b7280',
+            light: '#f9fafb',
+            text: '#374151',
+            border: '#d1d5db'
+          }
+        },
+        // 图表相关颜色
+        chart: {
+          text: '#374151',
+          white: '#ffffff',
+          primary: '#3b82f6',
+          success: '#10b981',
+          border: '#f1f5f9',
+          stroke: '#e5e7eb',
+          background: {
+            light: '#f9fafb',
+            lighter: '#f3f4f6'
+          }
         },        
       },
       boxShadow: {

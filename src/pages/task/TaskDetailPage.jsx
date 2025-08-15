@@ -17,6 +17,7 @@ import {
 import { EditContactForm } from "../contact/blocks/EditContactForm";
 import { Box, CircularProgress } from "@mui/material";
 import TaskDetailModal from "./blocks/TaskDetailModal";
+import { KeenIcon } from "@/components";
 
 export default function TaskDetailPage() {
   const navigate = useNavigate();
@@ -379,194 +380,297 @@ export default function TaskDetailPage() {
   const hasDeletePermission = userPermissions.task?.includes("delete");
 
   return (
-    <div className="container mx-auto p-4">
-      {/* Back Button */}
-      <button
-        className="btn btn-secondary mb-6"
-        onClick={() => navigate("/property/tasks")}
-      >
-        Back <i className="ki-filled ki-arrow-left"></i>
-      </button>
-
-      {/* 顶部区域 */}
-      <div className="flex flex-col md:flex-row items-center justify-between bg-white p-6 shadow rounded mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">Job Order Detail</h1>
-          <p className="mt-2 text-gray-600">
-            <span className="font-medium">Task Name: </span>
-            {task.task_name}
-          </p>
-          {/* 动态日期显示 */}
-          {(() => {
-            if (task.status === "PROCESSING") {
-              // 显示 Inspection Date
-              return (
-                <p className="mt-1 text-gray-600">
-                  <span className="font-medium">Inspection Date: </span>
-                  {task.inspection_date
-                    ? new Date(task.inspection_date).toLocaleString()
-                    : "N/A"}
-                </p>
-              );
-            } else if (
-              ["COMPLETED", "DUE SOON", "EXPIRED", "HISTORY"].includes(
-                task.status
-              )
-            ) {
-              // 显示 Due Date
-              return (
-                <p className="mt-1 text-gray-600">
-                  <span className="font-medium">Due Date: </span>
-                  {task.due_date
-                    ? new Date(task.due_date).toLocaleString()
-                    : "N/A"}
-                </p>
-              );
-            }
-            // 如果是 UNKNOWN 或 INCOMPLETE，则不显示任何日期
-            return null;
-          })()}
-          <p className="mt-1 text-gray-600">
-            <span className="font-medium">Status: </span>
-            <span className={getStatusColorClass(task.status)}>
-              {task.status}
-            </span>
-          </p>
-
-          <p className="mt-1 text-gray-600">
-            <span className="font-medium">Type: </span>
-            <Link className="btn-link" to={`/property/tasks?type=${encodeURIComponent(task.type.replace(/\s/g, '_'))}`}>
-              {task.type}
-            </Link>
-          </p>
-          <p className="mt-1 text-gray-600">
-            <span className="font-medium">Repeat Frequency: </span>
-            {task.repeat_frequency}
-          </p>
-          <p className="mt-1 text-gray-600">
-            <span className="font-medium">Agency: </span>
-            {task.agency_name || "N/A"}
-          </p>
-          <p className="mt-1 text-gray-600">
-            <span className="font-medium">Address: </span>
-            <Link className="btn-link" to={`/property/${task.property_id}`}>
-              {task.property_address || "N/A"}
-            </Link>
-          </p>
-          <p className="mt-1 text-gray-600">
-            <span className="font-medium">Description: </span>
-            <span
-              dangerouslySetInnerHTML={{
-                __html: task.task_description?.replace(/\n/g, "<br />") || "",
-              }}
-            />
-          </p>
-          <p className="mt-1 text-gray-600">
-            <span className="font-medium">Free Check Available: </span>
-            <span
-              dangerouslySetInnerHTML={{
-                __html: task.free_check_available ? 'Yes' : 'No'
-              }}
-            />
-          </p>
-        </div>
-        <div className="mt-4 md:mt-0 flex flex-col gap-2">
-          <Button
-            variant="edit"
-            onClick={() => setShowEditModal(true)}
-            disabled={task.status === "COMPLETED" || task.status === "HISTORY"}
-          >
-            Edit
-          </Button>
-          {/*<Button variant="delete" onClick={handleDeleteTask}>*/}
-          {/*  Delete*/}
-          {/*</Button>*/}
-          {task.status !== "HISTORY" && (
-            <Button onClick={handleOpenStatusModal}>
-              {getStatusButtonLabel()}
-            </Button>
-          )}
-          {
-            // 如果用户有权限，则显示 Delete 按钮
-
-            hasDeletePermission && (
-              <Button variant="delete" onClick={handleDeleteTask}>
-                Delete
-              </Button>
-            )
-          }
+    <div className="container mx-auto p-6 max-w-6xl">
+      {/* 页面头部 */}
+      <div className="mb-8">
+        <button
+          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors"
+          onClick={() => navigate("/property/tasks")}
+        >
+          <KeenIcon icon="arrow-left" className="text-lg" />
+          <span>Back to Job Orders</span>
+        </button>
+        
+        <div className="flex items-center gap-4">
+          <div className="flex items-center justify-center w-12 h-12 bg-primary-100 rounded-lg">
+            <KeenIcon icon="document" className="text-2xl text-primary-600" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Job Order Detail</h1>
+            <p className="text-gray-600">View and manage job order information</p>
+          </div>
         </div>
       </div>
 
-      {/* 文件列表及上传区域 */}
-      <div className="bg-white p-6 shadow rounded mb-6">
-        <h2 className="text-xl font-bold mb-4">Task Files</h2>
+      {/* 任务详情卡片 */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+          <div className="flex-1 space-y-4">
+            {/* 任务名称 */}
+            <div className="flex items-center gap-3">
+              <KeenIcon icon="text" className="text-lg text-gray-500" />
+              <div>
+                <span className="text-sm font-medium text-gray-500">Task Name</span>
+                <p className="text-lg font-semibold text-gray-900">{task.task_name}</p>
+              </div>
+            </div>
 
-        {/* 上传区域 */}
-        <div className="flex flex-col md:flex-row items-center gap-2 mb-4">
-          <input
-            key={fileInputKey}
-            className="file-input file-input-bordered file-input-primary"
-            type="file"
-            onChange={handleFileChange}
-            accept="image/*,application/pdf"
-          />
-          <input
-            type="text"
-            placeholder="File Description (Optional)"
-            className="input input-bordered w-full max-w-xs"
-            value={fileDesc}
-            onChange={(e) => setFileDesc(e.target.value)}
-          />
-          <button
-            className="btn btn-primary"
-            onClick={handleUploadFile}
-            disabled={uploading}
-          >
-            {uploading ? "Uploading..." : "Upload"}
-          </button>
+            {/* 状态 */}
+            <div className="flex items-center gap-3">
+              <KeenIcon icon="status" className="text-lg text-gray-500" />
+              <div>
+                <span className="text-sm font-medium text-gray-500">Status</span>
+                <p className={`text-lg font-semibold ${getStatusColorClass(task.status)}`}>
+                  {task.status}
+                </p>
+              </div>
+            </div>
+
+            {/* 动态日期显示 */}
+            {(() => {
+              if (task.status === "PROCESSING") {
+                return (
+                  <div className="flex items-center gap-3">
+                    <KeenIcon icon="calendar" className="text-lg text-gray-500" />
+                    <div>
+                      <span className="text-sm font-medium text-gray-500">Inspection Date</span>
+                      <p className="text-lg text-gray-900">
+                        {task.inspection_date
+                          ? new Date(task.inspection_date).toLocaleString()
+                          : "N/A"}
+                      </p>
+                    </div>
+                  </div>
+                );
+              } else if (
+                ["COMPLETED", "DUE SOON", "EXPIRED", "HISTORY"].includes(task.status)
+              ) {
+                return (
+                  <div className="flex items-center gap-3">
+                    <KeenIcon icon="calendar" className="text-lg text-gray-500" />
+                    <div>
+                      <span className="text-sm font-medium text-gray-500">Due Date</span>
+                      <p className="text-lg text-gray-900">
+                        {task.due_date
+                          ? new Date(task.due_date).toLocaleString()
+                          : "N/A"}
+                      </p>
+                    </div>
+                  </div>
+                );
+              }
+              return null;
+            })()}
+
+            {/* 类型 */}
+            <div className="flex items-center gap-3">
+              <KeenIcon icon="category" className="text-lg text-gray-500" />
+              <div>
+                <span className="text-sm font-medium text-gray-500">Type</span>
+                <Link 
+                  className="text-lg text-primary-600 hover:text-primary-700 font-medium" 
+                  to={`/property/tasks?type=${encodeURIComponent(task.type.replace(/\s/g, '_'))}`}
+                >
+                  {task.type}
+                </Link>
+              </div>
+            </div>
+
+            {/* 重复频率 */}
+            <div className="flex items-center gap-3">
+              <KeenIcon icon="refresh" className="text-lg text-gray-500" />
+              <div>
+                <span className="text-sm font-medium text-gray-500">Repeat Frequency</span>
+                <p className="text-lg text-gray-900">{task.repeat_frequency}</p>
+              </div>
+            </div>
+
+            {/* 机构 */}
+            <div className="flex items-center gap-3">
+              <KeenIcon icon="office-bag" className="text-lg text-gray-500" />
+              <div>
+                <span className="text-sm font-medium text-gray-500">Agency</span>
+                <p className="text-lg text-gray-900">{task.agency_name || "N/A"}</p>
+              </div>
+            </div>
+
+            {/* 地址 */}
+            <div className="flex items-center gap-3">
+              <KeenIcon icon="geolocation" className="text-lg text-gray-500" />
+              <div>
+                <span className="text-sm font-medium text-gray-500">Address</span>
+                <Link 
+                  className="text-lg text-primary-600 hover:text-primary-700 font-medium" 
+                  to={`/property/${task.property_id}`}
+                >
+                  {task.property_address || "N/A"}
+                </Link>
+              </div>
+            </div>
+
+            {/* 描述 */}
+            <div className="flex items-start gap-3">
+              <KeenIcon icon="note" className="text-lg text-gray-500 mt-1" />
+              <div>
+                <span className="text-sm font-medium text-gray-500">Description</span>
+                <div 
+                  className="text-lg text-gray-900 mt-1"
+                  dangerouslySetInnerHTML={{
+                    __html: task.task_description?.replace(/\n/g, "<br />") || "No description",
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Free Check Available */}
+            <div className="flex items-center gap-3">
+              <KeenIcon icon="check-circle" className="text-lg text-gray-500" />
+              <div>
+                <span className="text-sm font-medium text-gray-500">Free Check Available</span>
+                <p className="text-lg text-gray-900">
+                  {task.free_check_available ? 'Yes' : 'No'}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* 操作按钮 */}
+          <div className="flex flex-col gap-3 lg:min-w-[200px]">
+            <Button
+              variant="edit"
+              onClick={() => setShowEditModal(true)}
+              disabled={task.status === "COMPLETED" || task.status === "HISTORY"}
+              className="flex items-center gap-2"
+            >
+              <KeenIcon icon="edit" className="text-sm" />
+              Edit
+            </Button>
+            
+            {task.status !== "HISTORY" && (
+              <Button 
+                onClick={handleOpenStatusModal}
+                className="flex items-center gap-2"
+              >
+                <KeenIcon icon="arrow-right" className="text-sm" />
+                {getStatusButtonLabel()}
+              </Button>
+            )}
+            
+            {hasDeletePermission && (
+              <Button 
+                variant="delete" 
+                onClick={handleDeleteTask}
+                className="flex items-center gap-2"
+              >
+                <KeenIcon icon="trash" className="text-sm" />
+                Delete
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* 文件管理卡片 */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="flex items-center gap-3 mb-6">
+          <KeenIcon icon="folder" className="text-xl text-gray-700" />
+          <h2 className="text-xl font-bold text-gray-900">Task Files</h2>
+        </div>
+
+        {/* 文件上传区域 */}
+        <div className="bg-gray-50 rounded-lg p-4 mb-6">
+          <div className="flex flex-col md:flex-row items-center gap-4">
+            <div className="flex items-center gap-2 flex-1">
+              <KeenIcon icon="file-up" className="text-lg text-gray-500" />
+              <input
+                key={fileInputKey}
+                className="file-input file-input-bordered file-input-primary flex-1"
+                type="file"
+                onChange={handleFileChange}
+                accept="image/*,application/pdf"
+              />
+            </div>
+            <div className="flex items-center gap-2 flex-1">
+              <KeenIcon icon="note-2" className="text-lg text-gray-500" />
+              <input
+                type="text"
+                placeholder="File Description (Optional)"
+                className="input input-bordered w-full"
+                value={fileDesc}
+                onChange={(e) => setFileDesc(e.target.value)}
+              />
+            </div>
+            <button
+              className="btn btn-primary flex items-center gap-2 min-w-[120px]"
+              onClick={handleUploadFile}
+              disabled={uploading}
+            >
+              {uploading ? (
+                <>
+                  <span className="loading loading-spinner loading-sm"></span>
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <KeenIcon icon="cloud-add" className="text-sm" />
+                  Upload
+                </>
+              )}
+            </button>
+          </div>
         </div>
 
         {/* 文件列表 */}
         {taskFiles.length === 0 ? (
-          <p className="text-gray-500">No Related Files</p>
+          <div className="text-center py-8">
+            <KeenIcon icon="file-deleted" className="text-4xl text-gray-300 mb-3" />
+            <p className="text-gray-500 text-lg">No Related Files</p>
+            <p className="text-gray-400 text-sm">Upload files to get started</p>
+          </div>
         ) : (
-          <ul className="divide-y">
+          <div className="space-y-3">
             {taskFiles.map((f) => (
-              <li key={f.id} className="py-2 flex items-center justify-between">
-                <div>
-                  <p className="font-semibold">{f.file_name}</p>
-                  {f.file_desc && (
-                    <p className="text-sm text-gray-600">{f.file_desc}</p>
-                  )}
+              <div key={f.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors">
+                <div className="flex items-center gap-3">
+                  <KeenIcon icon="file" className="text-lg text-gray-500" />
+                  <div>
+                    <p className="font-semibold text-gray-900">{f.file_name}</p>
+                    {f.file_desc && (
+                      <p className="text-sm text-gray-600">{f.file_desc}</p>
+                    )}
+                  </div>
                 </div>
                 <div className="flex gap-2">
                   <button
-                    className="btn btn-sm btn-light"
+                    className="btn btn-sm btn-light flex items-center gap-1"
                     onClick={() => handleOpenFile(f.id)}
                   >
+                    <KeenIcon icon="eye" className="text-sm" />
                     Open
                   </button>
                   <button
-                    className="btn btn-sm btn-danger"
+                    className="btn btn-sm btn-danger flex items-center gap-1"
                     onClick={() => handleDeleteFile(f.id)}
                   >
+                    <KeenIcon icon="trash" className="text-sm" />
                     Delete
                   </button>
                 </div>
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
         )}
       </div>
 
-      {/* Contacts DataTable */}
-      <div className="bg-white p-6 shadow rounded mb-6">
-        <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold mb-4">Contacts</h2>
+      {/* 联系人管理卡片 */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <KeenIcon icon="people" className="text-xl text-gray-700" />
+            <h2 className="text-xl font-bold text-gray-900">Contacts</h2>
+          </div>
           <Button
             variant="create"
-            className="mb-4"
             onClick={() =>
               navigate("/contacts/create", {
                 state: {
@@ -575,32 +679,37 @@ export default function TaskDetailPage() {
                 },
               })
             }
+            className="flex items-center gap-2"
           >
+            <KeenIcon icon="user-plus" className="text-sm" />
             Add Contact
           </Button>
         </div>
-        <ContactDataTable
-          contacts={task.contacts}
-          onEdit={(id) => {
-            setSelectedContactId(id);
-            setEditModalOpen(true);
-          }}
-          onDelete={(id) => {
-            if (!window.confirm("Are you sure to delete this contact?")) return;
-            axios
-              .delete(`${baseApi}/contacts/${id}`, {
-                headers: { Authorization: `Bearer ${token}` },
-              })
-              .then(() => {
-                toast.success("Contact deleted successfully");
-                fetchTaskDetail();
-              })
-              .catch((err) => {
-                console.error("Failed to delete contact", err);
-                toast.error("Failed to delete contact");
-              });
-          }}
-        />
+        
+        <div className="border border-gray-200 rounded-lg overflow-hidden">
+          <ContactDataTable
+            contacts={task.contacts}
+            onEdit={(id) => {
+              setSelectedContactId(id);
+              setEditModalOpen(true);
+            }}
+            onDelete={(id) => {
+              if (!window.confirm("Are you sure to delete this contact?")) return;
+              axios
+                .delete(`${baseApi}/contacts/${id}`, {
+                  headers: { Authorization: `Bearer ${token}` },
+                })
+                .then(() => {
+                  toast.success("Contact deleted successfully");
+                  fetchTaskDetail();
+                })
+                .catch((err) => {
+                  console.error("Failed to delete contact", err);
+                  toast.error("Failed to delete contact");
+                });
+            }}
+          />
+        </div>
       </div>
 
       <Modal open={editModalOpen} onClose={() => setEditModalOpen(false)}>

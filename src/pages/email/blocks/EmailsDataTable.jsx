@@ -4,6 +4,7 @@ import { DataGrid, DataGridColumnHeader } from "@/components/data-grid";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
+import { KeenIcon } from "@/components";
 // 点击按钮后在新窗口展示 HTML 内容
 const handleViewEmail = (emailHtml) => {
   const newWindow = window.open("", "_blank");
@@ -39,9 +40,10 @@ export default function EmailsDataTable({ emails }) {
           const email = row.original;
           return (
             <Link
-              className="btn btn-link"
+              className="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium"
               to={`/property/${email.property_id}`}
             >
+              <KeenIcon icon="home-2" className="text-sm" />
               {email.property_address}
             </Link>
           );
@@ -105,9 +107,10 @@ export default function EmailsDataTable({ emails }) {
           const email = row.original;
           return (
             <Link
-              className="btn btn-link"
+              className="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium"
               to={`/property/tasks/${email.task_id}`}
             >
+              <KeenIcon icon="note-2" className="text-sm" />
               {email.task_name}
             </Link>
           );
@@ -121,13 +124,15 @@ export default function EmailsDataTable({ emails }) {
           const email = row.original;
           return (
             <Button
-              variant="view"
+              variant="outline"
               size="sm"
+              className="flex items-center gap-2"
               onClick={(e) => {
                 e.stopPropagation();
                 handleViewEmail(email.html);
               }}
             >
+              <KeenIcon icon="eye" className="text-sm" />
               View HTML
             </Button>
           );
@@ -138,19 +143,25 @@ export default function EmailsDataTable({ emails }) {
   );
 
   return (
-    <div>
-      <p className="text-sm text-gray-500 mb-4">
-        Showing {filteredCount} of {emails.length} emails
-      </p>
-      <DataGrid
-        columns={columns}
-        data={emails}
-        serverSide={false} // 前端分页、排序
-        rowSelection={false}
-        pagination={{ size: 100 }}
-        onFilteredDataChange={(count) => setFilteredCount(count)}
-        sorting={[{ id: "updated_at", desc: true }]}
-      />
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <KeenIcon icon="information-5" className="text-sm" />
+          <span>Showing {filteredCount} of {emails.length} emails</span>
+        </div>
+      </div>
+      
+      <div className="border rounded-lg overflow-hidden">
+        <DataGrid
+          columns={columns}
+          data={emails}
+          serverSide={false} // 前端分页、排序
+          rowSelection={false}
+          pagination={{ size: 100 }}
+          onFilteredDataChange={(count) => setFilteredCount(count)}
+          sorting={[{ id: "updated_at", desc: true }]}
+        />
+      </div>
     </div>
   );
 }

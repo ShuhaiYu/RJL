@@ -12,7 +12,7 @@
 .ki-outline {
   /* use !important to prevent issues with browser extensions that change fonts */
   font-family: 'keenicons-outline' !important;
-  speak: never;
+
   font-style: normal;
   font-weight: normal;
   font-variant: normal;
