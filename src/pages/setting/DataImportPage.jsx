@@ -119,15 +119,29 @@ export default function DataImportPage() {
                   </label>
                   
                   <div className="relative">
-                    <Input
+                    <input
+                      ref={(input) => {
+                        if (input) {
+                          input.style.display = 'none';
+                        }
+                      }}
                       key={importLoading ? "loading" : "ready"}
                       type="file"
                       name="csv_file"
                       accept=".csv"
                       onChange={(e) => setSelectedFile(e.target.files[0])}
                       disabled={importLoading}
-                      className="w-full file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                      id="csv-file-input"
                     />
+                    <Button
+                      type="button"
+                      onClick={() => document.getElementById('csv-file-input').click()}
+                      disabled={importLoading}
+                      className="w-full justify-start bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400"
+                    >
+                      <KeenIcon icon="folder" className="mr-2" />
+                      {selectedFile ? selectedFile.name : 'Choose CSV File'}
+                    </Button>
                   </div>
                   
                   <div className="mt-2 flex items-center gap-2 text-sm text-gray-500">

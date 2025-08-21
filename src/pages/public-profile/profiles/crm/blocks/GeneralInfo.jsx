@@ -18,7 +18,7 @@ export const GeneralInfo = ({ user }) => {
 
   return (
     <div className="card bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
-      {/* 用户头像和基本信息 */}
+      {/* User avatar and basic information */}
       <div className="flex items-start gap-4 mb-6">
         <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xl font-bold">
           {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
@@ -38,16 +38,16 @@ export const GeneralInfo = ({ user }) => {
         </div>
       </div>
 
-      {/* 联系信息 */}
+      {/* Contact information */}
       <div className="space-y-3 mb-6">
         <div className="flex items-center gap-3 text-sm">
           <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
             <KeenIcon icon="calendar" className="text-gray-600" />
           </div>
           <div>
-            <span className="text-gray-500">加入时间</span>
+            <span className="text-gray-500">Join Date</span>
             <p className="text-gray-900 font-medium">
-              {user.created_at ? new Date(user.created_at).toLocaleDateString('zh-CN') : '未知'}
+              {user.created_at ? new Date(user.created_at).toLocaleDateString('en-US') : 'Unknown'}
             </p>
           </div>
         </div>
@@ -58,19 +58,19 @@ export const GeneralInfo = ({ user }) => {
               <KeenIcon icon="phone" className="text-gray-600" />
             </div>
             <div>
-              <span className="text-gray-500">电话</span>
+              <span className="text-gray-500">Phone</span>
               <p className="text-gray-900 font-medium">{user.phone}</p>
             </div>
           </div>
         )}
       </div>
 
-      {/* 机构信息 */}
+      {/* Agency information */}
       {user.agency && (
         <div className="border-t border-gray-100 pt-6 mb-6">
           <div className="flex items-center gap-2 mb-4">
             <KeenIcon icon="office-bag" className="text-lg text-gray-700" />
-            <h3 className="text-lg font-semibold text-gray-900">机构信息</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Agency Information</h3>
           </div>
           
           <div className="space-y-3">
@@ -79,7 +79,7 @@ export const GeneralInfo = ({ user }) => {
                 <KeenIcon icon="home-2" className="text-blue-600" />
               </div>
               <div>
-                <span className="text-gray-500">机构名称</span>
+                <span className="text-gray-500">Agency Name</span>
                 <p className="text-gray-900 font-medium">{user.agency.agency_name}</p>
               </div>
             </div>
@@ -90,7 +90,7 @@ export const GeneralInfo = ({ user }) => {
                   <KeenIcon icon="geolocation" className="text-green-600" />
                 </div>
                 <div>
-                  <span className="text-gray-500">地址</span>
+                  <span className="text-gray-500">Address</span>
                   <p className="text-gray-900 font-medium">{user.agency.address}</p>
                 </div>
               </div>
@@ -102,7 +102,7 @@ export const GeneralInfo = ({ user }) => {
                   <KeenIcon icon="phone" className="text-purple-600" />
                 </div>
                 <div>
-                  <span className="text-gray-500">联系电话</span>
+                  <span className="text-gray-500">Contact Phone</span>
                   <p className="text-gray-900 font-medium">{user.agency.phone}</p>
                 </div>
               </div>
@@ -111,7 +111,7 @@ export const GeneralInfo = ({ user }) => {
         </div>
       )}
 
-      {/* 操作按钮 */}
+      {/* Action buttons */}
       <div className="border-t border-gray-100 pt-6">
         <div className="flex gap-3">
           <button

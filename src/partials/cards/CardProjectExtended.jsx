@@ -22,15 +22,15 @@ const CardProjectExtended = ({
 }) => {
   const { isRTL } = useLanguage();
 
-  // 从 useAuthContext 中取出 token & currentUser
+  // Get token & currentUser from useAuthContext
   const { auth, baseApi, currentUser } = useAuthContext();
   const token = auth?.accessToken;
   const currentUserRole = currentUser?.role;
   
-  // 删除操作
+  // Delete operation
   const handleDelete = async () => {
     try {
-      // 注意你用的是 DELETE /agencies/:id
+      // Note: using DELETE /agencies/:id
       await axios.delete(`${baseApi}/agencies/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -57,12 +57,12 @@ const CardProjectExtended = ({
     <div className="card overflow-hidden grow justify-between">
       <div className="p-5 mb-5">
         <div className="flex items-center justify-between mb-5">
-          {/* 如果你有 status，就写这里 */}
+          {/* If you have status, write it here */}
           {/* <span className={`badge ${status.variant} badge-outline`}> */}
           {/*   {status.label} */}
           {/* </span> */}
 
-          {/* 只有 superuser 才显示该 Menu */}
+          {/* Only show this Menu for superuser */}
           {currentUserRole === "superuser" && (
             <Menu className="items-stretch">
               <MenuItem

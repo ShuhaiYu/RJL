@@ -18,7 +18,7 @@ const Activity = () => {
       try {
         setLoading(true);
         
-        // 并行获取用户相关的数据来构建活动时间线
+        // Fetch user-related data in parallel to build activity timeline
         const [tasksResponse, contactsResponse, propertiesResponse] = await Promise.all([
           axios.get(`${baseApi}/tasks`, {
             headers: { Authorization: `Bearer ${token}` }
@@ -33,45 +33,45 @@ const Activity = () => {
 
         const userActivities = [];
 
-        // 从任务数据中提取活动
+        // Extract activities from task data
         if (tasksResponse.data && Array.isArray(tasksResponse.data)) {
           tasksResponse.data
             .filter(task => task.created_by === currentUser.id || task.assigned_to === currentUser.id)
-            .slice(0, 5) // 增加到5个任务
+            .slice(0, 5) // Increase to 5 tasks
             .forEach(task => {
               userActivities.push({
                 id: `task-${task.id}`,
                 type: 'task',
                 icon: 'notepad-edit',
-                title: `创建了任务: ${task.task_name}`,
-                description: `状态: ${task.status}`,
+                title: `Created task: ${task.task_name}`,
+                description: `Status: ${task.status}`,
                 datetime: task.created_at,
                 link: `/property/tasks/${task.id}`
               });
             });
         }
 
-        // 从联系人数据中提取活动
+        // Extract activities from contact data
         if (contactsResponse.data && Array.isArray(contactsResponse.data)) {
           contactsResponse.data
-            .slice(0, 4) // 增加到4个联系人
+            .slice(0, 4) // Increase to 4 contacts
             .forEach(contact => {
               userActivities.push({
                 id: `contact-${contact.id}`,
                 type: 'contact',
                 icon: 'people',
-                title: `添加了联系人: ${contact.name}`,
-                description: `邮箱: ${contact.email}`,
+                title: `Added contact: ${contact.name}`,
+                description: `Email: ${contact.email}`,
                 datetime: contact.created_at,
                 link: `/contact/${contact.id}`
               });
             });
         }
 
-        // 从属性数据中提取活动
+        // Extract activities from property data
         if (propertiesResponse.data && Array.isArray(propertiesResponse.data)) {
           propertiesResponse.data
-            .slice(0, 4) // 增加到4个属性
+            .slice(0, 4) // Increase to 4 properties
             .forEach(property => {
               userActivities.push({
                 id: `property-${property.id}`,
@@ -85,25 +85,25 @@ const Activity = () => {
             });
         }
 
-        // 添加用户登录活动（基于用户的最后登录时间）
+        // Add user login activity (based on user's last login time)
         if (currentUser.last_login) {
           userActivities.push({
             id: 'login',
             type: 'login',
             icon: 'entrance-left',
-            title: '最近登录系统',
-            description: '用户门户',
+            title: 'Recent system login',
+            description: 'User Portal',
             datetime: currentUser.last_login,
             link: null
           });
         }
 
-        // 按时间排序（最新的在前）
+        // Sort by time (newest first)
         userActivities.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
         
-        setActivities(userActivities.slice(0, 8)); // 增加到显示最近8个活动
+        setActivities(userActivities.slice(0, 8)); // Increase to show recent 8 activities
       } catch (error) {
-        console.error('获取用户活动失败:', error);
+        console.error('Failed to fetch user activities:', error);
         setActivities([]);
       } finally {
         setLoading(false);
@@ -114,20 +114,20 @@ const Activity = () => {
   }, [token, currentUser, baseApi]);
 
   const formatDateTime = (dateString) => {
-    if (!dateString) return '未知时间';
+    if (!dateString) return 'Unknown time';
     
     const date = new Date(dateString);
     const now = new Date();
     const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
     
-    if (diffInHours < 1) return '刚刚';
-    if (diffInHours < 24) return `${diffInHours} 小时前`;
+    if (diffInHours < 1) return 'Just now';
+    if (diffInHours < 24) return `${diffInHours} hours ago`;
     
     const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays < 7) return `${diffInDays} 天前`;
+    if (diffInDays < 7) return `${diffInDays} days ago`;
     
     const diffInWeeks = Math.floor(diffInDays / 7);
-    if (diffInWeeks < 4) return `${diffInWeeks} 周前`;
+    if (diffInWeeks < 4) return `${diffInWeeks} weeks ago`;
     
     return date.toLocaleDateString('zh-CN');
   };
@@ -190,7 +190,7 @@ const Activity = () => {
         ) : (
           <div className="text-center py-8 text-gray-500">
             <KeenIcon icon="file-empty" className="text-4xl mb-2" />
-            <p>暂无活动记录</p>
+            <p>No activity records</p>
           </div>
         )}
       </div>
