@@ -582,13 +582,22 @@ export default function TaskDetailPage() {
           <div className="flex flex-col md:flex-row items-center gap-4">
             <div className="flex items-center gap-2 flex-1">
               <KeenIcon icon="file-up" className="text-lg text-gray-500" />
-              <input
-                key={fileInputKey}
-                className="file-input file-input-bordered file-input-primary flex-1"
-                type="file"
-                onChange={handleFileChange}
-                accept="image/*,application/pdf"
-              />
+              <div className="flex-1 relative">
+                <input
+                  key={fileInputKey}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  type="file"
+                  onChange={handleFileChange}
+                  accept="image/*,application/pdf"
+                  id="file-upload-input"
+                />
+                <label
+                  htmlFor="file-upload-input"
+                  className="flex items-center justify-center w-full h-12 px-4 bg-white border border-gray-300 rounded-lg cursor-pointer hover:border-gray-400 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
+                >
+                  <span className="text-gray-600">Choose File</span>
+                </label>
+              </div>
             </div>
             <div className="flex items-center gap-2 flex-1">
               <KeenIcon icon="note-2" className="text-lg text-gray-500" />
