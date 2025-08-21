@@ -137,40 +137,46 @@ const RecentData = () => {
   }
 
   const renderTaskItem = (task) => (
-    <div key={task.id} className="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-lg transition-colors duration-200">
-      <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-        <KeenIcon icon="task-square" className="text-blue-600" />
-      </div>
-      <div className="flex-1 min-w-0">
-        <h4 className="font-medium text-gray-800 truncate mb-2">
-          {task.title || `#${task.id}`}
-        </h4>
-        <div className="flex items-center gap-4 text-sm text-gray-600">
-          {task.property_address && (
-            <span className="flex items-center gap-1">
-              <KeenIcon icon="geolocation" className="text-xs" />
-              {task.property_address}
-            </span>
-          )}
-          {task.due_date && (
-            <span className="flex items-center gap-1">
-              <KeenIcon icon="calendar" className="text-xs" />
-              {formatDate(task.due_date)}
-            </span>
-          )}
+    <div key={task.id} className="p-4 hover:bg-gray-50 rounded-lg transition-colors duration-200">
+      <div className="flex items-start gap-4">
+        <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
+          <KeenIcon icon="task-square" className="text-blue-600" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-4 mb-2">
+            <h4 className="font-medium text-gray-800 truncate">
+              {task.title || `#${task.id}`}
+            </h4>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {task.status && (
+                <span className={`px-3 py-1 text-xs font-medium rounded-full whitespace-nowrap ${getStatusColor(task.status)}`}>
+                  {task.status}
+                </span>
+              )}
+              <Link 
+                to={`/property/tasks/${task.id}`}
+                className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
+              >
+                <KeenIcon icon="arrow-right" />
+              </Link>
+            </div>
+          </div>
+          <div className="space-y-1 text-sm text-gray-600">
+            {task.property_address && (
+              <div className="flex items-start gap-1">
+                <KeenIcon icon="geolocation" className="text-xs mt-0.5 flex-shrink-0" />
+                <span className="break-words">{task.property_address}</span>
+              </div>
+            )}
+            {task.due_date && (
+              <div className="flex items-center gap-1">
+                <KeenIcon icon="calendar" className="text-xs flex-shrink-0" />
+                <span>{formatDate(task.due_date)}</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-      {task.status && (
-        <span className={`px-3 py-1 text-xs font-medium rounded-full ${getStatusColor(task.status)}`}>
-          {task.status}
-        </span>
-      )}
-      <Link 
-        to={`/property/tasks/${task.id}`}
-        className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
-      >
-        <KeenIcon icon="arrow-right" />
-      </Link>
     </div>
   );
 
