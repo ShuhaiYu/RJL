@@ -2,21 +2,21 @@ import { KeenIcon } from "@/components/keenicons";
 import { useNavigate } from "react-router-dom";
 
 /**
- * 通用统计卡片组件
- * 统一样式，与My Profile中的Statistics Overview保持一致
+ * Common statistics cards component
+ * Unified styling, consistent with Statistics Overview in My Profile
  * @param {Object} props
- * @param {Array} props.cards - 统计卡片数据数组，每个卡片可包含：
- *   - key: 唯一标识
- *   - title: 标题
- *   - value: 数值
- *   - icon: 图标名称
- *   - color: 图标颜色类（如 'text-blue-600'）
- *   - bgColor: 背景颜色类（如 'bg-blue-50'）
- *   - borderColor: 边框颜色类（如 'border-blue-200'）
- *   - route: 点击跳转路由
- * @param {string} props.title - 标题
- * @param {boolean} props.loading - 加载状态
- * @param {Object} props.totalStats - 总计统计（可选）
+ * @param {Array} props.cards - Statistics card data array, each card can contain:
+ *   - key: unique identifier
+ *   - title: title
+ *   - value: numeric value
+ *   - icon: icon name
+ *   - color: icon color class (e.g. 'text-blue-600')
+ *   - bgColor: background color class (e.g. 'bg-blue-50')
+ *   - borderColor: border color class (e.g. 'border-blue-200')
+ *   - route: click navigation route
+ * @param {string} props.title - title
+ * @param {boolean} props.loading - loading state
+ * @param {Object} props.totalStats - total statistics (optional)
  */
 const StatsCards = ({ cards = [], title = "Statistics Overview", loading = false, totalStats = null }) => {
   const navigate = useNavigate();
@@ -85,7 +85,7 @@ const StatsCards = ({ cards = [], title = "Statistics Overview", loading = false
         ))}
       </div>
 
-      {/* 总计统计 */}
+      {/* Total Statistics */}
       {totalStats && (
         <div className="mt-8 pt-6 border-t border-gray-100">
           <div className="flex items-center justify-between text-sm text-gray-600">

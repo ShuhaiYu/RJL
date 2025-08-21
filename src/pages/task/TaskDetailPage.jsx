@@ -407,55 +407,55 @@ export default function TaskDetailPage() {
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
           <div className="flex-1 space-y-4">
             {/* 任务名称 */}
-            <div className="flex items-center gap-3">
-              <KeenIcon icon="text" className="text-lg text-gray-500" />
-              <div>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <KeenIcon icon="text" className="text-lg text-gray-500" />
                 <span className="text-sm font-medium text-gray-500">Task Name</span>
-                <p className="text-lg font-semibold text-gray-900">{task.task_name}</p>
               </div>
+              <p className="text-lg font-semibold text-gray-900 ml-7">{task.task_name}</p>
             </div>
 
             {/* 状态 */}
-            <div className="flex items-center gap-3">
-              <KeenIcon icon="status" className="text-lg text-gray-500" />
-              <div>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <KeenIcon icon="status" className="text-lg text-gray-500" />
                 <span className="text-sm font-medium text-gray-500">Status</span>
-                <p className={`text-lg font-semibold ${getStatusColorClass(task.status)}`}>
-                  {task.status}
-                </p>
               </div>
+              <p className={`text-lg font-semibold ml-7 ${getStatusColorClass(task.status)}`}>
+                {task.status}
+              </p>
             </div>
 
             {/* 动态日期显示 */}
             {(() => {
               if (task.status === "PROCESSING") {
                 return (
-                  <div className="flex items-center gap-3">
-                    <KeenIcon icon="calendar" className="text-lg text-gray-500" />
-                    <div>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <KeenIcon icon="calendar" className="text-lg text-gray-500" />
                       <span className="text-sm font-medium text-gray-500">Inspection Date</span>
-                      <p className="text-lg text-gray-900">
-                        {task.inspection_date
-                          ? new Date(task.inspection_date).toLocaleString()
-                          : "N/A"}
-                      </p>
                     </div>
+                    <p className="text-lg text-gray-900 ml-7">
+                      {task.inspection_date
+                        ? new Date(task.inspection_date).toLocaleString()
+                        : "N/A"}
+                    </p>
                   </div>
                 );
               } else if (
                 ["COMPLETED", "DUE SOON", "EXPIRED", "HISTORY"].includes(task.status)
               ) {
                 return (
-                  <div className="flex items-center gap-3">
-                    <KeenIcon icon="calendar" className="text-lg text-gray-500" />
-                    <div>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <KeenIcon icon="calendar" className="text-lg text-gray-500" />
                       <span className="text-sm font-medium text-gray-500">Due Date</span>
-                      <p className="text-lg text-gray-900">
-                        {task.due_date
-                          ? new Date(task.due_date).toLocaleString()
-                          : "N/A"}
-                      </p>
                     </div>
+                    <p className="text-lg text-gray-900 ml-7">
+                      {task.due_date
+                        ? new Date(task.due_date).toLocaleString()
+                        : "N/A"}
+                    </p>
                   </div>
                 );
               }
@@ -463,74 +463,74 @@ export default function TaskDetailPage() {
             })()}
 
             {/* 类型 */}
-            <div className="flex items-center gap-3">
-              <KeenIcon icon="category" className="text-lg text-gray-500" />
-              <div>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <KeenIcon icon="category" className="text-lg text-gray-500" />
                 <span className="text-sm font-medium text-gray-500">Type</span>
-                <Link 
-                  className="text-lg text-primary-600 hover:text-primary-700 font-medium" 
-                  to={`/property/tasks?type=${encodeURIComponent(task.type.replace(/\s/g, '_'))}`}
-                >
-                  {task.type}
-                </Link>
               </div>
+              <Link 
+                className="text-lg text-primary-600 hover:text-primary-700 font-medium ml-7" 
+                to={`/property/tasks?type=${encodeURIComponent(task.type.replace(/\s/g, '_'))}`}
+              >
+                {task.type}
+              </Link>
             </div>
 
             {/* 重复频率 */}
-            <div className="flex items-center gap-3">
-              <KeenIcon icon="refresh" className="text-lg text-gray-500" />
-              <div>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <KeenIcon icon="category" className="text-lg text-gray-500" />
                 <span className="text-sm font-medium text-gray-500">Repeat Frequency</span>
-                <p className="text-lg text-gray-900">{task.repeat_frequency}</p>
               </div>
+              <p className="text-lg text-gray-900 ml-7">{task.repeat_frequency}</p>
             </div>
 
             {/* 机构 */}
-            <div className="flex items-center gap-3">
-              <KeenIcon icon="office-bag" className="text-lg text-gray-500" />
-              <div>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <KeenIcon icon="office-bag" className="text-lg text-gray-500" />
                 <span className="text-sm font-medium text-gray-500">Agency</span>
-                <p className="text-lg text-gray-900">{task.agency_name || "N/A"}</p>
               </div>
+              <p className="text-lg text-gray-900 ml-7">{task.agency_name || "N/A"}</p>
             </div>
 
             {/* 地址 */}
-            <div className="flex items-center gap-3">
-              <KeenIcon icon="geolocation" className="text-lg text-gray-500" />
-              <div>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <KeenIcon icon="geolocation" className="text-lg text-gray-500" />
                 <span className="text-sm font-medium text-gray-500">Address</span>
-                <Link 
-                  className="text-lg text-primary-600 hover:text-primary-700 font-medium" 
-                  to={`/property/${task.property_id}`}
-                >
-                  {task.property_address || "N/A"}
-                </Link>
               </div>
+              <Link 
+                className="text-lg text-primary-600 hover:text-primary-700 font-medium ml-7" 
+                to={`/property/${task.property_id}`}
+              >
+                {task.property_address || "N/A"}
+              </Link>
             </div>
 
             {/* 描述 */}
-            <div className="flex items-start gap-3">
-              <KeenIcon icon="note" className="text-lg text-gray-500 mt-1" />
-              <div>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <KeenIcon icon="note" className="text-lg text-gray-500" />
                 <span className="text-sm font-medium text-gray-500">Description</span>
-                <div 
-                  className="text-lg text-gray-900 mt-1"
-                  dangerouslySetInnerHTML={{
-                    __html: task.task_description?.replace(/\n/g, "<br />") || "No description",
-                  }}
-                />
               </div>
+              <div 
+                className="text-lg text-gray-900 ml-7"
+                dangerouslySetInnerHTML={{
+                  __html: task.task_description?.replace(/\n/g, "<br />") || "No description",
+                }}
+              />
             </div>
 
             {/* Free Check Available */}
-            <div className="flex items-center gap-3">
-              <KeenIcon icon="check-circle" className="text-lg text-gray-500" />
-              <div>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <KeenIcon icon="check-circle" className="text-lg text-gray-500" />
                 <span className="text-sm font-medium text-gray-500">Free Check Available</span>
-                <p className="text-lg text-gray-900">
-                  {task.free_check_available ? 'Yes' : 'No'}
-                </p>
               </div>
+              <p className="text-lg text-gray-900 ml-7">
+                {task.free_check_available ? 'Yes' : 'No'}
+              </p>
             </div>
           </div>
 

@@ -36,10 +36,10 @@ const DataTableCard = ({ title, children, footer }) => {
 };
 
 /**
- * UserDataTable 组件：分别显示 properties 与 tasks 的 DataTable
+ * UserDataTable component: Display DataTable for properties and tasks separately
  * @param {Object} props
- * @param {Array} props.tasks - 任务数组
- * @param {Array} props.properties - 房产数组
+ * @param {Array} props.tasks - tasks array
+ * @param {Array} props.properties - properties array
  */
 const UserDataTable = ({ tasks, properties }) => {
   return (
@@ -67,7 +67,7 @@ const UserDataTable = ({ tasks, properties }) => {
                 Showing 1 to {properties.length} of {properties.length} entries
               </span>
               <div className="pagination" data-datatable-pagination="true">
-                {/* 如果需要，可以在这里添加分页控件 */}
+                {/* Add pagination controls here if needed */}
               </div>
             </div>
           </div>
@@ -152,7 +152,7 @@ const UserDataTable = ({ tasks, properties }) => {
                 Showing 1 to {tasks.length} of {tasks.length} entries
               </span>
               <div className="pagination" data-datatable-pagination="true">
-                {/* 如果需要，可以在这里添加分页控件 */}
+                {/* Add pagination controls here if needed */}
               </div>
             </div>
           </div>

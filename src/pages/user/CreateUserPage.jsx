@@ -791,7 +791,7 @@ export default function CreateUserPage() {
                                return (
                                  <label
                                    key={perm}
-                                   className={`group flex items-center gap-2 p-2 rounded-md cursor-pointer transition-all duration-200 ${
+                                   className={`group flex items-center gap-2 p rounded-md cursor-pointer transition-all duration-200 ${
                                      disabled 
                                        ? 'bg-gray-50 text-gray-400 cursor-not-allowed opacity-60' 
                                        : isChecked
@@ -819,9 +819,6 @@ export default function CreateUserPage() {
                                    }`}>
                                      {perm}
                                    </span>
-                                   {isChecked && (
-                                     <KeenIcon icon="check" className="text-blue-600 text-xs ml-auto animate-in fade-in duration-200" />
-                                   )}
                                  </label>
                                );
                              })}

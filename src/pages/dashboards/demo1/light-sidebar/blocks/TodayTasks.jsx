@@ -36,12 +36,12 @@ export default function TodayTasks() {
     fetchTasks();
   }, [token]);
 
-  // 根据状态过滤任务
+  // Filter tasks by status
   const undoTasks = tasks.filter((task) => task.status === "INCOMPLETE");
   const doingTasks = tasks.filter((task) => task.status === "PROCESSING");
   const unknownTasks = tasks.filter((task) => task.status === "UNKNOWN");
 
-  // 点击单个任务时跳转
+  // Navigate when clicking on a single task
   const handleTaskClick = (taskId) => {
     navigate(`/property/tasks/${taskId}`);
   };

@@ -23,7 +23,7 @@ const RecentData = () => {
       try {
         setLoading(true);
         
-        // 并行请求获取最近数据
+        // Fetch recent data in parallel
         const requests = [
           axios.get(`${baseApi}/tasks`, {
             headers: { Authorization: `Bearer ${token}` },
@@ -40,21 +40,21 @@ const RecentData = () => {
 
         const [tasksResponse, contactsResponse, propertiesResponse] = await Promise.all(requests);
         
-        // 处理任务数据 - 取最近5个
+        // Process task data - get recent 5
         const tasks = Array.isArray(tasksResponse.data) 
           ? tasksResponse.data
               .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
               .slice(0, 5)
           : [];
 
-        // 处理联系人数据 - 取最近5个
+        // Process contact data - get recent 5
         const contacts = Array.isArray(contactsResponse.data)
           ? contactsResponse.data
               .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
               .slice(0, 5)
           : [];
 
-        // 处理属性数据 - 取最近5个
+        // Process property data - get recent 5
         const properties = Array.isArray(propertiesResponse.data)
           ? propertiesResponse.data
               .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
@@ -73,15 +73,15 @@ const RecentData = () => {
   }, [token, baseApi, currentUser?.agency_id]);
 
   const formatDate = (dateString) => {
-    if (!dateString) return '未知时间';
+    if (!dateString) return 'Unknown time';
     const date = new Date(dateString);
     const now = new Date();
     const diffTime = Math.abs(now - date);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     
-    if (diffDays === 1) return '今天';
-    if (diffDays === 2) return '昨天';
-    if (diffDays <= 7) return `${diffDays - 1}天前`;
+    if (diffDays === 1) return 'Today';
+    if (diffDays === 2) return 'Yesterday';
+    if (diffDays <= 7) return `${diffDays - 1} days ago`;
     return date.toLocaleDateString('zh-CN');
   };
 
@@ -255,34 +255,36 @@ const RecentData = () => {
 
   return (
     <div className="card p-8">
-      <div className="flex items-center gap-3 mb-8">
-        <div className="flex items-center justify-center w-10 h-10 bg-purple-50 rounded-lg">
-          <KeenIcon icon="time" className="text-purple-600" />
+      <div className="flex items-start justify-between mb-8">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center w-10 h-10 bg-purple-50 rounded-lg">
+            <KeenIcon icon="time" className="text-purple-600" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-800">Recent Data</h3>
         </div>
-        <h3 className="text-lg font-semibold text-gray-800">Recent Data</h3>
-      </div>
-      
-      {/* 标签页导航 */}
-      <div className="flex space-x-1 mb-8 bg-gray-50 p-1 rounded-lg">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-all duration-200 ${
-              activeTab === tab.id
-                ? 'bg-white text-blue-600 shadow-sm'
-                : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
-            }`}
-          >
-            <KeenIcon icon={tab.icon} className="text-sm" />
-            <span>{tab.label}</span>
-            <span className={`px-2 py-1 rounded-full text-xs ${
-              activeTab === tab.id ? 'bg-blue-100 text-blue-600' : 'bg-gray-200 text-gray-600'
-            }`}>
-              {tab.count}
-            </span>
-          </button>
-        ))}
+        
+        {/* 垂直标签页导航 */}
+        <div className="flex flex-col gap-1 bg-gray-50 p-1 rounded-lg">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-3 py-2 rounded-md text-xs font-medium transition-all duration-200 whitespace-nowrap ${
+                activeTab === tab.id
+                  ? 'bg-white text-blue-600 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+              }`}
+            >
+              <KeenIcon icon={tab.icon} className="text-xs" />
+              <span>{tab.label}</span>
+              <span className={`px-1.5 py-0.5 rounded-full text-xs ml-auto ${
+                activeTab === tab.id ? 'bg-blue-100 text-blue-600' : 'bg-gray-200 text-gray-600'
+              }`}>
+                {tab.count}
+              </span>
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* 内容区域 */}

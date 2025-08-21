@@ -21,7 +21,7 @@ export default function CreateTaskPage() {
   const token = auth?.accessToken;
   const navigate = useNavigate();
 
-  // 1) 获取 property 列表并存储
+  // 1) Get property list and store
   const [selectedPropertyId, setSelectedPropertyId] = useState("");
 
   const [taskName, setTaskName] = useState("");
@@ -29,13 +29,13 @@ export default function CreateTaskPage() {
   const [dueDate, setDueDate] = useState("");
   const [repeatFrequency, setRepeatFrequency] = useState("none");
 
-  // 新增字段
+  // New fields
   const [taskType, setTaskType] = useState("GAS & ELECTRICITY");
   const [status, setStatus] = useState("INCOMPLETE");
 
   const [loading, setLoading] = useState(false);
   
-  // 统计数据状态
+  // Statistics data state
   const [stats, setStats] = useState({
     totalTasks: 0,
     activeTasks: 0,
@@ -43,7 +43,7 @@ export default function CreateTaskPage() {
   });
   const [statsLoading, setStatsLoading] = useState(true);
   
-  // 表单进度状态
+  // Form progress state
   const [formProgress, setFormProgress] = useState(0);
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -61,7 +61,7 @@ export default function CreateTaskPage() {
     }
   }, [isAgencyUser, currentUser]);
   
-  // 获取统计数据
+  // Fetch statistics data
   useEffect(() => {
     const fetchStats = async () => {
       if (!token) return;
@@ -92,7 +92,7 @@ export default function CreateTaskPage() {
         });
       } catch (error) {
         console.error('Failed to fetch task statistics:', error);
-        // 设置模拟数据
+        // Set mock data
         setStats({
           totalTasks: 25,
           activeTasks: 8,
@@ -106,18 +106,18 @@ export default function CreateTaskPage() {
     fetchStats();
   }, [token, baseApi]);
   
-  // 计算表单进度
+  // Calculate form progress
   useEffect(() => {
     const calculateProgress = () => {
       let progress = 0;
       let step = 1;
       
-      // 基本信息 (60%)
+      // Basic information (60%)
       if (selectedPropertyId) progress += 20;
       if (taskName) progress += 20;
       if (taskType) progress += 20;
       
-      // 详细信息 (25%)
+      // Detailed information (25%)
       if (taskDescription) {
         progress += 15;
         step = 2;
@@ -126,7 +126,7 @@ export default function CreateTaskPage() {
         progress += 10;
       }
       
-      // 分配信息 (15%)
+      // Assignment information (15%)
       if (selectedAgencyId) {
         progress += 15;
         step = 3;
@@ -141,7 +141,7 @@ export default function CreateTaskPage() {
 
   useEffect(() => {
     if (originalTask) {
-      // 填充表单字段
+      // Fill form fields
       setSelectedPropertyId(originalTask.property_id || "");
       setTaskName(originalTask.task_name || "");
       setTaskDescription(originalTask.task_description || "");
