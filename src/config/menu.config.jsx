@@ -168,6 +168,50 @@ export const MENU_SIDEBAR = [
     ],
   },
 
+  // ====== VEU ======
+  {
+    title: "VEU",
+    icon: "element-11",
+    permissions: {
+      veu_project: ["read"],
+    },
+    children: [
+      {
+        title: "VEU Dashboard",
+        icon: "element-11",
+        path: "/veu/dashboard",
+        permissions: {
+          veu_project: ["read"],
+        },
+      },
+      {
+        title: "Incomplete VEU",
+        icon: "element-11",
+        path: "/veu/incomplete",
+        permissions: {
+          veu_project: ["read"],
+        },
+      },
+      {
+        title: "Incomplete Water Heater",
+        icon: "element-11",
+        path: "/veu/incomplete/water-heater",
+        permissions: {
+          veu_project: ["read"],
+        },
+      },
+      {
+        title: "Incomplete Air Conditioner",
+        icon: "element-11",
+        path: "/veu/incomplete/air-conditioner",
+        permissions: {
+          veu_project: ["read"],
+        },
+      },
+    ],
+  },
+  // ====== /VEU ======
+
   {
     title: "Email List",
     icon: "sms",
@@ -189,7 +233,7 @@ export const MENU_SIDEBAR = [
       },
       {
         title: "Data Import",
-          icon: "setting-2",
+        icon: "setting-2",
         path: "/setting/import",
         permissions: {
           task: ["create"],
