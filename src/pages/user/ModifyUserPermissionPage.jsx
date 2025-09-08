@@ -13,6 +13,7 @@ const permissionOptions = {
   task: ["create", "read", "update", "delete"], // 这里 key 仍是 "task" 不变
   contact: ["create", "read", "update", "delete"],
   role: ["create", "read", "update", "delete"],
+  veu_project: ["create", "read", "update", "delete"],
 };
 
 // 如果有更多需要特殊显示的，可以继续加
