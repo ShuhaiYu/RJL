@@ -385,12 +385,15 @@ export default function VeuDetailModal({
                                 htmlFor={`veu-file-${p.id}`}
                                 className="flex items-center justify-center w-full h-12 px-4 bg-white border border-gray-300 rounded-lg cursor-pointer hover:border-gray-400"
                               >
-                                <span className="text-gray-600">Choose File</span>
+                                <span className="text-gray-600">
+                                  {selectedFileMap[p.id]?.name || "Choose File"}
+                                </span>
                               </label>
                             </div>
                             <input
                               type="text"
                               className="input input-bordered flex-1 w-full"
+                              placeholder="File description (optional)"
                               value={fileDescMap[p.id] || ""}
                               onChange={(e) =>
                                 setFileDescMap((prev) => ({
@@ -407,6 +410,11 @@ export default function VeuDetailModal({
                               {uploadingMap[p.id] ? "Uploading..." : "Upload"}
                             </button>
                           </div>
+                          {selectedFileMap[p.id] && (
+                            <div className="mt-2 text-sm text-green-600">
+                              Selected: {selectedFileMap[p.id].name}
+                            </div>
+                          )}
                         </div>
                       )}
 
