@@ -138,7 +138,6 @@ export default function VeuIncompleteWaterHeaterPage() {
               <thead>
                 <tr className="text-left text-gray-600 border-b">
                   <th className="py-2 pr-4">Property</th>
-                  <th className="py-2 pr-4">Completed By</th>
                   <th className="py-2 pr-4">Price</th>
                   <th className="py-2 pr-4">Agency</th>
                   <th className="py-2 pr-4">Updated</th>
@@ -149,7 +148,6 @@ export default function VeuIncompleteWaterHeaterPage() {
                 {items.map((r) => (
                   <tr key={r.id} className="border-b last:border-0">
                     <td className="py-2 pr-4">{r.property_address || "-"}</td>
-                    <td className="py-2 pr-4">{r.completed_by || "-"}</td>
                     <td className="py-2 pr-4">{r.price ?? "-"}</td>
                     <td className="py-2 pr-4">{r.agency_name || "-"}</td>
                     <td className="py-2 pr-4">

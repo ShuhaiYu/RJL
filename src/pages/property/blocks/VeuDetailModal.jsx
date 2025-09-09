@@ -41,8 +41,9 @@ export default function VeuDetailModal({
 
   const role = currentUser?.role?.toLowerCase?.() || "";
   const isAdmin = role === "admin" || role === "superuser";
+  const isAgency = role === "agency-admin" || role === "agency-user";
   const canEditOtherFields = canEdit && isAdmin; // price / is_completed / files
-  const canEditCompletedBy = canEdit;            // non-admin limited to "other__"
+  const canEditCompletedBy = canEdit;            // edit permission gate
 
   const authHeader = useMemo(
     () => ({ Authorization: `Bearer ${token}` }),
@@ -73,6 +74,7 @@ export default function VeuDetailModal({
       const otherMap = {};
       list.forEach((p) => {
         const v = p.completed_by;
+
         if (isAdmin) {
           if (v === "RJL A Group") {
             modeMap[p.id] = "rjl";
@@ -90,8 +92,24 @@ export default function VeuDetailModal({
             modeMap[p.id] = "other";
             otherMap[p.id] = "";
           }
+        } else if (isAgency) {
+          // Agency user: allow "Other" and "Not Required"
+          if (v === "not_required") {
+            modeMap[p.id] = "not_required";
+            otherMap[p.id] = "";
+          } else if (typeof v === "string" && v.startsWith("other__")) {
+            modeMap[p.id] = "other";
+            otherMap[p.id] = v.slice(7);
+          } else if (v && v !== "RJL A Group") {
+            modeMap[p.id] = "other";
+            otherMap[p.id] = v;
+          } else {
+            // RJL A Group or empty -> default to "other" with empty input (save disabled until filled)
+            modeMap[p.id] = "other";
+            otherMap[p.id] = "";
+          }
         } else {
-          // 非 admin 强制进入 other 编辑模式
+          // other roles: only "Other" free text (previous behavior)
           modeMap[p.id] = "other";
           if (typeof v === "string" && v.startsWith("other__")) {
             otherMap[p.id] = v.slice(7);
@@ -278,10 +296,18 @@ export default function VeuDetailModal({
                 const inputKey = fileInputKeyMap[p.id] || 0;
                 const cbMode = cbModeMap[p.id] || "other";
                 const cbOther = cbOtherMap[p.id] || "";
+
+                // Save button disabled rules:
+                // - must have edit perm
+                // - non-admin & non-agency: only "other" allowed and must be non-empty
+                // - agency: if mode=other, text must be non-empty
                 const saveDisabled =
                   !canEdit ||
-                  (!isAdmin && cbMode !== "other") ||
-                  (!isAdmin && cbMode === "other" && cbOther.trim().length === 0);
+                  (!isAdmin && !isAgency && cbMode !== "other") ||
+                  ((isAgency || (!isAdmin && !isAgency)) &&
+                    cbMode === "other" &&
+                    cbOther.trim().length === 0);
+
                 return (
                   <div key={p.id} className="border rounded-lg p-4">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -320,6 +346,25 @@ export default function VeuDetailModal({
                               onChange={(e) => setCbMode(p.id, e.target.value)}
                             >
                               <option value="rjl">RJL A Group</option>
+                              <option value="other">Other</option>
+                              <option value="not_required">Not Required</option>
+                            </select>
+                            {cbMode === "other" && (
+                              <input
+                                type="text"
+                                className="input input-bordered w-full"
+                                value={cbOther}
+                                onChange={(e) => setCbOther(p.id, e.target.value)}
+                              />
+                            )}
+                          </div>
+                        ) : isAgency ? (
+                          <div className="flex flex-col gap-2">
+                            <select
+                              className="select select-bordered w-full"
+                              value={cbMode === "rjl" ? "other" : cbMode}
+                              onChange={(e) => setCbMode(p.id, e.target.value)}
+                            >
                               <option value="other">Other</option>
                               <option value="not_required">Not Required</option>
                             </select>
@@ -393,7 +438,6 @@ export default function VeuDetailModal({
                             <input
                               type="text"
                               className="input input-bordered flex-1 w-full"
-                              placeholder="File description (optional)"
                               value={fileDescMap[p.id] || ""}
                               onChange={(e) =>
                                 setFileDescMap((prev) => ({
