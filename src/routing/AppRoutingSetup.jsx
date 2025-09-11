@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes } from "react-router";
-import {Demo1DarkSidebarPage} from "@/pages/dashboards/demo1/dark-sidebar/Demo1DarkSidebarPage";
+import { Demo1DarkSidebarPage } from "@/pages/dashboards/demo1/dark-sidebar/Demo1DarkSidebarPage";
 import { DefaultPage } from "../pages/dashboards/default/DefaultPage";
 import { AuthPage } from "@/auth";
 import { RequireAuth } from "@/auth/RequireAuth";
@@ -24,6 +24,10 @@ import Tasks from "../pages/task/Tasks";
 import PropertyDetailPage from "../pages/property/PeopertyDetailPage";
 import SystemSettingPage from "../pages/setting/SystemSettingPage.jsx";
 import DataImportPage from "../pages/setting/DataImportPage.jsx";
+import VeuDashboardPage from "../pages/veu/VeuDashboardPage";
+import VeuIncompleteListPage from "../pages/veu/VeuIncompleteListPage";
+import VeuIncompleteWaterHeaterPage from "../pages/veu/VeuIncompleteWaterHeaterPage";
+import VeuIncompleteAirConditionerPage from "../pages/veu/VeuIncompleteAirConditionerPage";
 
 const AppRoutingSetup = () => {
   return (
@@ -32,6 +36,21 @@ const AppRoutingSetup = () => {
         <Route element={<Demo1Layout />}>
           <Route path="/" element={<DefaultPage />} />
           <Route path="/dark-sidebar" element={<Demo1DarkSidebarPage />} />
+
+          {/* VEU */}
+          <Route path="/veu">
+            <Route path="dashboard" element={<VeuDashboardPage />} />
+            <Route path="incomplete" element={<VeuIncompleteListPage />} />
+            <Route
+              path="incomplete/water-heater"
+              element={<VeuIncompleteWaterHeaterPage />}
+            />
+            <Route
+              path="incomplete/air-conditioner"
+              element={<VeuIncompleteAirConditionerPage />}
+            />
+          </Route>
+
           <Route
             path="/public-profile/profiles/crm"
             element={<ProfileCRMPage />}
@@ -41,12 +60,16 @@ const AppRoutingSetup = () => {
             element={<CreateUserPage />}
           />
           <Route path="/users" element={<AllUsersPage />} />
-          <Route path="/users/:id/permissions" element={<ModifyUserPermissionPage />} />
+          <Route
+            path="/users/:id/permissions"
+            element={<ModifyUserPermissionPage />}
+          />
           <Route path="/users/:id/edit" element={<EditUserPage />} />
 
           <Route path="/agencies/my-agencies" element={<AgenciesList />} />
           <Route path="/agencies/create-agency" element={<CreateAgency />} />
           <Route path="/agencies/:id" element={<AgencyDetail />} />
+
           <Route path="/property">
             <Route path="my-properties" element={<MyProperties />} />
             <Route path="create" element={<CreatePropertyPage />} />

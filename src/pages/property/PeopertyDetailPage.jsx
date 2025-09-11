@@ -5,6 +5,7 @@ import axios from "axios";
 import { useAuthContext } from "@/auth";
 import PropertyDetailModal from "./blocks/PropertyDetailModal";
 import TasksDataTable from "../task/blocks/TasksDataTable";
+import VeuDetailModal from "./blocks/VeuDetailModal";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import { Box, CircularProgress } from "@mui/material";
@@ -32,6 +33,10 @@ export default function PropertyDetailPage() {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedContactId, setSelectedContactId] = useState(null);
 
+  // VEU modal state
+  const [showVeuModal, setShowVeuModal] = useState(false);
+  const [hasVeuRecords, setHasVeuRecords] = useState(null); // null=pending, true/false=checked
+
   const navigate = useNavigate();
 
   const fetchPropertyDetail = async () => {
@@ -51,12 +56,27 @@ export default function PropertyDetailPage() {
     }
   };
 
+  // 仅用于决定是否显示按钮
+  const fetchVeuExists = async () => {
+    if (!propertyId || !token) return;
+    try {
+      const { data } = await axios.get(
+        `${baseApi}/properties/${propertyId}/veu-projects`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setHasVeuRecords(Array.isArray(data) && data.length > 0);
+    } catch {
+      setHasVeuRecords(false);
+    }
+  };
+
   const handleTaskClick = (taskId) => {
     navigate(`/property/tasks/${taskId}`);
   };
 
   useEffect(() => {
     fetchPropertyDetail();
+    fetchVeuExists();
   }, [propertyId, token]);
 
   if (loading) {
@@ -80,6 +100,12 @@ export default function PropertyDetailPage() {
       </div>
     );
   }
+
+  // Permissions
+  const veuPerms = currentUser?.permissions?.veu_project || [];
+  const canViewVeu = veuPerms.includes("read");
+  const canEditVeu = veuPerms.includes("update");
+  const canCreateVeu = veuPerms.includes("create");
 
   // 根据任务 status 拆分为 activeTasks 与 archivedTasks
   const activeTasks = property.tasks.filter(
@@ -129,6 +155,16 @@ export default function PropertyDetailPage() {
           </p>
         </div>
         <div className="flex mt-4 md:mt-0 gap-2">
+          {/* 只有有读取权限且存在记录时才显示按钮；按钮使用 primary 色 */}
+          {canViewVeu && hasVeuRecords === true && (
+            <Button
+              variant="default"
+              className="bg-primary text-white hover:bg-primary/90"
+              onClick={() => setShowVeuModal(true)}
+            >
+              VEU Project
+            </Button>
+          )}
           <Button variant="edit" onClick={() => setShowEditModal(true)}>
             Edit
           </Button>
@@ -198,14 +234,13 @@ export default function PropertyDetailPage() {
           onDelete={(id) => {
             if (!window.confirm("Are you sure to delete this contact?")) return;
 
-            // 删除联系人
             axios
               .delete(`${baseApi}/contacts/${id}`, {
                 headers: { Authorization: `Bearer ${token}` },
               })
               .then(() => {
                 toast.success("Contact deleted successfully");
-                fetchPropertyDetail(); // 刷新详情以显示更新后的数据
+                fetchPropertyDetail();
               })
               .catch((err) => {
                 console.error("Failed to delete contact", err);
@@ -244,7 +279,7 @@ export default function PropertyDetailPage() {
                 contactId={selectedContactId}
                 onSuccess={() => {
                   setEditModalOpen(false);
-                  fetchPropertyDetail(); // 刷新详情以显示更新后的数据
+                  fetchPropertyDetail();
                 }}
               />
             )}
@@ -259,8 +294,19 @@ export default function PropertyDetailPage() {
           token={token}
           onClose={() => {
             setShowEditModal(false);
-            fetchPropertyDetail(); // 刷新详情以显示更新后的数据
+            fetchPropertyDetail();
           }}
+        />
+      )}
+
+      {/* VEU 弹窗：查看与管理 VEU 项目与文件 */}
+      {showVeuModal && (
+        <VeuDetailModal
+          open={showVeuModal}
+          onClose={() => setShowVeuModal(false)}
+          propertyId={propertyId}
+          canEdit={canEditVeu}
+          canCreate={canCreateVeu}
         />
       )}
     </div>
