@@ -26,8 +26,8 @@ export default function CreatePropertyPage() {
   // VEU form state
   const initialVeuState = useMemo(
     () => ({
-      water_heater: { price: "", mode: "other", other: "" },
-      air_conditioner: { price: "", mode: "other", other: "" },
+      water_heater: { price: "", mode: "other", other: "", note: "" },
+      air_conditioner: { price: "", mode: "other", other: "", note: "" },
     }),
     []
   );
@@ -183,6 +183,11 @@ export default function CreatePropertyPage() {
               completed_by = `other__${v.other.trim()}`;
             }
             if (completed_by !== null) body.completed_by = completed_by;
+
+            // note
+            if (typeof v.note === "string" && v.note.trim().length > 0) {
+              body.note = v.note.trim();
+            }
 
             if (Object.keys(body).length > 0) {
               updates.push(
@@ -633,6 +638,18 @@ function VeuMiniCard({ title, typeKey, state, onChange, options }) {
             placeholder="e.g. 120.00"
             value={state.price}
             onChange={(e) => onChange(typeKey, "price", e.target.value)}
+          />
+        </div>
+
+        {/* Note */}
+        <div>
+          <div className="text-sm text-gray-500 mb-1">Note</div>
+          <textarea
+            rows={3}
+            className="textarea textarea-bordered w-full"
+            placeholder="Optional note"
+            value={state.note}
+            onChange={(e) => onChange(typeKey, "note", e.target.value)}
           />
         </div>
 

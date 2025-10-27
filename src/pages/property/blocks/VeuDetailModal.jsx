@@ -155,6 +155,7 @@ export default function VeuDetailModal({
         price:
           proj.price === "" || proj.price === null ? null : Number(proj.price),
         completed_by: proj.completed_by,
+        note: proj.note ?? null,
         type: proj.type, // not editable in UI
       };
       const { data } = await axios.put(
@@ -335,6 +336,8 @@ export default function VeuDetailModal({
                         )}
                       </Field>
 
+                      
+
                       <Field label="Completed By">
                         {!canEditCompletedBy ? (
                           <span className="font-medium">{p.completed_by ?? "-"}</span>
@@ -389,6 +392,22 @@ export default function VeuDetailModal({
                               Only “Other” is allowed for your role
                             </div>
                           </div>
+                        )}
+                      </Field>
+                    </div>
+
+                    {/* Note - full width row */}
+                    <div className="mt-3">
+                      <Field label="Note">
+                        {canEditOtherFields ? (
+                          <textarea
+                            rows={3}
+                            className="textarea textarea-bordered w-full"
+                            value={p.note ?? ""}
+                            onChange={(e) => setLocalProject(p.id, "note", e.target.value)}
+                          />
+                        ) : (
+                          <div className="text-sm whitespace-pre-wrap">{p.note ?? "-"}</div>
                         )}
                       </Field>
                     </div>
