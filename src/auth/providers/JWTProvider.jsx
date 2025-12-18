@@ -9,7 +9,7 @@ export const REGISTER_URL = `${API_URL}/register`;
 export const FORGOT_PASSWORD_URL = `${API_URL}/forgot-password`;
 export const RESET_PASSWORD_URL = `${API_URL}/reset-password`;
 export const GET_USER_URL = `${API_URL}/me`;
-export const REFRESH_URL = `${API_URL}/refresh`;
+export const REFRESH_URL = `${API_URL}/refresh-token`;
 
 const AuthContext = createContext(null);
 

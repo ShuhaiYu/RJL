@@ -168,6 +168,34 @@ export const MENU_SIDEBAR = [
     ],
   },
 
+  // ====== Inspection ======
+  {
+    title: "Inspection",
+    icon: "calendar-tick",
+    permissions: {
+      inspection: ["read"],
+    },
+    children: [
+      {
+        title: "Schedules",
+        icon: "calendar",
+        path: "/inspection",
+        permissions: {
+          inspection: ["read"],
+        },
+      },
+      {
+        title: "Bookings",
+        icon: "notepad-bookmark",
+        path: "/inspection/bookings",
+        permissions: {
+          inspection: ["read"],
+        },
+      },
+    ],
+  },
+  // ====== /Inspection ======
+
   // ====== VEU ======
   {
     title: "VEU",

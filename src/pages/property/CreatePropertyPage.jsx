@@ -7,11 +7,16 @@ import { useAuthContext } from "@/auth";
 import { toast } from "sonner";
 import AsyncUserSelect from "../../components/custom/AsyncUserSelect";
 import AddressInput from "../../components/custom/AddressInput";
+import RegionSelect, { getRegionLabel } from "../../components/custom/RegionSelect";
+import PropertyMapViewer from "../../components/custom/PropertyMapViewer";
 import { KeenIcon } from "@/components/keenicons";
 import StatsCards from "@/components/common/StatsCards";
 
 export default function CreatePropertyPage() {
   const [address, setAddress] = useState("");
+  const [region, setRegion] = useState(null);
+  const [coordinates, setCoordinates] = useState(null);
+  const [suggestedRegion, setSuggestedRegion] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const { auth, baseApi, currentUser } = useAuthContext();
@@ -112,15 +117,15 @@ export default function CreatePropertyPage() {
 
   // Calculate form progress
   useEffect(() => {
-    const fields = { address: !!address, selectedUserId: !!selectedUserId };
+    const fields = { address: !!address, region: !!region, selectedUserId: !!selectedUserId };
     const completedFields = Object.values(fields).filter(Boolean).length;
     const totalFields = Object.keys(fields).length;
     const progress = (completedFields / totalFields) * 100;
 
     setFormProgress(progress);
-    if (address && selectedUserId) setCurrentStep(2);
+    if (address && region && selectedUserId) setCurrentStep(2);
     else setCurrentStep(1);
-  }, [address, selectedUserId]);
+  }, [address, region, selectedUserId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -128,6 +133,10 @@ export default function CreatePropertyPage() {
 
     if (!address) {
       setError("Please enter a property address.");
+      return;
+    }
+    if (!region) {
+      setError("Please select a region for this property.");
       return;
     }
     if (!selectedUserId) {
@@ -140,7 +149,7 @@ export default function CreatePropertyPage() {
       // 1) Create property
       const response = await axios.post(
         `${baseApi}/properties`,
-        { address, user_id: selectedUserId },
+        { address, user_id: selectedUserId, region: region || null },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const property = response.data?.data;
@@ -443,13 +452,75 @@ export default function CreatePropertyPage() {
                 >
                   <AddressInput
                     value={address}
-                    onChange={(formattedAddress) => setAddress(formattedAddress)}
+                    onChange={(formattedAddress) => {
+                      setAddress(formattedAddress);
+                      // Clear coordinates if address is manually edited
+                      if (!formattedAddress) {
+                        setCoordinates(null);
+                        setSuggestedRegion(null);
+                      }
+                    }}
+                    onCoordinatesChange={(coords) => {
+                      setCoordinates(coords);
+                    }}
                     placeholder="Enter property address"
                   />
                 </div>
                 <p className="text-xs text-gray-500">
                   Start typing to search for an address
                 </p>
+              </div>
+
+              {/* Region */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                  <KeenIcon icon="map" className="text-gray-500 text-sm" />
+                  Region <span className="text-red-500">*</span>
+                  {region && (
+                    <KeenIcon icon="check" className="text-green-500 text-sm" />
+                  )}
+                </label>
+                <div
+                  className={`transition-all duration-200 ${
+                    region ? "ring-1 ring-green-200 rounded-md" : ""
+                  }`}
+                >
+                  <RegionSelect
+                    value={region}
+                    onChange={(value) => setRegion(value)}
+                    placeholder="Select region"
+                  />
+                </div>
+                <p className="text-xs text-gray-500">
+                  Select the Melbourne region for this property (East, South, West, North, Central)
+                </p>
+                {/* Suggested region button */}
+                {suggestedRegion && !region && (
+                  <button
+                    type="button"
+                    onClick={() => setRegion(suggestedRegion)}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-blue-600 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
+                  >
+                    <KeenIcon icon="geolocation" className="text-xs" />
+                    Use suggested: {suggestedRegion}
+                  </button>
+                )}
+              </div>
+
+              {/* Map Preview */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                  <KeenIcon icon="geolocation" className="text-gray-500 text-sm" />
+                  Location Preview
+                </label>
+                <PropertyMapViewer
+                  coordinates={coordinates}
+                  address={address}
+                  suggestedRegion={suggestedRegion}
+                  onRegionSuggest={(suggested) => {
+                    setSuggestedRegion(suggested);
+                  }}
+                />
               </div>
             </div>
 

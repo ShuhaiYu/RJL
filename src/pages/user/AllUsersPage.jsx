@@ -33,7 +33,7 @@ export default function AllUsersPage() {
       const response = await axios.get(`${baseApi}/users`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      let data = response.data;
+      let data = response.data || [];
       // 如果传入了 agency_id，则只显示该机构下的用户
       if (agencyIdFromState) {
         data = data.filter((user) => user.agency_id === agencyIdFromState);

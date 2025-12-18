@@ -15,8 +15,10 @@ import React from 'react';
  */
 setupAxios(axios);
 const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<React.StrictMode>
-    <ProvidersWrapper>
-      <App />
-    </ProvidersWrapper>
-  </React.StrictMode>);
+// React.StrictMode 在开发模式会导致所有 useEffect 执行两次
+// 生产环境不受影响，这里开发环境也禁用以避免重复 API 请求
+root.render(
+  <ProvidersWrapper>
+    <App />
+  </ProvidersWrapper>
+);

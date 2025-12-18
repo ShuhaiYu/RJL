@@ -19,6 +19,7 @@ import {
   ModalContent,
 } from "@/components/modal";
 import { EditContactForm } from "../contact/blocks/EditContactForm";
+import { getRegionLabel } from "../../components/custom/RegionSelect";
 
 export default function PropertyDetailPage() {
   const { id: propertyId } = useParams();
@@ -108,11 +109,12 @@ export default function PropertyDetailPage() {
   const canCreateVeu = veuPerms.includes("create");
 
   // 根据任务 status 拆分为 activeTasks 与 archivedTasks
-  const activeTasks = property.tasks.filter(
-    (task) => !["COMPLETED", "HISTORY"].includes(task.status.toUpperCase())
+  const tasks = property.tasks || [];
+  const activeTasks = tasks.filter(
+    (task) => !["COMPLETED", "HISTORY"].includes(task.status?.toUpperCase?.() || "")
   );
-  const archivedTasks = property.tasks.filter((task) =>
-    ["COMPLETED", "HISTORY"].includes(task.status.toUpperCase())
+  const archivedTasks = tasks.filter((task) =>
+    ["COMPLETED", "HISTORY"].includes(task.status?.toUpperCase?.() || "")
   );
 
   const onDelete = (propertyId) => {
@@ -151,7 +153,17 @@ export default function PropertyDetailPage() {
           </p>
           <p className="mt-1 text-gray-600">
             <span className="font-medium">Agency: </span>
-            {property.agency_name || "N/A"}
+            {property.agency?.agency_name || "N/A"}
+          </p>
+          <p className="mt-1 text-gray-600">
+            <span className="font-medium">Region: </span>
+            {property.region ? (
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-sm font-medium bg-blue-100 text-blue-800">
+                {getRegionLabel(property.region)}
+              </span>
+            ) : (
+              <span className="text-gray-400">Not set</span>
+            )}
           </p>
         </div>
         <div className="flex mt-4 md:mt-0 gap-2">

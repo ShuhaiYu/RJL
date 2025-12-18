@@ -44,7 +44,7 @@ export default function Emails() {
       const response = await axios.get(`${baseApi}/emails`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const emailData = response.data;
+      const emailData = response.data || [];
       setEmails(emailData);
       
       // Step 2: Processing statistics

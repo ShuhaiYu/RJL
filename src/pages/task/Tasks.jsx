@@ -65,7 +65,7 @@ export default function Tasks() {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        let data = response.data;
+        let data = response.data || [];
         // 如果传入 agency_id，则过滤任务数据
         if (agencyIdFromState) {
           data = data.filter((task) => task.agency_id === agencyIdFromState);

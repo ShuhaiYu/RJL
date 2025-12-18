@@ -34,7 +34,7 @@ export default function MyProperties() {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        let data = response.data;
+        let data = response.data || [];
         // 如果传入 agency_id，则过滤
         if (agencyIdFromState) {
           data = data.filter((property) => property.agency.id === agencyIdFromState);
@@ -188,7 +188,7 @@ export default function MyProperties() {
               )}
             </div>
           ) : (
-            <MyPropertiesDataTable properties={properties} onEdit={handleEdit} />
+            <MyPropertiesDataTable properties={properties} onEdit={handleEdit} onRefresh={fetchProperties} />
           )}
         </div>
       </div>

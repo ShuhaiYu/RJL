@@ -28,6 +28,10 @@ import VeuDashboardPage from "../pages/veu/VeuDashboardPage";
 import VeuIncompleteListPage from "../pages/veu/VeuIncompleteListPage";
 import VeuIncompleteWaterHeaterPage from "../pages/veu/VeuIncompleteWaterHeaterPage";
 import VeuIncompleteAirConditionerPage from "../pages/veu/VeuIncompleteAirConditionerPage";
+import InspectionDashboardPage from "../pages/inspection/InspectionDashboardPage";
+import ScheduleDetailPage from "../pages/inspection/ScheduleDetailPage";
+import BookingsListPage from "../pages/inspection/BookingsListPage";
+import PublicBookingPage from "../pages/public/PublicBookingPage";
 
 const AppRoutingSetup = () => {
   return (
@@ -89,8 +93,18 @@ const AppRoutingSetup = () => {
 
           <Route path="/setting/system" element={<SystemSettingPage />} />
           <Route path="/setting/import" element={<DataImportPage />} />
+
+          {/* Inspection */}
+          <Route path="/inspection">
+            <Route index element={<InspectionDashboardPage />} />
+            <Route path="schedules/:id" element={<ScheduleDetailPage />} />
+            <Route path="bookings" element={<BookingsListPage />} />
+          </Route>
         </Route>
       </Route>
+      {/* Public Routes (no authentication required) */}
+      <Route path="/book/:token" element={<PublicBookingPage />} />
+
       <Route path="error/*" element={<ErrorsRouting />} />
       <Route path="auth/*" element={<AuthPage />} />
       <Route path="*" element={<Navigate to="/error/404" />} />

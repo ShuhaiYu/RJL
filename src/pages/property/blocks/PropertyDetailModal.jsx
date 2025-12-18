@@ -6,6 +6,7 @@ import { useAuthContext } from "@/auth";
 import TasksDataTable from "../../task/blocks/TasksDataTable";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../../components/ui/button";
+import RegionSelect from "../../../components/custom/RegionSelect";
 
 export default function PropertyDetailModal({ propertyId, onClose }) {
   const [loading, setLoading] = useState(false);
@@ -14,6 +15,7 @@ export default function PropertyDetailModal({ propertyId, onClose }) {
 
   // 编辑属性状态
   const [propertyAddress, setPropertyAddress] = useState("");
+  const [propertyRegion, setPropertyRegion] = useState(null);
 
   const { baseApi, auth, currentUser } = useAuthContext();
   const isDisableAssignUser = currentUser?.agency_id ? true : false;
@@ -56,6 +58,7 @@ export default function PropertyDetailModal({ propertyId, onClose }) {
 
         setPropertyAddress(res.data.address || "");
         setSelectedUserId(res.data.user_id || "");
+        setPropertyRegion(res.data.region || null);
 
         setLoading(false);
       })
@@ -80,7 +83,8 @@ export default function PropertyDetailModal({ propertyId, onClose }) {
         `${baseApi}/properties/${propertyId}`,
         {
           address: propertyAddress,
-          user_id: selectedUserId,
+          user_id: selectedUserId ? Number(selectedUserId) : null,
+          region: propertyRegion,
         },
         {
           headers: {
@@ -93,6 +97,7 @@ export default function PropertyDetailModal({ propertyId, onClose }) {
           ...propertyDetail,
           address: propertyAddress,
           user_id: selectedUserId,
+          region: propertyRegion,
         });
         toast("Property updated successfully!");
       })
@@ -172,6 +177,15 @@ export default function PropertyDetailModal({ propertyId, onClose }) {
               />
             </div>
             <div className="mb-4">
+              <label className="block mb-1 font-medium">Region</label>
+              <RegionSelect
+                value={propertyRegion}
+                onChange={(value) => setPropertyRegion(value)}
+                placeholder="Select region (optional)"
+                allowClear={true}
+              />
+            </div>
+            <div className="mb-4">
               <label className="block mb-1 font-medium">Assigned User</label>
               <select
                 className="select select-bordered w-full"
@@ -182,7 +196,7 @@ export default function PropertyDetailModal({ propertyId, onClose }) {
                 <option value="">-- Select User --</option>
                 {userList.map((u) => (
                   <option key={u.id} value={u.id}>
-                    {u.name || u.email} 
+                    {u.name || u.email}
                   </option>
                 ))}
               </select>

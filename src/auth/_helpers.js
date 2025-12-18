@@ -3,7 +3,7 @@ import { toast } from "sonner";
 
 const AUTH_LOCAL_STORAGE_KEY = `${import.meta.env.VITE_APP_NAME}-auth-v${import.meta.env.VITE_APP_VERSION}`;
 const API_URL = import.meta.env.VITE_API_BASE_URL + "/auth";
-const REFRESH_URL = API_URL + "/refresh";
+const REFRESH_URL = API_URL + "/refresh-token";
 
 const getAuth = () => {
   try {
