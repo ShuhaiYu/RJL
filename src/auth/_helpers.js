@@ -47,7 +47,13 @@ export function setupAxios(axios) {
   );
 
   axios.interceptors.response.use(
-    (response) => response,
+    (response) => {
+      // 自动解包 data 属性，兼容新后端 { success, data } 格式
+      if (response.data && response.data.data !== undefined) {
+        response.data = response.data.data;
+      }
+      return response;
+    },
     async (error) => {
       const originalRequest = error.config;
 
