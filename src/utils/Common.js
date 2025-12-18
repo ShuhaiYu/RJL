@@ -17,3 +17,19 @@ export const throttle = (func, limit) => {
     }
   };
 };
+
+export function debounce(func, wait) {
+  let timeout = null;
+  return function (...args) {
+    if (timeout) {
+      clearTimeout(timeout);
+    }
+    timeout = setTimeout(() => {
+      func(...args);
+    }, wait);
+  };
+}
+
+export function uniqueID() {
+  return (Date.now() + Math.floor(Math.random() * 1000)).toString();
+}

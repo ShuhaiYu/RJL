@@ -3,7 +3,7 @@
 import { getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, getFacetedRowModel, getFacetedUniqueValues } from '@tanstack/react-table';
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { DataGridInner } from './DataGridInner';
-import { deepMerge, debounce } from '@/lib/helpers';
+import { deepMerge, debounce } from '@/utils';
 const DataGridContext = createContext(undefined);
 export const useDataGrid = () => {
   const context = useContext(DataGridContext);
