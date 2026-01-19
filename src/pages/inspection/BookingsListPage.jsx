@@ -64,6 +64,18 @@ function BookingRow({ booking, onConfirm, onReject }) {
         </div>
       </td>
       <td className="px-6 py-4">
+        {booking.booked_by ? (
+          <div>
+            <p className="text-gray-900">{booking.booked_by.name}</p>
+            <p className={`text-xs ${booking.booked_by.type === "agencyUser" ? "text-blue-600" : "text-gray-500"}`}>
+              {booking.booked_by.type_label}
+            </p>
+          </div>
+        ) : (
+          <span className="text-gray-400">-</span>
+        )}
+      </td>
+      <td className="px-6 py-4">
         <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${STATUS_COLORS[booking.status] || STATUS_COLORS.pending}`}>
           {booking.status}
         </span>
@@ -262,6 +274,9 @@ export default function BookingsListPage() {
                       Contact
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Booked By
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Status
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -297,18 +312,42 @@ export default function BookingsListPage() {
               </DialogDescription>
             </DialogHeader>
             {confirmDialog.booking && (
-              <div className="bg-gray-50 rounded-lg p-4 space-y-2">
-                <div>
-                  <p className="text-sm text-gray-500">Property</p>
-                  <p className="font-medium">{confirmDialog.booking.property?.address}</p>
+              <div className="space-y-4">
+                <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+                  <div>
+                    <p className="text-sm text-gray-500">Property</p>
+                    <p className="font-medium">{confirmDialog.booking.property?.address}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Contact</p>
+                    <p className="font-medium">{confirmDialog.booking.contact_name}</p>
+                  </div>
+                  {confirmDialog.booking.booked_by && (
+                    <div>
+                      <p className="text-sm text-gray-500">Booked By</p>
+                      <p className="font-medium">
+                        {confirmDialog.booking.booked_by.name}
+                        <span className="text-gray-500 font-normal ml-1">
+                          ({confirmDialog.booking.booked_by.type_label})
+                        </span>
+                      </p>
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-sm text-gray-500">Time Slot</p>
+                    <p className="font-medium">{confirmDialog.booking.slot?.start_time} - {confirmDialog.booking.slot?.end_time}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">Contact</p>
-                  <p className="font-medium">{confirmDialog.booking.contact_name}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Time Slot</p>
-                  <p className="font-medium">{confirmDialog.booking.slot?.start_time} - {confirmDialog.booking.slot?.end_time}</p>
+
+                {/* Auto-reject warning */}
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 flex items-start gap-2">
+                  <KeenIcon icon="information-2" className="text-yellow-600 mt-0.5" />
+                  <div className="text-sm text-yellow-700">
+                    <p className="font-medium">Other pending bookings will be auto-rejected</p>
+                    <p className="text-yellow-600">
+                      Any other pending bookings for this property will be automatically rejected (without notification).
+                    </p>
+                  </div>
                 </div>
               </div>
             )}

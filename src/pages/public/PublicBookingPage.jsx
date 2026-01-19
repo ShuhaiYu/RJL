@@ -167,6 +167,7 @@ export default function PublicBookingPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [data, setData] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(null);
@@ -186,7 +187,19 @@ export default function PublicBookingPage() {
       const res = await axios.get(`${API_URL}/public/booking/${token}`);
       // Note: axios interceptor already unwraps response.data.data to response.data
       setData(res.data);
-      if (res.data.contact?.name) {
+
+      // Set initial selected date (first available date with slots)
+      if (res.data.schedules?.length > 0) {
+        setSelectedDate(res.data.schedules[0].id);
+      }
+
+      // Pre-fill contact name from booker info
+      if (res.data.booker?.name) {
+        setFormData((prev) => ({
+          ...prev,
+          contact_name: res.data.booker.name || "",
+        }));
+      } else if (res.data.contact?.name) {
         setFormData((prev) => ({
           ...prev,
           contact_name: res.data.contact.name || "",
@@ -275,59 +288,111 @@ export default function PublicBookingPage() {
             <div className="flex items-start gap-3">
               <div className="w-9 h-9 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
                 <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-xs text-gray-400 uppercase tracking-wide">Inspection Date</p>
-                <p className="font-medium text-gray-900">{formatDate(data?.schedule?.schedule_date)}</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="w-9 h-9 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
               </div>
               <div>
                 <p className="text-xs text-gray-400 uppercase tracking-wide">Region</p>
-                <p className="font-medium text-gray-900">{data?.schedule?.region_label}</p>
+                <p className="font-medium text-gray-900">{data?.region?.label || data?.schedule?.region_label}</p>
               </div>
             </div>
+            {/* Booker Identity */}
+            {data?.booker?.name && (
+              <div className="flex items-start gap-3">
+                <div className="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-400 uppercase tracking-wide">Booking As</p>
+                  <p className="font-medium text-gray-900">{data.booker.name}</p>
+                  {data.booker.type === "agencyUser" && (
+                    <p className="text-xs text-blue-600">Agency Staff</p>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Time Slot Selection */}
-        <div className="bg-white rounded-lg shadow-sm border p-6 mb-4">
-          <h2 className="font-semibold text-gray-900 mb-4">Select a Time Slot</h2>
-          {data?.available_slots?.length === 0 ? (
-            <p className="text-gray-500 text-center py-6 text-sm">
-              No available time slots. Please contact your property manager.
-            </p>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {data?.available_slots?.map((slot) => (
+        {/* Date Selection (Multi-date support) */}
+        {data?.schedules?.length > 1 && (
+          <div className="bg-white rounded-lg shadow-sm border p-6 mb-4">
+            <h2 className="font-semibold text-gray-900 mb-4">Select Inspection Date</h2>
+            <div className="flex flex-wrap gap-2">
+              {data.schedules.map((schedule) => (
                 <button
-                  key={slot.id}
+                  key={schedule.id}
                   type="button"
-                  onClick={() => setSelectedSlot(slot.id)}
-                  className={`p-3 rounded-lg border-2 text-center transition-all ${
-                    selectedSlot === slot.id
+                  onClick={() => {
+                    setSelectedDate(schedule.id);
+                    setSelectedSlot(null); // Reset slot when date changes
+                  }}
+                  className={`px-4 py-2 rounded-lg border-2 text-sm font-medium transition-all ${
+                    selectedDate === schedule.id
                       ? "border-gray-900 bg-gray-900 text-white"
-                      : "border-gray-200 hover:border-gray-400 bg-white"
+                      : "border-gray-200 hover:border-gray-400 bg-white text-gray-700"
                   }`}
                 >
-                  <p className="font-medium text-sm">
-                    {slot.start_time} - {slot.end_time}
-                  </p>
-                  <p className={`text-xs mt-1 ${selectedSlot === slot.id ? "text-gray-300" : "text-gray-400"}`}>
-                    {slot.available_spots} spot{slot.available_spots > 1 ? "s" : ""} left
-                  </p>
+                  {formatDate(schedule.schedule_date)}
+                  <span className={`block text-xs ${selectedDate === schedule.id ? "text-gray-300" : "text-gray-400"}`}>
+                    {schedule.slots.length} slot{schedule.slots.length !== 1 ? "s" : ""} available
+                  </span>
                 </button>
               ))}
             </div>
-          )}
+          </div>
+        )}
+
+        {/* Time Slot Selection */}
+        <div className="bg-white rounded-lg shadow-sm border p-6 mb-4">
+          <h2 className="font-semibold text-gray-900 mb-4">
+            Select a Time Slot
+            {data?.schedules?.length > 1 && selectedDate && (
+              <span className="text-sm font-normal text-gray-500 ml-2">
+                for {formatDate(data.schedules.find((s) => s.id === selectedDate)?.schedule_date)}
+              </span>
+            )}
+          </h2>
+          {(() => {
+            // Get slots for selected date
+            const currentSchedule = data?.schedules?.find((s) => s.id === selectedDate);
+            const slotsToShow = currentSchedule?.slots || data?.available_slots || [];
+
+            if (slotsToShow.length === 0) {
+              return (
+                <p className="text-gray-500 text-center py-6 text-sm">
+                  No available time slots. Please contact your property manager.
+                </p>
+              );
+            }
+
+            return (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {slotsToShow.map((slot) => (
+                  <button
+                    key={slot.id}
+                    type="button"
+                    onClick={() => setSelectedSlot(slot.id)}
+                    className={`p-3 rounded-lg border-2 text-center transition-all ${
+                      selectedSlot === slot.id
+                        ? "border-gray-900 bg-gray-900 text-white"
+                        : "border-gray-200 hover:border-gray-400 bg-white"
+                    }`}
+                  >
+                    <p className="font-medium text-sm">
+                      {slot.start_time} - {slot.end_time}
+                    </p>
+                    <p className={`text-xs mt-1 ${selectedSlot === slot.id ? "text-gray-300" : "text-gray-400"}`}>
+                      {slot.available_spots} spot{slot.available_spots > 1 ? "s" : ""} left
+                    </p>
+                  </button>
+                ))}
+              </div>
+            );
+          })()}
         </div>
 
         {/* Contact Form */}

@@ -421,13 +421,18 @@ export default function InspectionDashboardPage() {
   const [expandedRegion, setExpandedRegion] = useState(null);
   const [createFormData, setCreateFormData] = useState({
     region: "",
-    schedule_date: "",
+    selectedDates: [],
   });
   const [creating, setCreating] = useState(false);
+  const [batchResult, setBatchResult] = useState(null);
+  const [previewData, setPreviewData] = useState(null);
+  const [loadingPreview, setLoadingPreview] = useState(false);
 
   // Dialog states
   const [confirmDialog, setConfirmDialog] = useState({ open: false, booking: null });
   const [rejectDialog, setRejectDialog] = useState({ open: false, booking: null });
+  const [resultDialog, setResultDialog] = useState({ open: false });
+  const [previewDialog, setPreviewDialog] = useState({ open: false });
   const [processing, setProcessing] = useState(false);
 
   // ==================== Data Fetching ====================
@@ -471,13 +476,63 @@ export default function InspectionDashboardPage() {
   };
 
   // ==================== Schedule Functions ====================
+  const handlePreview = async () => {
+    if (!createFormData.region) {
+      toast.error("Please select a region");
+      return;
+    }
+    if (createFormData.selectedDates.length === 0) {
+      toast.error("Please select at least one date");
+      return;
+    }
+
+    const regionConfig = configs.find((c) => c.region === createFormData.region);
+    if (!regionConfig?.is_configured) {
+      toast.error(`Please configure ${getRegionLabel(createFormData.region)} first`);
+      setExpandedRegion(createFormData.region);
+      return;
+    }
+
+    setLoadingPreview(true);
+    try {
+      const response = await axios.get(
+        `${baseApi}/inspection/preview-recipients/${createFormData.region}`
+      );
+      setPreviewData(response.data);
+      setPreviewDialog({ open: true });
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to load preview");
+    } finally {
+      setLoadingPreview(false);
+    }
+  };
+
+  const handleAddDate = (dateStr) => {
+    if (!dateStr) return;
+    if (createFormData.selectedDates.includes(dateStr)) {
+      toast.info("This date is already selected");
+      return;
+    }
+    setCreateFormData((prev) => ({
+      ...prev,
+      selectedDates: [...prev.selectedDates, dateStr].sort(),
+    }));
+  };
+
+  const handleRemoveDate = (dateStr) => {
+    setCreateFormData((prev) => ({
+      ...prev,
+      selectedDates: prev.selectedDates.filter((d) => d !== dateStr),
+    }));
+  };
+
   const handleCreateSchedule = async () => {
     if (!createFormData.region) {
       toast.error("Please select a region");
       return;
     }
-    if (!createFormData.schedule_date) {
-      toast.error("Please select a date");
+    if (createFormData.selectedDates.length === 0) {
+      toast.error("Please select at least one date");
       return;
     }
 
@@ -490,13 +545,33 @@ export default function InspectionDashboardPage() {
 
     setCreating(true);
     try {
-      // axios interceptor will auto-add Authorization header
-      await axios.post(`${baseApi}/inspection/schedules`, createFormData);
-      toast.success("Schedule created successfully");
-      setCreateFormData({ region: "", schedule_date: "" });
+      // Call batch API with multiple dates
+      const response = await axios.post(`${baseApi}/inspection/schedules/batch`, {
+        region: createFormData.region,
+        dates: createFormData.selectedDates,
+      });
+
+      const result = response.data;
+      setBatchResult(result);
+      setResultDialog({ open: true });
+
+      // Show summary toast
+      if (result.created?.length > 0) {
+        toast.success(`Created ${result.created.length} schedule(s)`);
+      }
+      if (result.skipped?.length > 0) {
+        toast.info(`${result.skipped.length} schedule(s) skipped (already exist)`);
+      }
+      if (result.failed?.length > 0) {
+        toast.error(`${result.failed.length} schedule(s) failed`);
+      }
+
+      setCreateFormData({ region: "", selectedDates: [] });
+      setPreviewDialog({ open: false });
+      setPreviewData(null);
       await fetchAllData();
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to create schedule");
+      toast.error(error.response?.data?.message || "Failed to create schedules");
     } finally {
       setCreating(false);
     }
@@ -742,48 +817,115 @@ export default function InspectionDashboardPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Inspection Date
+                    Inspection Dates
+                    {createFormData.selectedDates.length > 0 && (
+                      <span className="ml-2 text-blue-600 font-normal">
+                        ({createFormData.selectedDates.length} selected)
+                      </span>
+                    )}
                   </label>
                   <Input
                     type="date"
-                    value={createFormData.schedule_date}
-                    onChange={(e) =>
-                      setCreateFormData((prev) => ({
-                        ...prev,
-                        schedule_date: e.target.value,
-                      }))
-                    }
+                    value=""
+                    onChange={(e) => handleAddDate(e.target.value)}
                     min={minDate}
                     className="w-full"
                   />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Click a date to add it. You can select multiple dates.
+                  </p>
+
+                  {/* Selected dates tags */}
+                  {createFormData.selectedDates.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {createFormData.selectedDates.map((dateStr) => {
+                        const date = new Date(dateStr);
+                        const formatted = date.toLocaleDateString("en-AU", {
+                          weekday: "short",
+                          month: "short",
+                          day: "numeric",
+                        });
+                        return (
+                          <span
+                            key={dateStr}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-100 text-blue-800 rounded-full text-sm"
+                          >
+                            <KeenIcon icon="calendar" className="text-xs" />
+                            {formatted}
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveDate(dateStr)}
+                              className="ml-1 hover:bg-blue-200 rounded-full p-0.5 transition-colors"
+                            >
+                              <KeenIcon icon="cross" className="text-xs" />
+                            </button>
+                          </span>
+                        );
+                      })}
+                      {createFormData.selectedDates.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setCreateFormData((prev) => ({
+                              ...prev,
+                              selectedDates: [],
+                            }))
+                          }
+                          className="text-xs text-red-600 hover:text-red-700 underline"
+                        >
+                          Clear all
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
 
-                <Button
-                  onClick={handleCreateSchedule}
-                  disabled={creating || !createFormData.region || !createFormData.schedule_date}
-                  className="w-full bg-blue-600 hover:bg-blue-700"
-                  size="lg"
-                >
-                  {creating ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                      Creating...
-                    </>
-                  ) : (
-                    <>
-                      <KeenIcon icon="plus" className="text-base mr-2" />
-                      Create Schedule
-                    </>
-                  )}
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handlePreview}
+                    disabled={loadingPreview || creating || !createFormData.region || createFormData.selectedDates.length === 0}
+                    variant="outline"
+                    className="flex-1"
+                    size="lg"
+                  >
+                    {loadingPreview ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mr-2" />
+                        Loading...
+                      </>
+                    ) : (
+                      <>
+                        <KeenIcon icon="eye" className="text-base mr-2" />
+                        Preview
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    onClick={handleCreateSchedule}
+                    disabled={creating || loadingPreview || !createFormData.region || createFormData.selectedDates.length === 0}
+                    className="flex-1 bg-blue-600 hover:bg-blue-700"
+                    size="lg"
+                  >
+                    {creating ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                        Creating...
+                      </>
+                    ) : (
+                      <>
+                        <KeenIcon icon="plus" className="text-base mr-2" />
+                        Create
+                      </>
+                    )}
+                  </Button>
+                </div>
               </div>
 
               {/* Quick tip */}
               <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
                 <p className="text-sm text-blue-800">
-                  <strong>Next step:</strong> After creating a schedule, click
-                  "Send Links" to email booking invitations to property contacts
-                  in that region.
+                  <strong>Tip:</strong> Click "Preview" to see which properties and
+                  contacts will receive booking invitation emails before creating.
                 </p>
               </div>
             </div>
@@ -979,6 +1121,283 @@ export default function InspectionDashboardPage() {
                 className="bg-red-600 hover:bg-red-700"
               >
                 {processing ? "Rejecting..." : "Reject"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Preview Dialog */}
+        <Dialog
+          open={previewDialog.open}
+          onOpenChange={(open) => {
+            setPreviewDialog({ open });
+            if (!open) setPreviewData(null);
+          }}
+        >
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <KeenIcon icon="eye" className="text-blue-600" />
+                Preview: Create Schedules
+              </DialogTitle>
+              <DialogDescription>
+                Review the schedules to create and who will receive booking invitation emails.
+              </DialogDescription>
+            </DialogHeader>
+
+            {previewData && (
+              <div className="flex-1 overflow-y-auto space-y-4">
+                {/* Selected Dates */}
+                <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                  <h4 className="font-semibold text-blue-800 mb-2 flex items-center gap-2">
+                    <KeenIcon icon="calendar" className="text-sm" />
+                    Schedules to Create ({createFormData.selectedDates.length})
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {createFormData.selectedDates.map((dateStr) => (
+                      <span
+                        key={dateStr}
+                        className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                      >
+                        {new Date(dateStr).toLocaleDateString("en-AU", {
+                          weekday: "short",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Summary */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div className="bg-gray-50 rounded-lg p-3 text-center">
+                    <p className="text-2xl font-bold text-gray-900">
+                      {previewData.summary?.total_properties || 0}
+                    </p>
+                    <p className="text-xs text-gray-500">Properties</p>
+                  </div>
+                  <div className="bg-green-50 rounded-lg p-3 text-center">
+                    <p className="text-2xl font-bold text-green-600">
+                      {previewData.summary?.properties_with_recipients || 0}
+                    </p>
+                    <p className="text-xs text-gray-500">With Recipients</p>
+                  </div>
+                  <div className="bg-yellow-50 rounded-lg p-3 text-center">
+                    <p className="text-2xl font-bold text-yellow-600">
+                      {previewData.summary?.properties_without_recipients || 0}
+                    </p>
+                    <p className="text-xs text-gray-500">No Recipients</p>
+                  </div>
+                  <div className="bg-purple-50 rounded-lg p-3 text-center">
+                    <p className="text-2xl font-bold text-purple-600">
+                      {previewData.summary?.total_recipients || 0}
+                    </p>
+                    <p className="text-xs text-gray-500">Total Emails</p>
+                  </div>
+                </div>
+
+                {/* Properties List */}
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                    <KeenIcon icon="home-2" className="text-sm" />
+                    Properties & Recipients ({previewData.properties?.length || 0})
+                  </h4>
+                  <div className="space-y-2 max-h-[300px] overflow-y-auto border rounded-lg">
+                    {previewData.properties?.map((property) => (
+                      <div
+                        key={property.id}
+                        className={`p-3 border-b last:border-b-0 ${
+                          property.has_recipients ? "bg-white" : "bg-yellow-50"
+                        }`}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-gray-900 text-sm truncate">
+                              {property.address}
+                            </p>
+                            {property.agency_name && (
+                              <p className="text-xs text-gray-500">
+                                {property.agency_name}
+                              </p>
+                            )}
+                          </div>
+                          <span
+                            className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
+                              property.has_recipients
+                                ? "bg-green-100 text-green-700"
+                                : "bg-yellow-100 text-yellow-700"
+                            }`}
+                          >
+                            {property.recipient_count} recipient{property.recipient_count !== 1 ? "s" : ""}
+                          </span>
+                        </div>
+                        {property.recipients?.length > 0 && (
+                          <div className="mt-2 flex flex-wrap gap-1">
+                            {property.recipients.map((recipient, idx) => (
+                              <span
+                                key={idx}
+                                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs ${
+                                  recipient.type === "contact"
+                                    ? "bg-blue-50 text-blue-700"
+                                    : "bg-purple-50 text-purple-700"
+                                }`}
+                              >
+                                <KeenIcon
+                                  icon={recipient.type === "contact" ? "profile-circle" : "security-user"}
+                                  className="text-[10px]"
+                                />
+                                {recipient.name}
+                                <span className="text-gray-400">({recipient.email})</span>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        {!property.has_recipients && (
+                          <p className="mt-1 text-xs text-yellow-600">
+                            No contacts or agency users with email
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <DialogFooter className="mt-4">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setPreviewDialog({ open: false });
+                  setPreviewData(null);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleCreateSchedule}
+                disabled={creating}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                {creating ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    <KeenIcon icon="check" className="text-sm mr-1" />
+                    Create {createFormData.selectedDates.length} Schedule(s)
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Batch Creation Result Dialog */}
+        <Dialog
+          open={resultDialog.open}
+          onOpenChange={(open) => {
+            setResultDialog({ open });
+            if (!open) setBatchResult(null);
+          }}
+        >
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <KeenIcon icon="check-circle" className="text-green-600" />
+                Batch Schedule Creation
+              </DialogTitle>
+              <DialogDescription>
+                Here's a summary of the schedule creation results.
+              </DialogDescription>
+            </DialogHeader>
+            {batchResult && (
+              <div className="space-y-4">
+                {/* Created schedules */}
+                {batchResult.created?.length > 0 && (
+                  <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+                    <div className="flex items-center gap-2 mb-2">
+                      <KeenIcon icon="check" className="text-green-600" />
+                      <span className="font-semibold text-green-800">
+                        Created ({batchResult.created.length})
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {batchResult.created.map((item) => (
+                        <span
+                          key={item.date}
+                          className="px-2 py-1 bg-green-100 text-green-800 rounded text-sm"
+                        >
+                          {new Date(item.date).toLocaleDateString("en-AU", {
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Skipped schedules */}
+                {batchResult.skipped?.length > 0 && (
+                  <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+                    <div className="flex items-center gap-2 mb-2">
+                      <KeenIcon icon="information-2" className="text-yellow-600" />
+                      <span className="font-semibold text-yellow-800">
+                        Skipped - Already Exist ({batchResult.skipped.length})
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {batchResult.skipped.map((item) => (
+                        <span
+                          key={item.date}
+                          className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-sm"
+                        >
+                          {new Date(item.date).toLocaleDateString("en-AU", {
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Failed schedules */}
+                {batchResult.failed?.length > 0 && (
+                  <div className="bg-red-50 rounded-lg p-4 border border-red-200">
+                    <div className="flex items-center gap-2 mb-2">
+                      <KeenIcon icon="cross-circle" className="text-red-600" />
+                      <span className="font-semibold text-red-800">
+                        Failed ({batchResult.failed.length})
+                      </span>
+                    </div>
+                    <div className="space-y-1">
+                      {batchResult.failed.map((item) => (
+                        <p key={item.date} className="text-sm text-red-700">
+                          {new Date(item.date).toLocaleDateString("en-AU", {
+                            month: "short",
+                            day: "numeric",
+                          })}{" "}
+                          - {item.error}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+            <DialogFooter>
+              <Button
+                onClick={() => {
+                  setResultDialog({ open: false });
+                  setBatchResult(null);
+                }}
+              >
+                Close
               </Button>
             </DialogFooter>
           </DialogContent>

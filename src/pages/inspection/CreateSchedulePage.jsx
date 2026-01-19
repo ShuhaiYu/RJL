@@ -17,9 +17,9 @@ export default function CreateSchedulePage() {
   const [loading, setLoading] = useState(false);
   const [loadingConfig, setLoadingConfig] = useState(false);
   const [regionConfig, setRegionConfig] = useState(null);
+  const [selectedDates, setSelectedDates] = useState([]);
   const [formData, setFormData] = useState({
     region: "",
-    schedule_date: "",
     start_time: "",
     end_time: "",
     slot_duration: 150,
@@ -100,6 +100,19 @@ export default function CreateSchedulePage() {
     return slots;
   };
 
+  const handleAddDate = (date) => {
+    if (!date) return;
+    if (selectedDates.includes(date)) {
+      toast.error("This date is already selected");
+      return;
+    }
+    setSelectedDates([...selectedDates, date].sort());
+  };
+
+  const handleRemoveDate = (dateToRemove) => {
+    setSelectedDates(selectedDates.filter((d) => d !== dateToRemove));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -107,8 +120,8 @@ export default function CreateSchedulePage() {
       toast.error("Please select a region");
       return;
     }
-    if (!formData.schedule_date) {
-      toast.error("Please select a date");
+    if (selectedDates.length === 0) {
+      toast.error("Please select at least one date");
       return;
     }
 
@@ -116,7 +129,7 @@ export default function CreateSchedulePage() {
     try {
       const payload = {
         region: formData.region,
-        schedule_date: formData.schedule_date,
+        dates: selectedDates,
         note: formData.note || undefined,
       };
 
@@ -127,12 +140,37 @@ export default function CreateSchedulePage() {
       if (formData.max_capacity) payload.max_capacity = formData.max_capacity;
 
       // axios interceptor will auto-add Authorization header
-      const res = await axios.post(`${baseApi}/inspection/schedules`, payload);
+      const res = await axios.post(`${baseApi}/inspection/schedules/batch`, payload);
+      const result = res.data;
 
-      toast.success("Schedule created successfully");
-      navigate(`/inspection/schedules/${res.data.id}`);
+      // Show detailed result message
+      const messages = [];
+      if (result.created?.length > 0) {
+        messages.push(`${result.created.length} schedule(s) created`);
+      }
+      if (result.skipped?.length > 0) {
+        messages.push(`${result.skipped.length} skipped (already exist)`);
+      }
+      if (result.failed?.length > 0) {
+        messages.push(`${result.failed.length} failed`);
+      }
+
+      if (result.created?.length > 0) {
+        toast.success(messages.join(", "));
+        // Navigate to the first created schedule or the list
+        if (result.created.length === 1) {
+          navigate(`/inspection/schedules/${result.created[0].id}`);
+        } else {
+          navigate("/inspection/schedules");
+        }
+      } else if (result.skipped?.length > 0) {
+        toast.warning(messages.join(", "));
+        navigate("/inspection/schedules");
+      } else {
+        toast.error("Failed to create schedules");
+      }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to create schedule");
+      toast.error(error.response?.data?.message || "Failed to create schedules");
     } finally {
       setLoading(false);
     }
@@ -171,33 +209,75 @@ export default function CreateSchedulePage() {
         {/* Form */}
         <form onSubmit={handleSubmit}>
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            {/* Region and Date */}
+            {/* Region and Dates */}
             <div className="p-6 border-b border-gray-200">
               <h2 className="font-semibold text-gray-900 mb-4">Basic Information</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Region <span className="text-red-500">*</span>
-                  </label>
-                  <RegionSelect
-                    value={formData.region}
-                    onChange={(value) => setFormData((prev) => ({ ...prev, region: value }))}
-                    placeholder="Select a region"
-                  />
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Region <span className="text-red-500">*</span>
+                    </label>
+                    <RegionSelect
+                      value={formData.region}
+                      onChange={(value) => setFormData((prev) => ({ ...prev, region: value }))}
+                      placeholder="Select a region"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Add Inspection Dates <span className="text-red-500">*</span>
+                    </label>
+                    <div className="flex gap-2">
+                      <Input
+                        type="date"
+                        id="date-picker"
+                        min={minDate}
+                        className="flex-1"
+                        onChange={(e) => {
+                          if (e.target.value) {
+                            handleAddDate(e.target.value);
+                            e.target.value = "";
+                          }
+                        }}
+                      />
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Select multiple dates for batch schedule creation
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Inspection Date <span className="text-red-500">*</span>
-                  </label>
-                  <Input
-                    type="date"
-                    name="schedule_date"
-                    value={formData.schedule_date}
-                    onChange={handleChange}
-                    min={minDate}
-                    className="w-full"
-                  />
-                </div>
+
+                {/* Selected Dates Display */}
+                {selectedDates.length > 0 && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Selected Dates ({selectedDates.length})
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedDates.map((date) => (
+                        <span
+                          key={date}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-purple-50 border border-purple-200 rounded-full text-sm text-purple-700"
+                        >
+                          {new Date(date).toLocaleDateString("en-AU", {
+                            weekday: "short",
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          })}
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveDate(date)}
+                            className="ml-1 text-purple-500 hover:text-purple-700"
+                          >
+                            <KeenIcon icon="cross" className="text-xs" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -329,12 +409,14 @@ export default function CreateSchedulePage() {
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={loading || !formData.region || !formData.schedule_date}>
+              <Button type="submit" disabled={loading || !formData.region || selectedDates.length === 0}>
                 {loading ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
                     Creating...
                   </>
+                ) : selectedDates.length > 1 ? (
+                  `Create ${selectedDates.length} Schedules`
                 ) : (
                   "Create Schedule"
                 )}
