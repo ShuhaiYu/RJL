@@ -104,7 +104,7 @@ export default function TaskDetailPage() {
           nextStatus: "PROCESSING",
           fieldLabel: "Enter Inspection Date",
           fieldKey: "inspection_date",
-          inputType: "date",
+          inputType: "datetime-local",
         };
       case "PROCESSING":
         return {
@@ -192,7 +192,7 @@ export default function TaskDetailPage() {
     const payload = { status: nextStatus };
     if (fieldKey && statusModalInput) {
       payload[fieldKey] =
-        inputType === "date"
+        inputType === "date" || inputType === "datetime-local"
           ? new Date(statusModalInput).toISOString()
           : statusModalInput;
     }
