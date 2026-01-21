@@ -18,6 +18,7 @@ import { EditContactForm } from "../contact/blocks/EditContactForm";
 import { Box, CircularProgress } from "@mui/material";
 import TaskDetailModal from "./blocks/TaskDetailModal";
 import { KeenIcon } from "@/components";
+import { sanitizeWithLineBreaks } from "@/utils";
 
 export default function TaskDetailPage() {
   const navigate = useNavigate();
@@ -514,10 +515,10 @@ export default function TaskDetailPage() {
                 <KeenIcon icon="note" className="text-lg text-gray-500" />
                 <span className="text-sm font-medium text-gray-500">Description</span>
               </div>
-              <div 
+              <div
                 className="text-lg text-gray-900 ml-7"
                 dangerouslySetInnerHTML={{
-                  __html: task.task_description?.replace(/\n/g, "<br />") || "No description",
+                  __html: sanitizeWithLineBreaks(task.task_description) || "No description",
                 }}
               />
             </div>

@@ -251,7 +251,7 @@ function RegionConfigCard({ config, onConfigure, isExpanded, onToggle }) {
 }
 
 // ===================== Schedule Card =====================
-function ScheduleCard({ schedule, onSendLinks }) {
+function ScheduleCard({ schedule, onSendLinks, canManage }) {
   const navigate = useNavigate();
 
   const formatDate = (dateStr) => {
@@ -330,20 +330,22 @@ function ScheduleCard({ schedule, onSendLinks }) {
             <Button
               variant="outline"
               size="sm"
-              className="flex-1"
+              className={canManage ? "flex-1" : "w-full"}
               onClick={() => navigate(`/inspection/schedules/${schedule.id}`)}
             >
               <KeenIcon icon="eye" className="text-sm mr-1" />
               View
             </Button>
-            <Button
-              size="sm"
-              className="flex-1 bg-blue-600 hover:bg-blue-700"
-              onClick={() => onSendLinks(schedule)}
-            >
-              <KeenIcon icon="sms" className="text-sm mr-1" />
-              Send Links
-            </Button>
+            {canManage && (
+              <Button
+                size="sm"
+                className="flex-1 bg-blue-600 hover:bg-blue-700"
+                onClick={() => onSendLinks(schedule)}
+              >
+                <KeenIcon icon="sms" className="text-sm mr-1" />
+                Send Links
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -352,7 +354,7 @@ function ScheduleCard({ schedule, onSendLinks }) {
 }
 
 // ===================== Pending Booking Card =====================
-function PendingBookingCard({ booking, onConfirm, onReject }) {
+function PendingBookingCard({ booking, onConfirm, onReject, canManage }) {
   const formatDate = (dateStr) => {
     return new Date(dateStr).toLocaleDateString("en-AU", {
       month: "short",
@@ -384,23 +386,25 @@ function PendingBookingCard({ booking, onConfirm, onReject }) {
           </p>
         </div>
       </div>
-      <div className="flex gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex-1 text-red-600 hover:bg-red-50 border-red-200"
-          onClick={() => onReject(booking)}
-        >
-          Reject
-        </Button>
-        <Button
-          size="sm"
-          className="flex-1 bg-green-600 hover:bg-green-700"
-          onClick={() => onConfirm(booking)}
-        >
-          Confirm
-        </Button>
-      </div>
+      {canManage && (
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1 text-red-600 hover:bg-red-50 border-red-200"
+            onClick={() => onReject(booking)}
+          >
+            Reject
+          </Button>
+          <Button
+            size="sm"
+            className="flex-1 bg-green-600 hover:bg-green-700"
+            onClick={() => onConfirm(booking)}
+          >
+            Confirm
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
@@ -408,8 +412,11 @@ function PendingBookingCard({ booking, onConfirm, onReject }) {
 // ===================== Main Dashboard Component =====================
 export default function InspectionDashboardPage() {
   const navigate = useNavigate();
-  const { baseApi, auth } = useAuthContext();
+  const { baseApi, auth, currentUser } = useAuthContext();
   const token = auth?.accessToken;
+
+  // Check if user can manage inspections (create/update/delete/confirm/reject)
+  const canManageInspection = ['superuser', 'admin'].includes(currentUser?.role);
 
   // Data states
   const [configs, setConfigs] = useState([]);
@@ -717,10 +724,11 @@ export default function InspectionDashboardPage() {
           />
         </div>
 
-        {/* Workflow Indicator */}
-        <WorkflowIndicator currentStep={currentStep} />
+        {/* Workflow Indicator - Only show for admins */}
+        {canManageInspection && <WorkflowIndicator currentStep={currentStep} />}
 
-        {/* Main Content Grid */}
+        {/* Main Content Grid - Only show for admins */}
+        {canManageInspection && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* Left Panel: Region Configuration */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -931,6 +939,7 @@ export default function InspectionDashboardPage() {
             </div>
           </div>
         </div>
+        )}
 
         {/* Recent Schedules Section */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
@@ -975,6 +984,7 @@ export default function InspectionDashboardPage() {
                   key={schedule.id}
                   schedule={schedule}
                   onSendLinks={handleSendLinks}
+                  canManage={canManageInspection}
                 />
               ))}
             </div>
@@ -1012,6 +1022,7 @@ export default function InspectionDashboardPage() {
                   booking={booking}
                   onConfirm={(b) => setConfirmDialog({ open: true, booking: b })}
                   onReject={(b) => setRejectDialog({ open: true, booking: b })}
+                  canManage={canManageInspection}
                 />
               ))}
             </div>

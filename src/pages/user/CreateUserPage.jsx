@@ -10,42 +10,54 @@ import { useNavigate } from "react-router-dom";
 import { KeenIcon } from "@/components/keenicons";
 import StatsCards from "@/components/common/StatsCards";
 
-// Available permission scopes/values
+// Available permission scopes/values (must match backend PERMISSION_SCOPE)
 const permissionOptions = {
   user: ["create", "read", "update", "delete"],
   agency: ["create", "read", "update", "delete"],
   property: ["create", "read", "update", "delete"],
   task: ["create", "read", "update", "delete"],
   contact: ["create", "read", "update", "delete"],
-  role: ["create", "read", "update", "delete"],
+  email: ["create", "read", "update", "delete"],
+  veu_project: ["create", "read", "update", "delete"],
+  setting: ["create", "read", "update", "delete"],
+  inspection: ["create", "read", "update", "delete"],
 };
 
 // Default permission sets for each role we can create
-// Adjust these defaults based on your actual needs
+// Must match backend permissionRepository.assignDefaultPermissions
 const defaultRolePermissions = {
   admin: {
-    user: ["create", "read", "update", "delete"],
-    agency: ["create", "read", "update", "delete"],
-    property: ["create", "read", "update", "delete"],
-    task: ["create", "read", "update", "delete"],
-    contact: ["create", "read", "update", "delete"],
-    role: ["create", "read", "update", "delete"],
-  },
-  "agency-admin": {
     user: ["create", "read", "update"],
-    agency: ["read", "update"],
+    agency: ["create", "read", "update"],
     property: ["create", "read", "update"],
     task: ["create", "read", "update"],
     contact: ["create", "read", "update"],
-    role: [], // agency-admin typically can't manage roles
+    email: ["create", "read", "update"],
+    veu_project: ["create", "read", "update"],
+    setting: ["create", "read", "update"],
+    inspection: ["create", "read", "update"],
+  },
+  "agency-admin": {
+    user: ["create", "read", "update"],
+    agency: ["create", "read", "update"],
+    property: ["create", "read", "update"],
+    task: ["create", "read", "update"],
+    contact: ["create", "read", "update"],
+    email: ["create", "read", "update"],
+    veu_project: ["create", "read", "update"],
+    setting: ["create", "read", "update"],
+    inspection: ["create", "read", "update"],
   },
   "agency-user": {
     user: ["read"],
     agency: ["read"],
-    property: ["read", "update"],
-    task: ["create", "read", "update"],
-    contact: ["create", "read", "update"],
-    role: [], // no role management
+    property: ["read"],
+    task: ["read"],
+    contact: ["read"],
+    email: ["read"],
+    veu_project: ["read"],
+    setting: ["read"],
+    inspection: ["read"],
   },
 };
 
@@ -311,6 +323,19 @@ export default function CreateUserPage() {
       permissions
     );
 
+    // Convert permissions from object format { scope: [values] } to array format
+    // Backend expects: [{ permission_value: 'create', permission_scope: 'user' }, ...]
+    const permissionsArray = [];
+    for (const scope of Object.keys(finalPermissions)) {
+      const values = finalPermissions[scope] || [];
+      for (const value of values) {
+        permissionsArray.push({
+          permission_value: value,
+          permission_scope: scope,
+        });
+      }
+    }
+
     // Construct payload for register
     const payload = {
       email: form.email,
@@ -318,7 +343,7 @@ export default function CreateUserPage() {
       name: form.name,
       role: form.role,
       agency_id: finalAgencyId,
-      permissions: finalPermissions, // We assume the backend can handle this
+      permissions: permissionsArray,
     };
 
     // Confirm
@@ -612,14 +637,14 @@ export default function CreateUserPage() {
                       required
                       className="h-11 transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400"
                     />
-                    {form.password && form.password.length >= 6 && (
+                    {form.password && form.password.length >= 8 && (
                       <KeenIcon icon="check" className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 text-sm animate-in fade-in duration-200" />
                     )}
                   </div>
-                  {form.password && form.password.length < 6 && (
+                  {form.password && form.password.length < 8 && (
                     <p className="text-xs text-amber-600 flex items-center gap-1 animate-in slide-in-from-top-1 duration-200">
                       <KeenIcon icon="information" className="text-xs" />
-                      Password should be at least 6 characters
+                      Password must be at least 8 characters
                     </p>
                   )}
                 </div>
@@ -748,16 +773,20 @@ export default function CreateUserPage() {
                                <div className={`w-6 h-6 rounded-md flex items-center justify-center transition-all duration-300 ${
                                  hasPermissions ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500'
                                }`}>
-                                 <KeenIcon 
+                                 <KeenIcon
                                    icon={
                                      scope === 'user' ? 'profile-circle' :
                                      scope === 'agency' ? 'office-bag' :
                                      scope === 'property' ? 'home-2' :
                                      scope === 'task' ? 'notepad-edit' :
                                      scope === 'contact' ? 'phone' :
+                                     scope === 'email' ? 'sms' :
+                                     scope === 'veu_project' ? 'wrench' :
+                                     scope === 'setting' ? 'setting-2' :
+                                     scope === 'inspection' ? 'calendar' :
                                      'security-user'
-                                   } 
-                                   className="text-xs" 
+                                   }
+                                   className="text-xs"
                                  />
                                </div>
                                <h5 className={`text-sm font-semibold uppercase tracking-wide transition-colors ${

@@ -1,4 +1,4 @@
-import { toAbsoluteUrl } from '@/utils';
+import { toAbsoluteUrl, sanitizeHtml } from '@/utils';
 import { KeenIcon } from '@/components';
 import clsx from 'clsx';
 const DropdownChatMessageOut = ({
@@ -9,7 +9,7 @@ const DropdownChatMessageOut = ({
   return <div className="flex items-end justify-end gap-3.5 px-5">
       <div className="flex flex-col gap-1.5">
         <div className="card shadow-none flex bg-primary text-primary-inverse text-2sm font-medium flex-col gap-2.5 p-3 rounded-be-none" dangerouslySetInnerHTML={{
-        __html: text
+        __html: sanitizeHtml(text)
       }} />
 
         <div className="flex items-center justify-end relative">

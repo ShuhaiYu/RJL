@@ -70,8 +70,11 @@ function NotificationItem({ notification }) {
 export default function ScheduleDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { baseApi, auth } = useAuthContext();
+  const { baseApi, auth, currentUser } = useAuthContext();
   const token = auth?.accessToken;
+
+  // Check if user can manage inspections (create/update/delete/send notifications)
+  const canManageInspection = ['superuser', 'admin'].includes(currentUser?.role);
 
   const [schedule, setSchedule] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -259,42 +262,44 @@ export default function ScheduleDetailPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              <Button
-                onClick={openSendDialog}
-                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
-              >
-                <KeenIcon icon="sms" className="text-sm" />
-                Send Booking Links
-              </Button>
-              <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="outline" className="text-red-600 border-red-200 hover:bg-red-50">
-                    <KeenIcon icon="trash" className="text-sm" />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Delete Schedule</DialogTitle>
-                    <DialogDescription>
-                      Are you sure you want to delete this inspection schedule? This action cannot be undone.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <DialogFooter>
-                    <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
-                      Cancel
+            {canManageInspection && (
+              <div className="flex items-center gap-3">
+                <Button
+                  onClick={openSendDialog}
+                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
+                >
+                  <KeenIcon icon="sms" className="text-sm" />
+                  Send Booking Links
+                </Button>
+                <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="text-red-600 border-red-200 hover:bg-red-50">
+                      <KeenIcon icon="trash" className="text-sm" />
                     </Button>
-                    <Button
-                      onClick={handleDelete}
-                      disabled={deleting}
-                      className="bg-red-600 hover:bg-red-700"
-                    >
-                      {deleting ? "Deleting..." : "Delete"}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </div>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Delete Schedule</DialogTitle>
+                      <DialogDescription>
+                        Are you sure you want to delete this inspection schedule? This action cannot be undone.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+                        Cancel
+                      </Button>
+                      <Button
+                        onClick={handleDelete}
+                        disabled={deleting}
+                        className="bg-red-600 hover:bg-red-700"
+                      >
+                        {deleting ? "Deleting..." : "Delete"}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            )}
           </div>
         </div>
 
@@ -382,15 +387,21 @@ export default function ScheduleDetailPage() {
                     <KeenIcon icon="sms" className="text-xl text-gray-400" />
                   </div>
                   <p className="text-gray-500 mb-1">No booking links sent yet</p>
-                  <p className="text-gray-400 text-xs mb-3">Send booking links to property contacts via email</p>
-                  <Button
-                    size="sm"
-                    className="bg-blue-600 hover:bg-blue-700"
-                    onClick={openSendDialog}
-                  >
-                    <KeenIcon icon="sms" className="text-sm mr-1" />
-                    Send Booking Links
-                  </Button>
+                  <p className="text-gray-400 text-xs mb-3">
+                    {canManageInspection
+                      ? "Send booking links to property contacts via email"
+                      : "No booking links have been sent for this schedule"}
+                  </p>
+                  {canManageInspection && (
+                    <Button
+                      size="sm"
+                      className="bg-blue-600 hover:bg-blue-700"
+                      onClick={openSendDialog}
+                    >
+                      <KeenIcon icon="sms" className="text-sm mr-1" />
+                      Send Booking Links
+                    </Button>
+                  )}
                 </div>
               )}
             </div>

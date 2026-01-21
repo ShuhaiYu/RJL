@@ -33,7 +33,9 @@ export default function ContactPage() {
       const response = await axios.get(`${baseApi}/contacts`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setContacts(response.data);
+      // Backend returns { success: true, data: [...] }
+      const contacts = response.data?.data || response.data || [];
+      setContacts(Array.isArray(contacts) ? contacts : []);
     } catch (err) {
       console.error(err);
     } finally {

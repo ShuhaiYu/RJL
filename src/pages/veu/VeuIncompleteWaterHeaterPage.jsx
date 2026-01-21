@@ -31,15 +31,26 @@ export default function VeuIncompleteWaterHeaterPage() {
     setError("");
     try {
       const { data } = await axios.get(
-        `${baseApi}/veu/incomplete/water-heater`,
+        `${baseApi}/veu-projects?is_completed=false&type=water_heater`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      let list = Array.isArray(data) ? data : [];
+      // Backend returns { success: true, data: [...], pagination: {...} }
+      let list = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
       if (agencyIdFromState) {
-        list = list.filter((r) => r.agency_id === agencyIdFromState);
+        list = list.filter((r) => r.agency?.id === agencyIdFromState);
       }
-      setItems(list);
-      setStats({ total: list.length, filtered: list.length });
+      // Transform to expected format
+      const transformedList = list.map(item => ({
+        id: item.id,
+        property_id: item.property_id,
+        property_address: item.property?.address,
+        price: item.price,
+        agency_id: item.agency?.id,
+        agency_name: item.agency?.agency_name,
+        updated_at: item.updated_at,
+      }));
+      setItems(transformedList);
+      setStats({ total: transformedList.length, filtered: transformedList.length });
     } catch (err) {
       const msg =
         err.response?.data?.message || "Failed to fetch Water Heater list";

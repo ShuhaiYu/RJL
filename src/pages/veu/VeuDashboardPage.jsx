@@ -34,15 +34,54 @@ export default function VeuDashboardPage() {
     setErr("");
     setOverview(null);
     axios
-      .get(`${baseApi}/veu/report/overview`, { headers: authHeader })
+      .get(`${baseApi}/veu-projects/overview`, { headers: authHeader })
       .then((res) => {
-        const data = res.data || {};
-        const agencies = Array.isArray(data.agencies) ? data.agencies : [];
-        setOverview({ ...data, agencies });
+        // Backend returns { success: true, data: [...agencies] }
+        const rawData = res.data?.data || res.data || [];
+        const agencies = Array.isArray(rawData) ? rawData : [];
+
+        // Transform backend data to frontend expected format
+        const transformedAgencies = agencies.map(agency => {
+          // Calculate metrics from properties
+          const totalProps = agency.total_properties || 0;
+          const whCompleted = agency.water_heater_completed || 0;
+          const acCompleted = agency.air_conditioner_completed || 0;
+
+          // Count incomplete from properties
+          let whIncomplete = 0;
+          let acIncomplete = 0;
+          (agency.properties || []).forEach(prop => {
+            (prop.veu_projects || []).forEach(veu => {
+              if (veu.type === 'water_heater' && !veu.is_completed) whIncomplete++;
+              if (veu.type === 'air_conditioner' && !veu.is_completed) acIncomplete++;
+            });
+          });
+
+          return {
+            agency_id: agency.agency_id,
+            agency_name: agency.agency_name,
+            users: [], // Backend doesn't provide user breakdown
+            metrics: {
+              total_property_count: totalProps,
+              completed_property_count: whCompleted + acCompleted > 0 ? Math.min(whCompleted, acCompleted) : 0,
+              incomplete_total_count: whIncomplete + acIncomplete,
+              incomplete_water_heater_count: whIncomplete,
+              incomplete_air_conditioner_count: acIncomplete,
+            },
+            pie: {
+              ac_done_count: acCompleted,
+              ac_not_count: acIncomplete,
+              wh_done_count: whCompleted,
+              wh_not_count: whIncomplete,
+            },
+          };
+        });
+
+        setOverview({ agencies: transformedAgencies });
 
         // 默认选中第一个中介
-        if (agencies.length > 0) {
-          setSelectedAgencyId(agencies[0].agency_id ?? 0);
+        if (transformedAgencies.length > 0) {
+          setSelectedAgencyId(transformedAgencies[0].agency_id ?? 0);
         } else {
           setSelectedAgencyId(null);
         }

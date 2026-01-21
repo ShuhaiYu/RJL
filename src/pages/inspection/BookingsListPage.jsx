@@ -36,7 +36,7 @@ const STATUS_COLORS = {
   cancelled: "bg-gray-100 text-gray-700",
 };
 
-function BookingRow({ booking, onConfirm, onReject }) {
+function BookingRow({ booking, onConfirm, onReject, canManage }) {
   const formatDate = (dateStr) => {
     return new Date(dateStr).toLocaleDateString("en-AU", {
       year: "numeric",
@@ -83,37 +83,42 @@ function BookingRow({ booking, onConfirm, onReject }) {
       <td className="px-6 py-4">
         <p className="text-sm text-gray-500">{formatDate(booking.created_at)}</p>
       </td>
-      <td className="px-6 py-4 text-right">
-        {booking.status === "pending" && (
-          <div className="flex items-center justify-end gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onConfirm(booking)}
-              className="text-green-600 border-green-200 hover:bg-green-50"
-            >
-              <KeenIcon icon="check" className="text-sm mr-1" />
-              Confirm
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onReject(booking)}
-              className="text-red-600 border-red-200 hover:bg-red-50"
-            >
-              <KeenIcon icon="cross" className="text-sm mr-1" />
-              Reject
-            </Button>
-          </div>
-        )}
-      </td>
+      {canManage && (
+        <td className="px-6 py-4 text-right">
+          {booking.status === "pending" && (
+            <div className="flex items-center justify-end gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onConfirm(booking)}
+                className="text-green-600 border-green-200 hover:bg-green-50"
+              >
+                <KeenIcon icon="check" className="text-sm mr-1" />
+                Confirm
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onReject(booking)}
+                className="text-red-600 border-red-200 hover:bg-red-50"
+              >
+                <KeenIcon icon="cross" className="text-sm mr-1" />
+                Reject
+              </Button>
+            </div>
+          )}
+        </td>
+      )}
     </tr>
   );
 }
 
 export default function BookingsListPage() {
-  const { baseApi, auth } = useAuthContext();
+  const { baseApi, auth, currentUser } = useAuthContext();
   const token = auth?.accessToken;
+
+  // Check if user can manage bookings (confirm/reject/reschedule)
+  const canManageBooking = ['superuser', 'admin'].includes(currentUser?.role);
 
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -208,7 +213,7 @@ export default function BookingsListPage() {
               <p className="text-gray-600">Review and manage inspection bookings</p>
             </div>
           </div>
-          {pendingCount > 0 && (
+          {pendingCount > 0 && canManageBooking && (
             <div className="flex items-center gap-2 px-4 py-2 bg-yellow-50 border border-yellow-200 rounded-lg">
               <KeenIcon icon="notification-bing" className="text-yellow-600" />
               <span className="text-sm font-medium text-yellow-700">
@@ -282,9 +287,11 @@ export default function BookingsListPage() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Submitted
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
+                    {canManageBooking && (
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    )}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -294,6 +301,7 @@ export default function BookingsListPage() {
                       booking={booking}
                       onConfirm={(b) => setConfirmDialog({ open: true, booking: b })}
                       onReject={(b) => setRejectDialog({ open: true, booking: b })}
+                      canManage={canManageBooking}
                     />
                   ))}
                 </tbody>

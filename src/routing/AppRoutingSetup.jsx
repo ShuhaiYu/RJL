@@ -29,6 +29,7 @@ import VeuIncompleteListPage from "../pages/veu/VeuIncompleteListPage";
 import VeuIncompleteWaterHeaterPage from "../pages/veu/VeuIncompleteWaterHeaterPage";
 import VeuIncompleteAirConditionerPage from "../pages/veu/VeuIncompleteAirConditionerPage";
 import InspectionDashboardPage from "../pages/inspection/InspectionDashboardPage";
+import InspectionSchedulesPage from "../pages/inspection/InspectionSchedulesPage";
 import ScheduleDetailPage from "../pages/inspection/ScheduleDetailPage";
 import BookingsListPage from "../pages/inspection/BookingsListPage";
 import PublicBookingPage from "../pages/public/PublicBookingPage";
@@ -97,6 +98,7 @@ const AppRoutingSetup = () => {
           {/* Inspection */}
           <Route path="/inspection">
             <Route index element={<InspectionDashboardPage />} />
+            <Route path="schedules" element={<InspectionSchedulesPage />} />
             <Route path="schedules/:id" element={<ScheduleDetailPage />} />
             <Route path="bookings" element={<BookingsListPage />} />
           </Route>

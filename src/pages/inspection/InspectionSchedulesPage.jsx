@@ -84,8 +84,11 @@ function ScheduleCard({ schedule, onClick }) {
 
 export default function InspectionSchedulesPage() {
   const navigate = useNavigate();
-  const { baseApi, auth } = useAuthContext();
+  const { baseApi, auth, currentUser } = useAuthContext();
   const token = auth?.accessToken;
+
+  // Check if user can manage inspections (create/update/delete)
+  const canManageInspection = ['superuser', 'admin'].includes(currentUser?.role);
 
   const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -132,13 +135,15 @@ export default function InspectionSchedulesPage() {
               <p className="text-gray-600">Manage inspection schedules by region and date</p>
             </div>
           </div>
-          <Button
-            onClick={() => navigate("/inspection/schedules/create")}
-            className="flex items-center gap-2"
-          >
-            <KeenIcon icon="plus" className="text-sm" />
-            Create Schedule
-          </Button>
+          {canManageInspection && (
+            <Button
+              onClick={() => navigate("/inspection/schedules/create")}
+              className="flex items-center gap-2"
+            >
+              <KeenIcon icon="plus" className="text-sm" />
+              Create Schedule
+            </Button>
+          )}
         </div>
 
         {/* Filters */}
@@ -186,11 +191,15 @@ export default function InspectionSchedulesPage() {
             <p className="text-gray-500 mb-4">
               {filters.region || filters.status !== "all"
                 ? "No schedules match the current filters"
-                : "Create your first inspection schedule to get started"}
+                : canManageInspection
+                  ? "Create your first inspection schedule to get started"
+                  : "No inspection schedules available"}
             </p>
-            <Button onClick={() => navigate("/inspection/schedules/create")}>
-              Create Schedule
-            </Button>
+            {canManageInspection && (
+              <Button onClick={() => navigate("/inspection/schedules/create")}>
+                Create Schedule
+              </Button>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
