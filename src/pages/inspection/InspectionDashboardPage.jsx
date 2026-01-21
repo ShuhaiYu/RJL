@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router";
 import axios from "axios";
 import { useAuthContext } from "@/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { KeenIcon } from "@/components";
 import RegionSelect, { getRegionLabel } from "@/components/custom/RegionSelect";
@@ -434,6 +435,7 @@ export default function InspectionDashboardPage() {
   const [batchResult, setBatchResult] = useState(null);
   const [previewData, setPreviewData] = useState(null);
   const [loadingPreview, setLoadingPreview] = useState(false);
+  const [selectedRecipients, setSelectedRecipients] = useState([]);
 
   // Dialog states
   const [confirmDialog, setConfirmDialog] = useState({ open: false, booking: null });
@@ -506,6 +508,25 @@ export default function InspectionDashboardPage() {
         `${baseApi}/inspection/preview-recipients/${createFormData.region}`
       );
       setPreviewData(response.data);
+
+      // Initialize selectedRecipients with all recipients (default: all selected)
+      const allRecipients = [];
+      for (const property of response.data.properties || []) {
+        for (const recipient of property.recipients || []) {
+          allRecipients.push({
+            property_id: property.id,
+            contact_id: recipient.type === 'contact' ? recipient.id : null,
+            user_id: recipient.type === 'agencyUser' ? recipient.id : null,
+            type: recipient.type,
+            email: recipient.email,
+            name: recipient.name,
+            // For UI tracking
+            _key: `${property.id}:${recipient.email}`,
+          });
+        }
+      }
+      setSelectedRecipients(allRecipients);
+
       setPreviewDialog({ open: true });
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to load preview");
@@ -552,10 +573,14 @@ export default function InspectionDashboardPage() {
 
     setCreating(true);
     try {
-      // Call batch API with multiple dates
+      // Prepare selected recipients for API (remove UI-only fields)
+      const recipientsForApi = selectedRecipients.map(({ _key, ...rest }) => rest);
+
+      // Call batch API with multiple dates and selected recipients
       const response = await axios.post(`${baseApi}/inspection/schedules/batch`, {
         region: createFormData.region,
         dates: createFormData.selectedDates,
+        selected_recipients: recipientsForApi.length > 0 ? recipientsForApi : undefined,
       });
 
       const result = response.data;
@@ -573,9 +598,22 @@ export default function InspectionDashboardPage() {
         toast.error(`${result.failed.length} schedule(s) failed`);
       }
 
+      // Show notification results if any
+      if (result.notifications) {
+        const notifSuccess = result.notifications.success?.length || 0;
+        const notifFailed = result.notifications.failed?.length || 0;
+        if (notifSuccess > 0) {
+          toast.success(`Sent ${notifSuccess} booking invitation(s)`);
+        }
+        if (notifFailed > 0) {
+          toast.error(`${notifFailed} invitation(s) failed to send`);
+        }
+      }
+
       setCreateFormData({ region: "", selectedDates: [] });
       setPreviewDialog({ open: false });
       setPreviewData(null);
+      setSelectedRecipients([]);
       await fetchAllData();
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to create schedules");
@@ -587,6 +625,65 @@ export default function InspectionDashboardPage() {
   const handleSendLinks = (schedule) => {
     navigate(`/inspection/schedules/${schedule.id}`);
   };
+
+  // ==================== Recipient Selection Functions ====================
+  const isRecipientSelected = (propertyId, email) => {
+    const key = `${propertyId}:${email}`;
+    return selectedRecipients.some((r) => r._key === key);
+  };
+
+  const toggleRecipient = (property, recipient) => {
+    const key = `${property.id}:${recipient.email}`;
+    const isSelected = selectedRecipients.some((r) => r._key === key);
+
+    if (isSelected) {
+      setSelectedRecipients((prev) => prev.filter((r) => r._key !== key));
+    } else {
+      setSelectedRecipients((prev) => [
+        ...prev,
+        {
+          property_id: property.id,
+          contact_id: recipient.type === 'contact' ? recipient.id : null,
+          user_id: recipient.type === 'agencyUser' ? recipient.id : null,
+          type: recipient.type,
+          email: recipient.email,
+          name: recipient.name,
+          _key: key,
+        },
+      ]);
+    }
+  };
+
+  const selectAllRecipients = () => {
+    const allRecipients = [];
+    for (const property of previewData?.properties || []) {
+      for (const recipient of property.recipients || []) {
+        allRecipients.push({
+          property_id: property.id,
+          contact_id: recipient.type === 'contact' ? recipient.id : null,
+          user_id: recipient.type === 'agencyUser' ? recipient.id : null,
+          type: recipient.type,
+          email: recipient.email,
+          name: recipient.name,
+          _key: `${property.id}:${recipient.email}`,
+        });
+      }
+    }
+    setSelectedRecipients(allRecipients);
+  };
+
+  const deselectAllRecipients = () => {
+    setSelectedRecipients([]);
+  };
+
+  // Calculate total possible recipients from previewData
+  const totalPossibleRecipients = useMemo(() => {
+    if (!previewData?.properties) return 0;
+    return previewData.properties.reduce(
+      (sum, p) => sum + (p.recipients?.length || 0),
+      0
+    );
+  }, [previewData]);
 
   // ==================== Booking Functions ====================
   const handleConfirmBooking = async () => {
@@ -1202,18 +1299,43 @@ export default function InspectionDashboardPage() {
                   </div>
                   <div className="bg-purple-50 rounded-lg p-3 text-center">
                     <p className="text-2xl font-bold text-purple-600">
-                      {previewData.summary?.total_recipients || 0}
+                      {selectedRecipients.length}
+                      <span className="text-sm text-purple-400">/{totalPossibleRecipients}</span>
                     </p>
-                    <p className="text-xs text-gray-500">Total Emails</p>
+                    <p className="text-xs text-gray-500">Selected to Email</p>
                   </div>
                 </div>
 
                 {/* Properties List */}
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                    <KeenIcon icon="home-2" className="text-sm" />
-                    Properties & Recipients ({previewData.properties?.length || 0})
-                  </h4>
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                      <KeenIcon icon="home-2" className="text-sm" />
+                      Properties & Recipients ({previewData.properties?.length || 0})
+                    </h4>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={selectAllRecipients}
+                        disabled={selectedRecipients.length === totalPossibleRecipients}
+                        className="h-7 text-xs"
+                      >
+                        Select All
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={deselectAllRecipients}
+                        disabled={selectedRecipients.length === 0}
+                        className="h-7 text-xs"
+                      >
+                        Deselect All
+                      </Button>
+                    </div>
+                  </div>
                   <div className="space-y-2 max-h-[300px] overflow-y-auto border rounded-lg">
                     {previewData.properties?.map((property) => (
                       <div
@@ -1244,24 +1366,45 @@ export default function InspectionDashboardPage() {
                           </span>
                         </div>
                         {property.recipients?.length > 0 && (
-                          <div className="mt-2 flex flex-wrap gap-1">
-                            {property.recipients.map((recipient, idx) => (
-                              <span
-                                key={idx}
-                                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs ${
-                                  recipient.type === "contact"
-                                    ? "bg-blue-50 text-blue-700"
-                                    : "bg-purple-50 text-purple-700"
-                                }`}
-                              >
-                                <KeenIcon
-                                  icon={recipient.type === "contact" ? "profile-circle" : "security-user"}
-                                  className="text-[10px]"
-                                />
-                                {recipient.name}
-                                <span className="text-gray-400">({recipient.email})</span>
-                              </span>
-                            ))}
+                          <div className="mt-2 space-y-1">
+                            {property.recipients.map((recipient, idx) => {
+                              const isSelected = isRecipientSelected(property.id, recipient.email);
+                              return (
+                                <label
+                                  key={idx}
+                                  className={`flex items-center gap-2 px-2 py-1.5 rounded cursor-pointer transition-colors ${
+                                    isSelected
+                                      ? recipient.type === "contact"
+                                        ? "bg-blue-100 hover:bg-blue-150"
+                                        : "bg-purple-100 hover:bg-purple-150"
+                                      : "bg-gray-50 hover:bg-gray-100"
+                                  }`}
+                                >
+                                  <Checkbox
+                                    checked={isSelected}
+                                    onCheckedChange={() => toggleRecipient(property, recipient)}
+                                    className="h-4 w-4"
+                                  />
+                                  <KeenIcon
+                                    icon={recipient.type === "contact" ? "profile-circle" : "security-user"}
+                                    className={`text-xs ${
+                                      recipient.type === "contact" ? "text-blue-600" : "text-purple-600"
+                                    }`}
+                                  />
+                                  <span className="text-sm text-gray-900">{recipient.name}</span>
+                                  <span className="text-xs text-gray-400">({recipient.email})</span>
+                                  <span
+                                    className={`ml-auto text-[10px] px-1.5 py-0.5 rounded ${
+                                      recipient.type === "contact"
+                                        ? "bg-blue-50 text-blue-600"
+                                        : "bg-purple-50 text-purple-600"
+                                    }`}
+                                  >
+                                    {recipient.type === "contact" ? "Contact" : "Agency"}
+                                  </span>
+                                </label>
+                              );
+                            })}
                           </div>
                         )}
                         {!property.has_recipients && (
@@ -1276,33 +1419,46 @@ export default function InspectionDashboardPage() {
               </div>
             )}
 
-            <DialogFooter className="mt-4">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setPreviewDialog({ open: false });
-                  setPreviewData(null);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleCreateSchedule}
-                disabled={creating}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                {creating ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                    Creating...
-                  </>
+            <DialogFooter className="mt-4 flex-col sm:flex-row gap-2">
+              <div className="flex-1 text-sm text-gray-500 hidden sm:block">
+                {selectedRecipients.length > 0 ? (
+                  <span className="flex items-center gap-1">
+                    <KeenIcon icon="sms" className="text-purple-500" />
+                    {selectedRecipients.length} email{selectedRecipients.length !== 1 ? "s" : ""} will be sent
+                  </span>
                 ) : (
-                  <>
-                    <KeenIcon icon="check" className="text-sm mr-1" />
-                    Create {createFormData.selectedDates.length} Schedule(s)
-                  </>
+                  <span className="text-yellow-600">No recipients selected - emails will not be sent</span>
                 )}
-              </Button>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setPreviewDialog({ open: false });
+                    setPreviewData(null);
+                    setSelectedRecipients([]);
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleCreateSchedule}
+                  disabled={creating}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  {creating ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                      Creating & Sending...
+                    </>
+                  ) : (
+                    <>
+                      <KeenIcon icon="check" className="text-sm mr-1" />
+                      Create & Send ({selectedRecipients.length})
+                    </>
+                  )}
+                </Button>
+              </div>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -1397,6 +1553,70 @@ export default function InspectionDashboardPage() {
                         </p>
                       ))}
                     </div>
+                  </div>
+                )}
+
+                {/* Notification Results */}
+                {batchResult.notifications && (
+                  <div className="border-t pt-4 mt-4">
+                    <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                      <KeenIcon icon="sms" className="text-purple-600" />
+                      Email Notifications
+                    </h4>
+
+                    {/* Success notifications */}
+                    {batchResult.notifications.success?.length > 0 && (
+                      <div className="bg-purple-50 rounded-lg p-3 border border-purple-200 mb-2">
+                        <div className="flex items-center gap-2 mb-1">
+                          <KeenIcon icon="check" className="text-purple-600 text-sm" />
+                          <span className="font-medium text-purple-800 text-sm">
+                            Sent ({batchResult.notifications.success.length})
+                          </span>
+                        </div>
+                        <p className="text-xs text-purple-600">
+                          Booking invitations sent successfully
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Skipped notifications */}
+                    {batchResult.notifications.skipped?.length > 0 && (
+                      <div className="bg-gray-50 rounded-lg p-3 border border-gray-200 mb-2">
+                        <div className="flex items-center gap-2 mb-1">
+                          <KeenIcon icon="information-2" className="text-gray-600 text-sm" />
+                          <span className="font-medium text-gray-800 text-sm">
+                            Skipped ({batchResult.notifications.skipped.length})
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-600">
+                          Already notified for this schedule
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Failed notifications */}
+                    {batchResult.notifications.failed?.length > 0 && (
+                      <div className="bg-red-50 rounded-lg p-3 border border-red-200">
+                        <div className="flex items-center gap-2 mb-1">
+                          <KeenIcon icon="cross-circle" className="text-red-600 text-sm" />
+                          <span className="font-medium text-red-800 text-sm">
+                            Failed ({batchResult.notifications.failed.length})
+                          </span>
+                        </div>
+                        <p className="text-xs text-red-600">
+                          Some emails could not be sent
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Error message */}
+                    {batchResult.notifications.error && (
+                      <div className="bg-red-50 rounded-lg p-3 border border-red-200">
+                        <p className="text-sm text-red-700">
+                          Error: {batchResult.notifications.error}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
