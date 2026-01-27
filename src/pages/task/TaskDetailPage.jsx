@@ -93,32 +93,32 @@ export default function TaskDetailPage() {
    */
   const getNextStatusAndField = (currentStatus) => {
     switch (currentStatus) {
-      case "UNKNOWN":
+      case "unknown":
         return {
-          nextStatus: "INCOMPLETE",
+          nextStatus: "incomplete",
           fieldLabel: "Select Type",
           fieldKey: "type",
           inputType: "select",
         };
-      case "INCOMPLETE":
+      case "incomplete":
         return {
-          nextStatus: "PROCESSING",
+          nextStatus: "processing",
           fieldLabel: "Enter Inspection Date",
           fieldKey: "inspection_date",
           inputType: "datetime-local",
         };
-      case "PROCESSING":
+      case "processing":
         return {
-          nextStatus: "COMPLETED",
+          nextStatus: "completed",
           fieldLabel: "Enter Due Date",
           fieldKey: "due_date",
           inputType: "date",
         };
-      case "COMPLETED":
-      case "DUE SOON":
-      case "EXPIRED":
+      case "completed":
+      case "due soon":
+      case "expired":
         return {
-          nextStatus: "HISTORY",
+          nextStatus: "history",
           fieldLabel: "",
           fieldKey: "",
           inputType: "hidden",
@@ -167,8 +167,8 @@ export default function TaskDetailPage() {
 
   // 打开状态更新弹窗
   const handleOpenStatusModal = () => {
-    // 如果状态是 PROCESSING，则预计算默认 due date
-    if (task.status === "PROCESSING") {
+    // 如果状态是 processing，则预计算默认 due date
+    if (task.status === "processing") {
       const defaultDate = computeDefaultDueDate();
       setStatusModalInput(defaultDate);
     } else {
@@ -197,10 +197,10 @@ export default function TaskDetailPage() {
           ? new Date(statusModalInput).toISOString()
           : statusModalInput;
     }
-    // 如果是 UNKNOWN -> INCOMPLETE，并且用户勾选了“Archive conflicting job orders”
+    // 如果是 unknown -> incomplete，并且用户勾选了"Archive conflicting job orders"
     if (
-      task.status === "UNKNOWN" &&
-      nextStatus === "INCOMPLETE" &&
+      task.status === "unknown" &&
+      nextStatus === "incomplete" &&
       archiveConflicts
     ) {
       payload.archive_conflicts = true;
@@ -318,19 +318,19 @@ export default function TaskDetailPage() {
   // 辅助函数：根据状态返回对应的颜色类
   const getStatusColorClass = (status) => {
     switch (status) {
-      case "UNKNOWN":
+      case "unknown":
         return "text-red-500";
-      case "INCOMPLETE":
+      case "incomplete":
         return "text-yellow-500";
-      case "PROCESSING":
+      case "processing":
         return "text-blue-500";
-      case "COMPLETED":
+      case "completed":
         return "text-green-500";
-      case "DUE SOON":
+      case "due soon":
         return "text-orange-500";
-      case "EXPIRED":
+      case "expired":
         return "text-red-600";
-      case "HISTORY":
+      case "history":
         return "text-gray-500";
       default:
         return "text-gray-600";
@@ -340,15 +340,15 @@ export default function TaskDetailPage() {
   // 定义状态按钮文本，根据当前任务状态返回不同的文字
   const getStatusButtonLabel = () => {
     switch (task.status) {
-      case "UNKNOWN":
+      case "unknown":
         return "Check";
-      case "INCOMPLETE":
+      case "incomplete":
         return "Process";
-      case "PROCESSING":
+      case "processing":
         return "Complete";
-      case "COMPLETED":
-      case "DUE SOON":
-      case "EXPIRED":
+      case "completed":
+      case "due soon":
+      case "expired":
         return "Archive Task";
       default:
         return "Update Status";
@@ -429,7 +429,7 @@ export default function TaskDetailPage() {
 
             {/* 动态日期显示 */}
             {(() => {
-              if (task.status === "PROCESSING") {
+              if (task.status === "processing") {
                 return (
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
@@ -444,7 +444,7 @@ export default function TaskDetailPage() {
                   </div>
                 );
               } else if (
-                ["COMPLETED", "DUE SOON", "EXPIRED", "HISTORY"].includes(task.status)
+                ["completed", "due soon", "expired", "history"].includes(task.status)
               ) {
                 return (
                   <div className="space-y-2">
@@ -469,11 +469,12 @@ export default function TaskDetailPage() {
                 <KeenIcon icon="category" className="text-lg text-gray-500" />
                 <span className="text-sm font-medium text-gray-500">Type</span>
               </div>
-              <Link 
-                className="text-lg text-primary-600 hover:text-primary-700 font-medium ml-7" 
-                to={`/property/tasks?type=${encodeURIComponent(task.type.replace(/\s/g, '_'))}`}
+              <Link
+                className="text-lg text-primary-600 hover:text-primary-700 font-medium ml-7"
+                to={`/property/tasks?type=${encodeURIComponent(task.type)}`}
               >
-                {task.type}
+                {task.type === "SMOKE_ALARM" ? "Smoke Alarm" :
+                 task.type === "GAS_&_ELECTRICITY" ? "Gas & Electricity" : task.type}
               </Link>
             </div>
 
@@ -540,14 +541,14 @@ export default function TaskDetailPage() {
             <Button
               variant="edit"
               onClick={() => setShowEditModal(true)}
-              disabled={task.status === "COMPLETED" || task.status === "HISTORY"}
+              disabled={task.status === "completed" || task.status === "history"}
               className="flex items-center gap-2"
             >
               <KeenIcon icon="edit" className="text-sm" />
               Edit
             </Button>
-            
-            {task.status !== "HISTORY" && (
+
+            {task.status !== "history" && (
               <Button 
                 onClick={handleOpenStatusModal}
                 className="flex items-center gap-2"
@@ -806,12 +807,12 @@ export default function TaskDetailPage() {
                               }
                             >
                               <option value="">Select an option</option>
-                              <option value="GAS & ELECTRICITY">
+                              <option value="GAS_&_ELECTRICITY">
                                 Gas & Electricity
                               </option>
-                              <option value="SMOKE ALARM">Smoke Alarm</option>
+                              <option value="SMOKE_ALARM">Smoke Alarm</option>
                             </select>
-                            {task.status === "UNKNOWN" && (
+                            {task.status === "unknown" && (
                               <div className="flex items-center mt-3">
                                 <input
                                   type="checkbox"

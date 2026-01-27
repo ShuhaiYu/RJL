@@ -17,7 +17,7 @@ export default function TaskDetailModal({ task, onClose }) {
   const [inspectionDate, setInspectionDate] = useState(
     task.inspection_date || ""
   );
-  const validTypes = ["GAS & ELECTRICITY", "SMOKE ALARM"];
+  const validTypes = ["GAS_&_ELECTRICITY", "SMOKE_ALARM"];
   const [type, setType] = useState(
     validTypes.includes(task.type) ? task.type : "unknown"
   );
@@ -29,12 +29,12 @@ export default function TaskDetailModal({ task, onClose }) {
     task.agency_id || ""
   );
 
-  // 新增状态：status 根据 inspection_date 判断初始值（如果任务中已有 status，则使用；否则 inspection_date 有值时为 PROCESSING，否则为 INCOMPLETE）
+  // 新增状态：status 根据 inspection_date 判断初始值（如果任务中已有 status，则使用；否则 inspection_date 有值时为 processing，否则为 incomplete）
   const initialStatus = task.status
     ? task.status
     : task.inspection_date
-      ? "PROCESSING"
-      : "INCOMPLETE";
+      ? "processing"
+      : "incomplete";
   const [status, setStatus] = useState(initialStatus);
 
   const { auth, baseApi, currentUser } = useAuthContext();
@@ -86,14 +86,15 @@ export default function TaskDetailModal({ task, onClose }) {
 
   const handleSaveTask = () => {
     // 保存任务时将 status 也一并传递给后端
+    // 空字符串日期转换为 null
     axios
       .put(
         `${baseApi}/tasks/${task.id}`,
         {
           task_name: taskName,
           task_description: taskDescription,
-          due_date: dueDate,
-          inspection_date: inspectionDate,
+          due_date: dueDate || null,
+          inspection_date: inspectionDate || null,
           status: status,
           type: type,
           repeat_frequency: repeatFrequency,
@@ -181,27 +182,27 @@ export default function TaskDetailModal({ task, onClose }) {
               type="datetime-local"
               className="border w-full p-2 rounded"
               value={inspectionDate}
-              // 只有当 status 为 INCOMPLETE 或 PROCESSING 时允许修改
-              disabled={!(status === "INCOMPLETE" || status === "PROCESSING")}
+              // 只有当 status 为 incomplete 或 processing 时允许修改
+              disabled={!(status === "incomplete" || status === "processing")}
               onChange={(e) => {
                 const value = e.target.value;
                 setInspectionDate(value);
-                // 如果有值，则状态为 PROCESSING，否则为 INCOMPLETE
+                // 如果有值，则状态为 processing，否则为 incomplete
                 if (value) {
-                  setStatus("PROCESSING");
+                  setStatus("processing");
                 } else {
-                  setStatus("INCOMPLETE");
+                  setStatus("incomplete");
                 }
               }}
             />
             {/* 增加一个设置为空的按钮 */}
-            {(status === "INCOMPLETE" || status === "PROCESSING") && (
+            {(status === "incomplete" || status === "processing") && (
               <button
                 type="button"
                 className="btn btn-sm btn-secondary ml-2"
                 onClick={() => {
                   setInspectionDate("");
-                  setStatus("INCOMPLETE");
+                  setStatus("incomplete");
                 }}
               >
                 Set Null
@@ -217,9 +218,8 @@ export default function TaskDetailModal({ task, onClose }) {
             onChange={(e) => setType(e.target.value)}
           >
             <option value="unknown" disabled>-- Select Type --</option>
-
-            <option value="GAS & ELECTRICITY">Gas & Electricity</option>
-            <option value="SMOKE ALARM">Smoke Alarm</option>
+            <option value="GAS_&_ELECTRICITY">Gas & Electricity</option>
+            <option value="SMOKE_ALARM">Smoke Alarm</option>
           </select>
         </div>
         <div className="mb-4">

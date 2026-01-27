@@ -137,15 +137,23 @@ export default function TasksDataTable({
 
           // 根据不同 type 设置颜色类
           const typeColorClasses = {
-            "GAS & ELECTRICITY": "bg-blue-100 text-blue-700",
-            "SMOKE ALARM": "bg-green-100 text-green-700",
+            "SMOKE_ALARM": "bg-green-100 text-green-700",
+            "GAS_&_ELECTRICITY": "bg-blue-100 text-blue-700",
           };
-          // 如果 type 不在 [A,B,C], 给一个默认颜色
+
+          // 用户友好的标签
+          const typeLabels = {
+            "SMOKE_ALARM": "Smoke Alarm",
+            "GAS_&_ELECTRICITY": "Gas & Electricity",
+          };
+
+          // 如果 type 不在列表中, 给一个默认颜色
           const colorClass =
             typeColorClasses[type] || "bg-gray-100 text-gray-700";
+          const displayLabel = typeLabels[type] || type;
 
           return (
-            <span className={`rounded px-2 py-1 ${colorClass}`}>{type}</span>
+            <span className={`rounded px-2 py-1 ${colorClass}`}>{displayLabel}</span>
           );
         },
       },

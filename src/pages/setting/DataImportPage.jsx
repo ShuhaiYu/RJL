@@ -14,10 +14,12 @@ export default function DataImportPage() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [importLoading, setImportLoading] = useState(false);
   const [importError, setImportError] = useState("");
+  const [importResult, setImportResult] = useState(null);
 
   const handleFileSubmit = async (e) => {
     e.preventDefault();
     setImportError("");
+    setImportResult(null);
 
     if (!selectedFile) {
       setImportError("Please select a file to upload");
@@ -43,21 +45,24 @@ export default function DataImportPage() {
         },
       });
 
-      if (res.data) {
-        const createdCount = res.data.created || 0;
-        toast.success(`Import completed: ${createdCount} job orders created`);
-        setSelectedFile(null);
-        setImportError("");
-        if (res.data.errors?.length > 0) {
-          setImportError(res.data.errors.map((e) => `• ${e}`).join("\n"));
-        }
-      } else {
-        setImportError(res.data.error || "Import failed");
-      }
+      // axios interceptor auto-unwraps { success, data } to just data
+      // So res.data is the inner data object: { created, skipped, errors }
+      const result = res.data || {};
+      const createdCount = result.created ?? 0;
+      const skippedCount = result.skipped ?? 0;
+
+      toast.success(`Import completed: ${createdCount} job orders created`);
+      setSelectedFile(null);
+      setImportError("");
+      setImportResult({
+        created: createdCount,
+        skipped: skippedCount,
+        messages: result.errors || []
+      });
     } catch (error) {
       let errorMessage = "Import failed";
-      if (error.response) {
-        errorMessage = error.response.data.message;
+      if (error.response?.data) {
+        errorMessage = error.response.data.error?.message || error.response.data.message || errorMessage;
       }
 
       setImportError(errorMessage);
@@ -105,6 +110,34 @@ export default function DataImportPage() {
                       <div className="text-sm text-red-700 whitespace-pre-line">
                         {importError}
                       </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 成功结果显示 */}
+              {importResult && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <KeenIcon icon="check-circle" className="text-green-500 text-lg mt-0.5" />
+                    <div className="flex-1">
+                      <h4 className="text-sm font-medium text-green-800 mb-1">Import Successful</h4>
+                      <div className="text-sm text-green-700">
+                        <p>Created: {importResult.created} job orders</p>
+                        {importResult.skipped > 0 && (
+                          <p>Skipped: {importResult.skipped} records (duplicates or errors)</p>
+                        )}
+                      </div>
+                      {importResult.messages?.length > 0 && (
+                        <div className="mt-2 p-2 bg-amber-50 border border-amber-200 rounded text-sm text-amber-700">
+                          <p className="font-medium mb-1">Details:</p>
+                          <ul className="list-disc list-inside space-y-0.5">
+                            {importResult.messages.map((msg, idx) => (
+                              <li key={idx}>{msg}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

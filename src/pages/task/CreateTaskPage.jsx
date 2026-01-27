@@ -30,8 +30,8 @@ export default function CreateTaskPage() {
   const [repeatFrequency, setRepeatFrequency] = useState("none");
 
   // New fields
-  const [taskType, setTaskType] = useState("GAS & ELECTRICITY");
-  const [status, setStatus] = useState("INCOMPLETE");
+  const [taskType, setTaskType] = useState("GAS_&_ELECTRICITY");
+  const [status, setStatus] = useState("incomplete");
 
   const [loading, setLoading] = useState(false);
   
@@ -406,8 +406,8 @@ export default function CreateTaskPage() {
                 value={taskType}
                 onChange={(e) => setTaskType(e.target.value)}
               >
-                <option value="GAS & ELECTRICITY">Gas & Electricity</option>
-                <option value="SMOKE ALARM">Smoke Alarm</option>
+                <option value="GAS_&_ELECTRICITY">Gas & Electricity</option>
+                <option value="SMOKE_ALARM">Smoke Alarm</option>
               </select>
             </div>
 

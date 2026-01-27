@@ -37,6 +37,12 @@ export default function Tasks() {
   let pageTitle = "Job Orders";
   let pageSubtitle = "Manage and track all job orders";
   
+  // Type labels for user-friendly display
+  const typeLabels = {
+    "SMOKE_ALARM": "Smoke Alarm",
+    "GAS_&_ELECTRICITY": "Gas & Electricity",
+  };
+
   if (statusQuery || typeQuery) {
     const parts = [];
     if (statusQuery) {
@@ -45,7 +51,7 @@ export default function Tasks() {
       pageTitle = `${statusLabel} Job Orders`;
     }
     if (typeQuery) {
-      const typeLabel = typeQuery.replace(/_/g, " ");
+      const typeLabel = typeLabels[typeQuery] || typeQuery.replace(/_/g, " ");
       parts.push(typeLabel);
       pageTitle = typeQuery ? `${typeLabel} Tasks` : pageTitle;
     }
@@ -105,13 +111,8 @@ export default function Tasks() {
   };
 
   const handleCreate = () => {
-    let finalType = "";
-    if (typeQuery) {
-      // 将查询参数中的下划线转换为空格，例如 "smoke_alarm" -> "smoke alarm"
-      finalType = typeQuery.replace(/_/g, " ");
-    }
-    // 将预填数据放入 originalTask 对象中
-    const state = finalType ? { originalTask: { type: finalType } } : {};
+    // Pass the type directly as-is (e.g., SMOKE_ALARM, GAS_&_ELECTRICITY)
+    const state = typeQuery ? { originalTask: { type: typeQuery } } : {};
     navigate("/property/tasks/create", { state });
   };
 
@@ -200,7 +201,7 @@ export default function Tasks() {
                 )}
                 {typeQuery && (
                   <span className="px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-700">
-                    {typeQuery.replace(/_/g, ' ')}
+                    {typeLabels[typeQuery] || typeQuery.replace(/_/g, ' ')}
                   </span>
                 )}
               </div>
