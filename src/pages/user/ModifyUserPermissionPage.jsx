@@ -14,6 +14,7 @@ const permissionOptions = {
   contact: ["create", "read", "update", "delete"],
   role: ["create", "read", "update", "delete"],
   veu_project: ["create", "read", "update", "delete"],
+  inspection: ["create", "read", "update", "delete"],
 };
 
 // 如果有更多需要特殊显示的，可以继续加
