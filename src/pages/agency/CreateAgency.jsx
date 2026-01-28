@@ -179,7 +179,20 @@ export default function CreateAgency() {
       });
     } catch (err) {
       console.error("Failed to create agency:", err);
-      setError(err.response?.data?.message || "Failed to create agency");
+      // Handle nested error structure from backend
+      const errorData = err.response?.data;
+      let errorMessage = "Failed to create agency";
+
+      if (errorData?.error?.details?.length > 0) {
+        // Show validation error details
+        errorMessage = errorData.error.details.map(d => d.message).join(", ");
+      } else if (errorData?.error?.message) {
+        errorMessage = errorData.error.message;
+      } else if (errorData?.message) {
+        errorMessage = errorData.message;
+      }
+
+      setError(errorMessage);
     }
     setLoading(false);
   };
