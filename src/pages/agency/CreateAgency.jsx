@@ -152,7 +152,16 @@ export default function CreateAgency() {
     }
 
     try {
-      const { confirmPassword: _, ...payload } = form; // 去掉 confirmPassword
+      // Map frontend field names to backend expected names
+      const payload = {
+        agency_name: form.agency_name,
+        admin_name: form.name,
+        admin_email: form.email,
+        admin_password: form.password,
+        address: form.address,
+        phone: form.phone,
+        logo: form.logo,
+      };
       await axios.post(`${baseApi}/agencies`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
