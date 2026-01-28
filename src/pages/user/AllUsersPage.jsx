@@ -157,7 +157,8 @@ export default function AllUsersPage() {
         enableSorting: true,
       },
       {
-        accessorKey: "agency_name",
+        accessorFn: (row) => row.agency?.agency_name || '',
+        id: "agency_name",
         header: ({ header }) => (
           <DataGridColumnHeader
             column={header.column}
@@ -170,7 +171,7 @@ export default function AllUsersPage() {
           return (
             <div className="flex items-center gap-2">
               <KeenIcon icon="office-bag" className="text-gray-400 text-sm" />
-              <span className="text-sm">{user.agency_name || 'No Agency'}</span>
+              <span className="text-sm">{user.agency?.agency_name || 'No Agency'}</span>
             </div>
           );
         },
