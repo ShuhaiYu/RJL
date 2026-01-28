@@ -6,16 +6,20 @@ const PathnameProvider = ({
   children
 }) => {
   const {
-    pathname
+    pathname,
+    search
   } = useLocation();
   const [prevPathname, setPrevPathname] = useState(undefined);
+  const fullPath = pathname + search;
   useEffect(() => {
     setPrevPathname(() => {
-      return pathname;
+      return fullPath;
     });
-  }, [pathname]);
+  }, [fullPath]);
   return <PathnameContext.Provider value={{
     pathname,
+    search,
+    fullPath,
     prevPathname
   }}>
       {children}

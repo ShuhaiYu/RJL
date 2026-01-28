@@ -47,6 +47,7 @@ const MenuItemComponent = forwardRef(function MenuItem(props, ref) {
   const hideTimeoutRef = useRef(null);
   const {
     pathname,
+    fullPath,
     prevPathname
   } = usePathname();
   const {
@@ -270,7 +271,7 @@ const MenuItemComponent = forwardRef(function MenuItem(props, ref) {
   }, [accordionShow]);
   useEffect(() => {
     if (highlight) {
-      if (hasMenuActiveChild(pathname, children)) {
+      if (hasMenuActiveChild(fullPath, children)) {
         if (propToggle === 'accordion') {
           setShow(true);
         }
@@ -282,10 +283,10 @@ const MenuItemComponent = forwardRef(function MenuItem(props, ref) {
         setHere(false);
       }
     }
-    if (prevPathname !== pathname && hasSub && propToggle === 'dropdown') {
+    if (prevPathname !== fullPath && hasSub && propToggle === 'dropdown') {
       handleHide();
     }
-  }, [pathname]);
+  }, [fullPath]);
 
   // Cleanup: ensure that any timeouts are cleared when the component unmounts
   useEffect(() => {
