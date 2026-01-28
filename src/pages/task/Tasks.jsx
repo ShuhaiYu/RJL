@@ -122,12 +122,14 @@ export default function Tasks() {
   // 获取状态颜色
   const getStatusColor = (status) => {
     const colors = {
-      'UNKNOWN': 'bg-gray-100 text-gray-700',
-      'INCOMPLETE': 'bg-yellow-100 text-yellow-700',
+      'UNKNOWN': 'bg-amber-100 text-amber-700',
+      'INCOMPLETE': 'bg-orange-100 text-orange-700',
       'PROCESSING': 'bg-blue-100 text-blue-700',
       'COMPLETED': 'bg-green-100 text-green-700',
-      'DUE_SOON': 'bg-orange-100 text-orange-700',
-      'EXPIRED': 'bg-red-100 text-red-700'
+      'DUE_SOON': 'bg-red-100 text-red-700',
+      'EXPIRED': 'bg-red-200 text-red-800',
+      'HISTORY': 'bg-purple-100 text-purple-700',
+      'CANCEL': 'bg-gray-100 text-gray-500'
     };
     return colors[status] || 'bg-gray-100 text-gray-700';
   };

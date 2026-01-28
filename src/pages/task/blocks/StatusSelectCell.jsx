@@ -20,20 +20,23 @@ function StatusSelectCell({ task, onStatusUpdated }) {
     // UNKNOWN: 使用柔和的黄色，表示需要关注和处理
     UNKNOWN: "bg-amber-50 text-amber-700 border-amber-200",
 
-    // UNDO: 使用醒目的橙色，表示需要重点关注和行动
+    // INCOMPLETE: 使用醒目的橙色，表示需要重点关注和行动
     INCOMPLETE: "bg-orange-50 text-orange-700 border-orange-200",
 
-    // DOING: 使用温和的蓝色，表示正在进行中但不需要立即关注
+    // PROCESSING: 使用温和的蓝色，表示正在进行中但不需要立即关注
     PROCESSING: "bg-sky-50 text-sky-700 border-sky-200",
 
-    // DONE: 使用清新的绿色，表示已完成
+    // COMPLETED: 使用清新的绿色，表示已完成
     COMPLETED: "bg-emerald-50 text-emerald-700 border-emerald-200",
 
-    // DUE SOON  使用温和的红色，表示即将到期
+    // DUE_SOON: 使用温和的红色，表示即将到期
     DUE_SOON: "bg-red-50 text-red-700 border-red-200",
 
-    // OVERDUE: 使用醒目的红色，表示已过期
+    // EXPIRED: 使用醒目的红色，表示已过期
     EXPIRED: "bg-red-100 text-red-700 border-red-200",
+
+    // HISTORY: 使用淡紫色，表示历史记录
+    HISTORY: "bg-purple-50 text-purple-700 border-purple-200",
 
     // CANCEL: 使用中性的灰色，表示已取消
     CANCEL: "bg-gray-100 text-gray-500 border-gray-200",
@@ -66,8 +69,9 @@ function StatusSelectCell({ task, onStatusUpdated }) {
   //   }
   // };
 
-  // 选择框的样式 - 根据当前status显示背景色
-  const colorClass = statusColorClasses[status] || "bg-gray-100 text-gray-700";
+  // 选择框的样式 - 根据当前status显示背景色（转大写匹配）
+  const normalizedStatus = status?.toUpperCase()?.replace(/ /g, '_');
+  const colorClass = statusColorClasses[normalizedStatus] || "bg-gray-100 text-gray-700";
 
   // useEffect(() => {
   //   onStatusUpdated?.(task.id, status);
@@ -87,7 +91,7 @@ function StatusSelectCell({ task, onStatusUpdated }) {
     //   <option value="CANCEL">CANCEL</option>
     // </select>
     // 更新： 直接显示不使用select， 不允许用户快速更新status，只作为颜色展出
-    <span className={`rounded px-2 py-1 ${colorClass}`}>{status}</span>
+    <span className={`rounded px-2 py-1 ${colorClass}`}>{normalizedStatus?.replace(/_/g, ' ')}</span>
   );
 }
 
