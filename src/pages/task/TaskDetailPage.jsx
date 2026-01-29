@@ -171,7 +171,7 @@ export default function TaskDetailPage() {
   // 打开状态更新弹窗
   const handleOpenStatusModal = () => {
     // 如果状态是 processing，则预计算默认 due date
-    if (task.status === "processing") {
+    if (task.status?.toLowerCase() === "processing") {
       const defaultDate = computeDefaultDueDate();
       setStatusModalInput(defaultDate);
     } else {
@@ -320,7 +320,8 @@ export default function TaskDetailPage() {
 
   // 辅助函数：根据状态返回对应的颜色类
   const getStatusColorClass = (status) => {
-    switch (status) {
+    const normalizedStatus = status?.toLowerCase().replace(/_/g, ' ');
+    switch (normalizedStatus) {
       case "unknown":
         return "text-red-500";
       case "incomplete":
@@ -342,7 +343,8 @@ export default function TaskDetailPage() {
 
   // 定义状态按钮文本，根据当前任务状态返回不同的文字
   const getStatusButtonLabel = () => {
-    switch (task.status) {
+    const normalizedStatus = task.status?.toLowerCase().replace(/_/g, ' ');
+    switch (normalizedStatus) {
       case "unknown":
         return "Check";
       case "incomplete":
@@ -432,7 +434,8 @@ export default function TaskDetailPage() {
 
             {/* 动态日期显示 */}
             {(() => {
-              if (task.status === "processing") {
+              const normalizedStatus = task.status?.toLowerCase().replace(/_/g, ' ');
+              if (normalizedStatus === "processing") {
                 return (
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
@@ -447,7 +450,7 @@ export default function TaskDetailPage() {
                   </div>
                 );
               } else if (
-                ["completed", "due soon", "expired", "history"].includes(task.status)
+                ["completed", "due soon", "expired", "history"].includes(normalizedStatus)
               ) {
                 return (
                   <div className="space-y-2">
@@ -544,14 +547,14 @@ export default function TaskDetailPage() {
             <Button
               variant="edit"
               onClick={() => setShowEditModal(true)}
-              disabled={task.status === "completed" || task.status === "history"}
+              disabled={task.status?.toLowerCase() === "completed" || task.status?.toLowerCase() === "history"}
               className="flex items-center gap-2"
             >
               <KeenIcon icon="edit" className="text-sm" />
               Edit
             </Button>
 
-            {task.status !== "history" && (
+            {task.status?.toLowerCase() !== "history" && (
               <Button 
                 onClick={handleOpenStatusModal}
                 className="flex items-center gap-2"
@@ -815,7 +818,7 @@ export default function TaskDetailPage() {
                               </option>
                               <option value="SMOKE_ALARM">Smoke Alarm</option>
                             </select>
-                            {task.status === "unknown" && (
+                            {task.status?.toLowerCase() === "unknown" && (
                               <div className="flex items-center mt-3">
                                 <input
                                   type="checkbox"
