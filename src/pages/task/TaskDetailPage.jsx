@@ -92,33 +92,36 @@ export default function TaskDetailPage() {
    * COMPLETED -> HISTORY，无需输入，直接归档
    */
   const getNextStatusAndField = (currentStatus) => {
-    switch (currentStatus) {
+    // Normalize status to lowercase for comparison
+    const normalizedStatus = currentStatus?.toLowerCase();
+    switch (normalizedStatus) {
       case "unknown":
         return {
-          nextStatus: "incomplete",
+          nextStatus: "INCOMPLETE",
           fieldLabel: "Select Type",
           fieldKey: "type",
           inputType: "select",
         };
       case "incomplete":
         return {
-          nextStatus: "processing",
+          nextStatus: "PROCESSING",
           fieldLabel: "Enter Inspection Date",
           fieldKey: "inspection_date",
           inputType: "datetime-local",
         };
       case "processing":
         return {
-          nextStatus: "completed",
+          nextStatus: "COMPLETED",
           fieldLabel: "Enter Due Date",
           fieldKey: "due_date",
           inputType: "date",
         };
       case "completed":
       case "due soon":
+      case "due_soon":
       case "expired":
         return {
-          nextStatus: "history",
+          nextStatus: "HISTORY",
           fieldLabel: "",
           fieldKey: "",
           inputType: "hidden",
@@ -199,8 +202,8 @@ export default function TaskDetailPage() {
     }
     // 如果是 unknown -> incomplete，并且用户勾选了"Archive conflicting job orders"
     if (
-      task.status === "unknown" &&
-      nextStatus === "incomplete" &&
+      task.status?.toLowerCase() === "unknown" &&
+      nextStatus === "INCOMPLETE" &&
       archiveConflicts
     ) {
       payload.archive_conflicts = true;

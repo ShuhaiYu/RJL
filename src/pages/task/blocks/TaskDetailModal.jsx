@@ -33,9 +33,13 @@ export default function TaskDetailModal({ task, onClose }) {
   const initialStatus = task.status
     ? task.status
     : task.inspection_date
-      ? "processing"
-      : "incomplete";
+      ? "PROCESSING"
+      : "INCOMPLETE";
   const [status, setStatus] = useState(initialStatus);
+
+  // Helper to normalize status for comparison (handles both upper and lowercase)
+  const isStatusIncomplete = status?.toUpperCase() === "INCOMPLETE";
+  const isStatusProcessing = status?.toUpperCase() === "PROCESSING";
 
   const { auth, baseApi, currentUser } = useAuthContext();
   const token = auth?.accessToken;
@@ -87,6 +91,8 @@ export default function TaskDetailModal({ task, onClose }) {
   const handleSaveTask = () => {
     // 保存任务时将 status 也一并传递给后端
     // 空字符串日期转换为 null
+    // Ensure status is uppercase to match backend enum
+    const normalizedStatus = status?.toUpperCase().replace(/ /g, '_') || status;
     axios
       .put(
         `${baseApi}/tasks/${task.id}`,
@@ -95,7 +101,7 @@ export default function TaskDetailModal({ task, onClose }) {
           task_description: taskDescription,
           due_date: dueDate || null,
           inspection_date: inspectionDate || null,
-          status: status,
+          status: normalizedStatus,
           type: type,
           repeat_frequency: repeatFrequency,
           agency_id: selectedAgencyId,
@@ -183,26 +189,26 @@ export default function TaskDetailModal({ task, onClose }) {
               className="border w-full p-2 rounded"
               value={inspectionDate}
               // 只有当 status 为 incomplete 或 processing 时允许修改
-              disabled={!(status === "incomplete" || status === "processing")}
+              disabled={!(isStatusIncomplete || isStatusProcessing)}
               onChange={(e) => {
                 const value = e.target.value;
                 setInspectionDate(value);
                 // 如果有值，则状态为 processing，否则为 incomplete
                 if (value) {
-                  setStatus("processing");
+                  setStatus("PROCESSING");
                 } else {
-                  setStatus("incomplete");
+                  setStatus("INCOMPLETE");
                 }
               }}
             />
             {/* 增加一个设置为空的按钮 */}
-            {(status === "incomplete" || status === "processing") && (
+            {(isStatusIncomplete || isStatusProcessing) && (
               <button
                 type="button"
                 className="btn btn-sm btn-secondary ml-2"
                 onClick={() => {
                   setInspectionDate("");
-                  setStatus("incomplete");
+                  setStatus("INCOMPLETE");
                 }}
               >
                 Set Null

@@ -31,7 +31,7 @@ export default function CreateTaskPage() {
 
   // New fields
   const [taskType, setTaskType] = useState("GAS_&_ELECTRICITY");
-  const [status, setStatus] = useState("incomplete");
+  const [status, setStatus] = useState("INCOMPLETE");
 
   const [loading, setLoading] = useState(false);
   
