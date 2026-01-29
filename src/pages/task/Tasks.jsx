@@ -66,8 +66,14 @@ export default function Tasks() {
   const fetchTasks = () => {
     if (!token) return;
     setLoading(true);
+
+    // Build URL with limit parameter
+    const params = new URLSearchParams(location.search);
+    params.set('limit', '1000');
+    const queryString = params.toString();
+
     axios
-      .get(`${baseApi}/tasks${location.search}`, {
+      .get(`${baseApi}/tasks?${queryString}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {

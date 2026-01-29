@@ -219,7 +219,7 @@ export default function TasksDataTable({
         data={tasks} // 这里传入的是所有任务数据
         serverSide={false}
         rowSelection={false}
-        pagination={{ size: 100 }}
+        pagination={{ size: 100, sizes: [25, 50, 100, 200, 500] }}
         // 将 onFilteredDataChange 回调传递给 DataGrid
         onFilteredDataChange={(count) => setFilteredCount(count)}
         getRowClassName={(task) => {
