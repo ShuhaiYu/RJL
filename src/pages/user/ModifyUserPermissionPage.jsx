@@ -12,6 +12,7 @@ const permissionOptions = {
   property: ["create", "read", "update", "delete"],
   task: ["create", "read", "update", "delete"], // 这里 key 仍是 "task" 不变
   contact: ["create", "read", "update", "delete"],
+  email: ["create", "read", "update"],
   role: ["create", "read", "update", "delete"],
   veu_project: ["create", "read", "update", "delete"],
   inspection: ["create", "read", "update", "delete"],

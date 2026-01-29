@@ -30,7 +30,7 @@ export default function MyProperties() {
     if (!token) return;
     setLoading(true);
     axios
-      .get(`${baseApi}/properties`, {
+      .get(`${baseApi}/properties?limit=1000`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
