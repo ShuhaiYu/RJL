@@ -44,34 +44,16 @@ export default function EmailsDataTable({ emails, onProcessEmail, processingId }
         ),
         cell: ({ row }) => {
           const email = row.original;
-          return (
-            <div className="space-y-1">
-              {email.is_processed ? (
-                <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
-                  <KeenIcon icon="check" className="mr-1 text-xs" />
-                  Processed
-                </span>
-              ) : (
-                <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">
-                  <KeenIcon icon="time" className="mr-1 text-xs" />
-                  Pending
-                </span>
-              )}
-              {email.process_note && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="text-xs text-gray-600 truncate max-w-[150px] cursor-help">
-                        {email.process_note.split('\n')[0]}
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom" className="max-w-sm">
-                      <pre className="text-xs whitespace-pre-wrap">{email.process_note}</pre>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-            </div>
+          return email.is_processed ? (
+            <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+              <KeenIcon icon="check" className="mr-1 text-xs" />
+              Processed
+            </span>
+          ) : (
+            <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">
+              <KeenIcon icon="time" className="mr-1 text-xs" />
+              Pending
+            </span>
           );
         },
         enableSorting: true,
@@ -82,6 +64,36 @@ export default function EmailsDataTable({ emails, onProcessEmail, processingId }
           if (lowerFilter === 'pending' || lowerFilter === 'no') return isProcessed === false;
           return true;
         },
+      },
+      {
+        accessorKey: "process_note",
+        header: ({ header }) => (
+          <DataGridColumnHeader
+            column={header.column}
+            title="Process Note"
+          />
+        ),
+        cell: ({ row }) => {
+          const email = row.original;
+          if (!email.process_note) {
+            return <span className="text-gray-400">-</span>;
+          }
+          return (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="text-xs text-gray-700 truncate max-w-[200px] cursor-help">
+                    {email.process_note.split('\n')[0]}
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="max-w-md">
+                  <pre className="text-xs whitespace-pre-wrap">{email.process_note}</pre>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          );
+        },
+        enableSorting: false,
       },
       {
         accessorKey: "property_address",
