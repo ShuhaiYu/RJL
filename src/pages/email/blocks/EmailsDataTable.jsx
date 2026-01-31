@@ -171,27 +171,35 @@ export default function EmailsDataTable({ emails, onProcessEmail, processingId }
         header: ({ header }) => (
           <DataGridColumnHeader
             column={header.column}
-            title="Task"
-            filter={<ColumnInputFilter column={header.column} />}
+            title="Tasks"
           />
         ),
         cell: ({ row }) => {
           const email = row.original;
-          // Show "-" if not processed yet or no task created
-          if (!email.is_processed || !email.task_id) {
+          // Show "-" if not processed yet or no tasks created
+          const tasks = email.tasks || [];
+          if (!email.is_processed || tasks.length === 0) {
             return <span className="text-gray-400">-</span>;
           }
+          // Display multiple tasks
           return (
-            <Link
-              className="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium"
-              to={`/property/tasks/${email.task_id}`}
-            >
-              <KeenIcon icon="note-2" className="text-sm" />
-              {email.task_name || email.task_type || 'View Task'}
-            </Link>
+            <div className="flex flex-col gap-1">
+              {tasks.map((task) => (
+                <Link
+                  key={task.id}
+                  className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 font-medium"
+                  to={`/property/tasks/${task.id}`}
+                >
+                  <KeenIcon icon="note-2" className="text-xs" />
+                  <span className="truncate max-w-[120px]" title={task.task_name}>
+                    {task.type || task.task_name || 'View Task'}
+                  </span>
+                </Link>
+              ))}
+            </div>
           );
         },
-        enableSorting: true,
+        enableSorting: false,
       },
       {
         id: "actions",
