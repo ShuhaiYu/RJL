@@ -5,14 +5,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
 import { KeenIcon } from "@/components";
-// 点击按钮后在新窗口展示 HTML 内容
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
+// Open HTML content in new window
 const handleViewEmail = (emailHtml) => {
   const newWindow = window.open("", "_blank");
   newWindow.document.write(emailHtml);
   newWindow.document.close();
 };
 
-export default function EmailsDataTable({ emails }) {
+export default function EmailsDataTable({ emails, onProcessEmail, processingId }) {
   const [filteredCount, setFilteredCount] = useState(emails.length);
 
   const ColumnInputFilter = ({ column }) => {
@@ -28,6 +35,55 @@ export default function EmailsDataTable({ emails }) {
   const columns = useMemo(
     () => [
       {
+        accessorKey: "is_processed",
+        header: ({ header }) => (
+          <DataGridColumnHeader
+            column={header.column}
+            title="Status"
+          />
+        ),
+        cell: ({ row }) => {
+          const email = row.original;
+          return (
+            <div className="space-y-1">
+              {email.is_processed ? (
+                <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+                  <KeenIcon icon="check" className="mr-1 text-xs" />
+                  Processed
+                </span>
+              ) : (
+                <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">
+                  <KeenIcon icon="time" className="mr-1 text-xs" />
+                  Pending
+                </span>
+              )}
+              {email.process_note && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="text-xs text-gray-600 truncate max-w-[150px] cursor-help">
+                        {email.process_note.split('\n')[0]}
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="max-w-sm">
+                      <pre className="text-xs whitespace-pre-wrap">{email.process_note}</pre>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </div>
+          );
+        },
+        enableSorting: true,
+        filterFn: (row, columnId, filterValue) => {
+          const isProcessed = row.getValue(columnId);
+          const lowerFilter = filterValue.toLowerCase();
+          if (lowerFilter === 'processed' || lowerFilter === 'yes') return isProcessed === true;
+          if (lowerFilter === 'pending' || lowerFilter === 'no') return isProcessed === false;
+          return true;
+        },
+      },
+      {
         accessorKey: "property_address",
         header: ({ header }) => (
           <DataGridColumnHeader
@@ -38,13 +94,17 @@ export default function EmailsDataTable({ emails }) {
         ),
         cell: ({ row }) => {
           const email = row.original;
+          // Show "-" if not processed yet (no property linked)
+          if (!email.is_processed || !email.property_id) {
+            return <span className="text-gray-400">-</span>;
+          }
           return (
             <Link
               className="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium"
               to={`/property/${email.property_id}`}
             >
               <KeenIcon icon="home-2" className="text-sm" />
-              {email.property_address}
+              {email.property_address || 'View Property'}
             </Link>
           );
         },
@@ -99,19 +159,23 @@ export default function EmailsDataTable({ emails }) {
         header: ({ header }) => (
           <DataGridColumnHeader
             column={header.column}
-            title="Task Type"
+            title="Task"
             filter={<ColumnInputFilter column={header.column} />}
           />
         ),
         cell: ({ row }) => {
           const email = row.original;
+          // Show "-" if not processed yet or no task created
+          if (!email.is_processed || !email.task_id) {
+            return <span className="text-gray-400">-</span>;
+          }
           return (
             <Link
               className="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium"
               to={`/property/tasks/${email.task_id}`}
             >
               <KeenIcon icon="note-2" className="text-sm" />
-              {email.task_name}
+              {email.task_name || email.task_type || 'View Task'}
             </Link>
           );
         },
@@ -122,24 +186,55 @@ export default function EmailsDataTable({ emails }) {
         header: "Actions",
         cell: ({ row }) => {
           const email = row.original;
+          const isProcessing = processingId === email.id;
+
           return (
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-2"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleViewEmail(email.html);
-              }}
-            >
-              <KeenIcon icon="eye" className="text-sm" />
-              View HTML
-            </Button>
+            <div className="flex gap-2">
+              {/* Process button - only show for unprocessed emails */}
+              {!email.is_processed && (
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="flex items-center gap-1"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onProcessEmail(email.id);
+                  }}
+                  disabled={isProcessing}
+                >
+                  {isProcessing ? (
+                    <>
+                      <KeenIcon icon="loading" className="text-sm animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <KeenIcon icon="setting-3" className="text-sm" />
+                      Process
+                    </>
+                  )}
+                </Button>
+              )}
+              {/* View HTML button */}
+              {email.html && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-1"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleViewEmail(email.html);
+                  }}
+                >
+                  <KeenIcon icon="eye" className="text-sm" />
+                </Button>
+              )}
+            </div>
           );
         },
       },
     ],
-    []
+    [onProcessEmail, processingId]
   );
 
   return (

@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuthContext } from "@/auth";
-import EmailsDataTable from "./blocks/EmailsDataTable"; // 根据实际路径调整
+import EmailsDataTable from "./blocks/EmailsDataTable";
 import { Box, CircularProgress } from "@mui/material";
 import { KeenIcon } from "@/components";
 import { toast } from "sonner";
@@ -13,11 +13,13 @@ import { useNavigate } from "react-router-dom";
 export default function Emails() {
   const [emails, setEmails] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [processingId, setProcessingId] = useState(null);
   const [error, setError] = useState("");
   const [emailStats, setEmailStats] = useState({
     total: 0,
     today: 0,
-    thisWeek: 0
+    thisWeek: 0,
+    pending: 0
   });
   const { auth, baseApi } = useAuthContext();
   const token = auth?.accessToken;
@@ -66,10 +68,13 @@ export default function Emails() {
         return emailDate >= weekAgo;
       }).length;
       
+      const pendingCount = emailData.filter(email => !email.is_processed).length;
+
       setEmailStats({
         total: emailData.length,
         today: todayCount,
-        thisWeek: weekCount
+        thisWeek: weekCount,
+        pending: pendingCount
       });
       
       // Step 3: View ready
@@ -92,6 +97,26 @@ export default function Emails() {
       fetchEmails();
     }
   }, [token]);
+
+  // Handle manual email processing
+  const handleProcessEmail = async (emailId) => {
+    if (processingId) return; // Prevent double-click
+
+    setProcessingId(emailId);
+    try {
+      await axios.post(
+        `${baseApi}/emails/${emailId}/process`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success("Email processed successfully");
+      fetchEmails(); // Refresh list
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to process email");
+    } finally {
+      setProcessingId(null);
+    }
+  };
 
 
   if (error)
@@ -217,6 +242,16 @@ export default function Emails() {
               bgColor: "bg-purple-50",
               borderColor: "border-purple-200",
               route: null
+            },
+            {
+              key: 'pending',
+              title: "Pending",
+              value: emailStats.pending,
+              icon: "time",
+              color: "text-yellow-600",
+              bgColor: "bg-yellow-50",
+              borderColor: "border-yellow-200",
+              route: null
             }
           ]}
           loading={loading}
@@ -279,7 +314,11 @@ export default function Emails() {
               </Button>
             </div>
           ) : (
-            <EmailsDataTable emails={emails} />
+            <EmailsDataTable
+              emails={emails}
+              onProcessEmail={handleProcessEmail}
+              processingId={processingId}
+            />
           )}
         </div>
       </div>
