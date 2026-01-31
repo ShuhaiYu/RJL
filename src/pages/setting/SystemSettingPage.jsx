@@ -11,10 +11,6 @@ export default function SystemSettingPage() {
   const token = auth?.accessToken;
 
   const [settings, setSettings] = useState({
-    imap_host: "",
-    imap_port: "",
-    imap_user: "",
-    imap_password: "",
     email_user: "",
     email_password: "",
     email_host: "",
@@ -32,10 +28,6 @@ export default function SystemSettingPage() {
         if (res.data) {
           setSettings((prev) => ({
             ...prev,
-            imap_host: res.data.imap_host || "",
-            imap_port: res.data.imap_port || "",
-            imap_user: res.data.imap_user || "",
-            imap_password: res.data.imap_password || "",
             email_user: res.data.email_user || "",
             email_password: res.data.email_password || "",
             email_host: res.data.email_host || "",
@@ -97,84 +89,14 @@ export default function SystemSettingPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="p-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* IMAP Settings Section */}
-              <div className="space-y-6">
-                <div className="flex items-center gap-2 pb-2 border-b border-gray-100">
-                  <KeenIcon icon="message" className="text-lg text-blue-600" />
-                  <h3 className="font-semibold text-gray-900">IMAP Configuration</h3>
-                </div>
-                
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <KeenIcon icon="cloud" className="inline mr-1" />
-                      IMAP Host
-                    </label>
-                    <Input
-                      type="text"
-                      name="imap_host"
-                      value={settings.imap_host}
-                      onChange={handleChange}
-                      placeholder="imap.gmail.com"
-                      className="w-full"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <KeenIcon icon="router" className="inline mr-1" />
-                      IMAP Port
-                    </label>
-                    <Input
-                      type="text"
-                      name="imap_port"
-                      value={settings.imap_port}
-                      onChange={handleChange}
-                      placeholder="993"
-                      className="w-full"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <KeenIcon icon="profile-user" className="inline mr-1" />
-                      IMAP User
-                    </label>
-                    <Input
-                      type="text"
-                      name="imap_user"
-                      value={settings.imap_user}
-                      onChange={handleChange}
-                      placeholder="your@gmail.com"
-                      className="w-full"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <KeenIcon icon="key" className="inline mr-1" />
-                      IMAP Password
-                    </label>
-                    <Input
-                      type="password"
-                      name="imap_password"
-                      value={settings.imap_password}
-                      onChange={handleChange}
-                      placeholder="application-specific password"
-                      className="w-full"
-                    />
-                  </div>
-                </div>
-              </div>
-
+            <div className="grid grid-cols-1 gap-6 max-w-md">
               {/* Email Settings Section */}
               <div className="space-y-6">
                 <div className="flex items-center gap-2 pb-2 border-b border-gray-100">
                   <KeenIcon icon="sms" className="text-lg text-green-600" />
                   <h3 className="font-semibold text-gray-900">Email Configuration</h3>
                 </div>
-                
+
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -190,7 +112,7 @@ export default function SystemSettingPage() {
                       className="w-full"
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       <KeenIcon icon="key" className="inline mr-1" />
@@ -205,7 +127,7 @@ export default function SystemSettingPage() {
                       className="w-full"
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       <KeenIcon icon="cloud" className="inline mr-1" />
@@ -220,7 +142,7 @@ export default function SystemSettingPage() {
                       className="w-full"
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       <KeenIcon icon="geolocation" className="inline mr-1" />
@@ -242,8 +164,8 @@ export default function SystemSettingPage() {
             {/* 提交按钮 */}
             <div className="mt-8 pt-6 border-t border-gray-200">
               <div className="flex justify-end">
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   disabled={loading}
                   className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors duration-200 flex items-center gap-2"
                 >
