@@ -1,10 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { useAuthContext } from "@/auth";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Box, CircularProgress } from "@mui/material";
 import { KeenIcon } from "@/components";
 
 export default function DataImportPage() {
@@ -43,6 +41,7 @@ export default function DataImportPage() {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        timeout: 60000, // 60 second timeout for large imports
       });
 
       // axios interceptor auto-unwraps { success, data } to just data
@@ -61,8 +60,18 @@ export default function DataImportPage() {
       });
     } catch (error) {
       let errorMessage = "Import failed";
-      if (error.response?.data) {
+
+      // Handle different error types
+      if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
+        errorMessage = "Import timed out. The file may be too large. Please try splitting it into smaller files.";
+      } else if (error.response?.status === 504 || error.response?.status === 502) {
+        errorMessage = "Server timeout. The import is taking too long. Please try with a smaller file or contact support.";
+      } else if (error.response?.status === 413) {
+        errorMessage = "File too large. Please reduce the file size and try again.";
+      } else if (error.response?.data) {
         errorMessage = error.response.data.error?.message || error.response.data.message || errorMessage;
+      } else if (!navigator.onLine) {
+        errorMessage = "No internet connection. Please check your network and try again.";
       }
 
       setImportError(errorMessage);
@@ -121,22 +130,29 @@ export default function DataImportPage() {
                   <div className="flex items-start gap-3">
                     <KeenIcon icon="check-circle" className="text-green-500 text-lg mt-0.5" />
                     <div className="flex-1">
-                      <h4 className="text-sm font-medium text-green-800 mb-1">Import Successful</h4>
+                      <h4 className="text-sm font-medium text-green-800 mb-1">Import Completed</h4>
                       <div className="text-sm text-green-700">
-                        <p>Created: {importResult.created} job orders</p>
+                        <p>✓ Created: <span className="font-semibold">{importResult.created}</span> tasks</p>
                         {importResult.skipped > 0 && (
-                          <p>Skipped: {importResult.skipped} records (duplicates or errors)</p>
+                          <p className="text-amber-700">⚠ Skipped: <span className="font-semibold">{importResult.skipped}</span> rows</p>
                         )}
                       </div>
                       {importResult.messages?.length > 0 && (
-                        <div className="mt-2 p-2 bg-amber-50 border border-amber-200 rounded text-sm text-amber-700">
-                          <p className="font-medium mb-1">Details:</p>
-                          <ul className="list-disc list-inside space-y-0.5">
-                            {importResult.messages.map((msg, idx) => (
-                              <li key={idx}>{msg}</li>
-                            ))}
-                          </ul>
-                        </div>
+                        <details className="mt-3">
+                          <summary className="cursor-pointer text-sm font-medium text-amber-800 hover:text-amber-900">
+                            View {importResult.messages.length} skip reasons →
+                          </summary>
+                          <div className="mt-2 p-3 bg-amber-50 border border-amber-200 rounded text-sm text-amber-700 max-h-60 overflow-y-auto">
+                            <ul className="space-y-1">
+                              {importResult.messages.map((msg, idx) => (
+                                <li key={idx} className="flex items-start gap-2">
+                                  <span className="text-amber-500 mt-0.5">•</span>
+                                  <span>{msg}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </details>
                       )}
                     </div>
                   </div>
@@ -208,10 +224,11 @@ export default function DataImportPage() {
                   <div>
                     <h4 className="text-sm font-medium text-gray-900 mb-2">Import Guidelines</h4>
                     <ul className="text-sm text-gray-600 space-y-1">
-                      <li>• Ensure your CSV file contains the required columns</li>
-                      <li>• Data will be validated before import</li>
-                      <li>• Duplicate entries will be skipped</li>
-                      <li>• Import process may take a few minutes for large files</li>
+                      <li>• <strong>Required columns:</strong> Job Number, Customer, Job Address, Description</li>
+                      <li>• <strong>Description</strong> must contain: "gas", "electric", "smoke", "alarm", or "safety check"</li>
+                      <li>• <strong>Customer</strong> must match an existing agency name in the system</li>
+                      <li>• Duplicate job numbers will be skipped automatically</li>
+                      <li>• For large files (1000+ rows), import may take up to 30 seconds</li>
                     </ul>
                   </div>
                 </div>
@@ -219,15 +236,15 @@ export default function DataImportPage() {
 
               {/* 提交按钮 */}
               <div className="flex justify-end pt-4 border-t border-gray-200">
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   disabled={importLoading || !selectedFile}
                   className="px-6 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white rounded-lg font-medium transition-colors duration-200 flex items-center gap-2"
                 >
                   {importLoading ? (
                     <>
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Importing...
+                      Importing... (this may take a moment)
                     </>
                   ) : (
                     <>
