@@ -11,9 +11,6 @@ export default function SystemSettingPage() {
   const token = auth?.accessToken;
 
   const [settings, setSettings] = useState({
-    email_user: "",
-    email_password: "",
-    email_host: "",
     google_map_key: "",
   });
   const [loading, setLoading] = useState(false);
@@ -28,9 +25,6 @@ export default function SystemSettingPage() {
         if (res.data) {
           setSettings((prev) => ({
             ...prev,
-            email_user: res.data.email_user || "",
-            email_password: res.data.email_password || "",
-            email_host: res.data.email_host || "",
             google_map_key: res.data.google_map_key || "",
           }));
         }
@@ -90,59 +84,14 @@ export default function SystemSettingPage() {
 
           <form onSubmit={handleSubmit} className="p-6">
             <div className="grid grid-cols-1 gap-6 max-w-md">
-              {/* Email Settings Section */}
+              {/* API Keys Section */}
               <div className="space-y-6">
                 <div className="flex items-center gap-2 pb-2 border-b border-gray-100">
-                  <KeenIcon icon="sms" className="text-lg text-green-600" />
-                  <h3 className="font-semibold text-gray-900">Email Configuration</h3>
+                  <KeenIcon icon="key" className="text-lg text-green-600" />
+                  <h3 className="font-semibold text-gray-900">API Keys</h3>
                 </div>
 
                 <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <KeenIcon icon="profile-user" className="inline mr-1" />
-                      Email User
-                    </label>
-                    <Input
-                      type="text"
-                      name="email_user"
-                      value={settings.email_user}
-                      onChange={handleChange}
-                      placeholder="your@gmail.com"
-                      className="w-full"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <KeenIcon icon="key" className="inline mr-1" />
-                      Email Password
-                    </label>
-                    <Input
-                      type="password"
-                      name="email_password"
-                      value={settings.email_password}
-                      onChange={handleChange}
-                      placeholder="application-specific password"
-                      className="w-full"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <KeenIcon icon="cloud" className="inline mr-1" />
-                      Email Host
-                    </label>
-                    <Input
-                      type="text"
-                      name="email_host"
-                      value={settings.email_host}
-                      onChange={handleChange}
-                      placeholder="Enter email host"
-                      className="w-full"
-                    />
-                  </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       <KeenIcon icon="geolocation" className="inline mr-1" />
@@ -156,6 +105,9 @@ export default function SystemSettingPage() {
                       placeholder="Enter Google Map key"
                       className="w-full"
                     />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Used for address formatting and geocoding
+                    </p>
                   </div>
                 </div>
               </div>

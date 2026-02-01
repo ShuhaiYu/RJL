@@ -758,6 +758,12 @@ export default function TaskDetailPage() {
             <div key={email.id} className="mb-4">
               <p className="font-medium">Subject: {email.subject}</p>
               <p className="text-gray-600">Sender: {email.sender}</p>
+              {email.process_note && (
+                <div className="mt-3 p-3 bg-blue-50 rounded-lg text-sm">
+                  <p className="font-medium text-blue-700 mb-1">AI Processing Notes</p>
+                  <div className="text-gray-700 whitespace-pre-wrap">{email.process_note}</div>
+                </div>
+              )}
               <div className="mt-2 whitespace-pre-wrap">{email.email_body}</div>
             </div>
           ))
