@@ -36,6 +36,9 @@ export default function TaskDetailPage() {
   const [statusModalInput, setStatusModalInput] = useState("");
   const [archiveConflicts, setArchiveConflicts] = useState(true);
 
+  // Multi-select types for UNKNOWN status
+  const [selectedTypes, setSelectedTypes] = useState([]);
+
   // ========== 联系人相关状态 ==========
   const [selectedContactId, setSelectedContactId] = useState(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -46,6 +49,21 @@ export default function TaskDetailPage() {
   const [fileDesc, setFileDesc] = useState(""); // 文件描述
   const [uploading, setUploading] = useState(false);
   const [fileInputKey, setFileInputKey] = useState(Date.now());
+
+  // Get default selected types based on task type
+  const getDefaultSelectedTypes = () => {
+    if (task?.type === 'SAFETY_CHECK') {
+      return ['SMOKE_ALARM', 'GAS_&_ELECTRICITY'];
+    }
+    return task?.type ? [task.type] : [];
+  };
+
+  // Update selectedTypes when task changes
+  useEffect(() => {
+    if (task) {
+      setSelectedTypes(getDefaultSelectedTypes());
+    }
+  }, [task?.id, task?.type]);
 
   // 获取任务详情（包括 contacts 和 emails）
   const fetchTaskDetail = async () => {
@@ -98,9 +116,9 @@ export default function TaskDetailPage() {
       case "unknown":
         return {
           nextStatus: "INCOMPLETE",
-          fieldLabel: "Select Type",
-          fieldKey: "type",
-          inputType: "select",
+          fieldLabel: "Select Task Types",
+          fieldKey: "selected_types",
+          inputType: "multi-select",
         };
       case "incomplete":
         return {
@@ -177,6 +195,10 @@ export default function TaskDetailPage() {
     } else {
       setStatusModalInput("");
     }
+    // Reset selected types for UNKNOWN status
+    if (task.status?.toLowerCase() === "unknown") {
+      setSelectedTypes(getDefaultSelectedTypes());
+    }
     setShowStatusModal(true);
   };
 
@@ -187,26 +209,33 @@ export default function TaskDetailPage() {
     const { nextStatus, fieldKey, inputType, fieldLabel } =
       getNextStatusAndField(task.status);
 
-    // 对于需要用户输入的情况，必填校验
-    if (fieldLabel && !statusModalInput) {
-      toast.error(`Please enter/select ${fieldLabel}`);
-      return;
-    }
-
     const payload = { status: nextStatus };
-    if (fieldKey && statusModalInput) {
-      payload[fieldKey] =
-        inputType === "date" || inputType === "datetime-local"
-          ? new Date(statusModalInput).toISOString()
-          : statusModalInput;
-    }
-    // 如果是 unknown -> incomplete，并且用户勾选了"Archive conflicting job orders"
-    if (
-      task.status?.toLowerCase() === "unknown" &&
-      nextStatus === "INCOMPLETE" &&
-      archiveConflicts
-    ) {
-      payload.archive_conflicts = true;
+
+    // Handle UNKNOWN status with multi-select types
+    if (task.status?.toLowerCase() === "unknown") {
+      if (selectedTypes.length === 0) {
+        toast.error("Please select at least one task type");
+        return;
+      }
+      payload.selected_types = selectedTypes;
+
+      // Archive conflicts option
+      if (archiveConflicts) {
+        payload.archive_conflicts = true;
+      }
+    } else {
+      // 对于需要用户输入的情况，必填校验
+      if (fieldLabel && !statusModalInput) {
+        toast.error(`Please enter/select ${fieldLabel}`);
+        return;
+      }
+
+      if (fieldKey && statusModalInput) {
+        payload[fieldKey] =
+          inputType === "date" || inputType === "datetime-local"
+            ? new Date(statusModalInput).toISOString()
+            : statusModalInput;
+      }
     }
 
     try {
@@ -217,6 +246,7 @@ export default function TaskDetailPage() {
       fetchTaskDetail();
       setShowStatusModal(false);
       setStatusModalInput("");
+      setSelectedTypes([]);
     } catch (error) {
       console.error("Failed to update task status:", error);
       toast.error("Failed to update task status");
@@ -480,7 +510,8 @@ export default function TaskDetailPage() {
                 to={`/property/tasks?type=${encodeURIComponent(task.type)}`}
               >
                 {task.type === "SMOKE_ALARM" ? "Smoke Alarm" :
-                 task.type === "GAS_&_ELECTRICITY" ? "Gas & Electricity" : task.type}
+                 task.type === "GAS_&_ELECTRICITY" ? "Gas & Electricity" :
+                 task.type === "SAFETY_CHECK" ? "Safety Check (Pending Confirmation)" : task.type}
               </Link>
             </div>
 
@@ -805,41 +836,70 @@ export default function TaskDetailPage() {
                       task.status
                     );
                     if (fieldLabel) {
-                      if (inputType === "select") {
+                      if (inputType === "multi-select") {
+                        // Multi-select checkboxes for UNKNOWN status
                         return (
                           <div className="mb-4">
-                            <label className="block mb-2 font-medium">
+                            <label className="block mb-3 font-medium">
                               {fieldLabel}
                             </label>
-                            <select
-                              className="select select-bordered w-full"
-                              value={statusModalInput}
-                              onChange={(e) =>
-                                setStatusModalInput(e.target.value)
-                              }
-                            >
-                              <option value="">Select an option</option>
-                              <option value="GAS_&_ELECTRICITY">
-                                Gas & Electricity
-                              </option>
-                              <option value="SMOKE_ALARM">Smoke Alarm</option>
-                            </select>
-                            {task.status?.toLowerCase() === "unknown" && (
-                              <div className="flex items-center mt-3">
+                            <div className="space-y-3">
+                              <label className="flex items-center gap-3 cursor-pointer p-3 border rounded-lg hover:bg-gray-50 transition-colors">
                                 <input
                                   type="checkbox"
-                                  id="archiveConflicts"
-                                  className="checkbox mr-2"
-                                  checked={archiveConflicts}
-                                  onChange={(e) =>
-                                    setArchiveConflicts(e.target.checked)
-                                  }
+                                  className="checkbox checkbox-primary"
+                                  checked={selectedTypes.includes('SMOKE_ALARM')}
+                                  onChange={(e) => {
+                                    if (e.target.checked) {
+                                      setSelectedTypes([...selectedTypes, 'SMOKE_ALARM']);
+                                    } else {
+                                      setSelectedTypes(selectedTypes.filter(t => t !== 'SMOKE_ALARM'));
+                                    }
+                                  }}
                                 />
-                                <label htmlFor="archiveConflicts">
-                                  Archive conflicting job orders
-                                </label>
-                              </div>
-                            )}
+                                <div>
+                                  <span className="font-medium">Smoke Alarm</span>
+                                  <p className="text-sm text-gray-500">Smoke alarm compliance check</p>
+                                </div>
+                              </label>
+                              <label className="flex items-center gap-3 cursor-pointer p-3 border rounded-lg hover:bg-gray-50 transition-colors">
+                                <input
+                                  type="checkbox"
+                                  className="checkbox checkbox-primary"
+                                  checked={selectedTypes.includes('GAS_&_ELECTRICITY')}
+                                  onChange={(e) => {
+                                    if (e.target.checked) {
+                                      setSelectedTypes([...selectedTypes, 'GAS_&_ELECTRICITY']);
+                                    } else {
+                                      setSelectedTypes(selectedTypes.filter(t => t !== 'GAS_&_ELECTRICITY'));
+                                    }
+                                  }}
+                                />
+                                <div>
+                                  <span className="font-medium">Gas & Electricity</span>
+                                  <p className="text-sm text-gray-500">Gas and electrical safety check</p>
+                                </div>
+                              </label>
+                            </div>
+                            <p className="text-sm text-gray-500 mt-3">
+                              {selectedTypes.length === 0
+                                ? "Please select at least one type"
+                                : `Will create ${selectedTypes.length} task${selectedTypes.length > 1 ? 's' : ''}`}
+                            </p>
+                            <div className="flex items-center mt-4 pt-3 border-t">
+                              <input
+                                type="checkbox"
+                                id="archiveConflicts"
+                                className="checkbox mr-2"
+                                checked={archiveConflicts}
+                                onChange={(e) =>
+                                  setArchiveConflicts(e.target.checked)
+                                }
+                              />
+                              <label htmlFor="archiveConflicts">
+                                Archive conflicting job orders
+                              </label>
+                            </div>
                           </div>
                         );
                       } else {
