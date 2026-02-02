@@ -133,6 +133,50 @@ export default function EmailsDataTable({ emails, onProcessEmail, processingId }
         ),
         enableSorting: true,
       },
+      // Direction column - shows icon for inbound/outbound
+      {
+        accessorKey: "direction",
+        header: ({ header }) => (
+          <DataGridColumnHeader
+            column={header.column}
+            title="Direction"
+          />
+        ),
+        cell: ({ row }) => {
+          const email = row.original;
+          const isOutbound = email.direction === 'outbound';
+          return (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${
+                    isOutbound
+                      ? 'bg-purple-100 text-purple-800'
+                      : 'bg-green-100 text-green-800'
+                  }`}>
+                    <KeenIcon
+                      icon={isOutbound ? "exit-right" : "entrance-left"}
+                      className="text-xs"
+                    />
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {isOutbound ? 'Sent' : 'Received'}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          );
+        },
+        enableSorting: true,
+        filterFn: (row, columnId, filterValue) => {
+          const direction = row.getValue(columnId) || 'inbound';
+          const lowerFilter = filterValue.toLowerCase();
+          if (lowerFilter === 'sent' || lowerFilter === 'outbound') return direction === 'outbound';
+          if (lowerFilter === 'received' || lowerFilter === 'inbound') return direction !== 'outbound';
+          return true;
+        },
+      },
+      // Sender column - shown for all or inbound
       {
         accessorKey: "sender",
         header: ({ header }) => (
@@ -142,6 +186,34 @@ export default function EmailsDataTable({ emails, onProcessEmail, processingId }
             filter={<ColumnInputFilter column={header.column} />}
           />
         ),
+        cell: ({ row }) => {
+          const email = row.original;
+          // For outbound emails, show "-" in sender column
+          if (email.direction === 'outbound') {
+            return <span className="text-gray-400">-</span>;
+          }
+          return email.sender || '-';
+        },
+        enableSorting: true,
+      },
+      // Recipient column - shown for outbound
+      {
+        accessorKey: "recipient",
+        header: ({ header }) => (
+          <DataGridColumnHeader
+            column={header.column}
+            title="Recipient"
+            filter={<ColumnInputFilter column={header.column} />}
+          />
+        ),
+        cell: ({ row }) => {
+          const email = row.original;
+          // For inbound emails, show "-" in recipient column
+          if (email.direction !== 'outbound') {
+            return <span className="text-gray-400">-</span>;
+          }
+          return email.recipient || '-';
+        },
         enableSorting: true,
       },
       {
@@ -149,21 +221,20 @@ export default function EmailsDataTable({ emails, onProcessEmail, processingId }
         header: ({ header }) => (
           <DataGridColumnHeader
             column={header.column}
-            title="Received At"
+            title="Date"
             filter={<ColumnInputFilter column={header.column} />}
           />
         ),
         enableSorting: true,
         cell: ({ getValue }) => {
           const dateStr = getValue();
-          // if not null
           if (dateStr) {
             const date = new Date(dateStr);
-            // 使用澳大利亚格式（en-AU），显示中等日期格式
             return date.toLocaleString("en-AU", {
               dateStyle: "medium",
             });
           }
+          return '-';
         },
       },
       {
@@ -274,7 +345,7 @@ export default function EmailsDataTable({ emails, onProcessEmail, processingId }
           rowSelection={false}
           pagination={{ size: 100 }}
           onFilteredDataChange={(count) => setFilteredCount(count)}
-          sorting={[{ id: "updated_at", desc: true }]}
+          sorting={[{ id: "created_at", desc: true }]}
         />
       </div>
     </div>

@@ -154,10 +154,35 @@ export default function TaskDetailPage() {
     }
   };
 
-  // 计算默认 Due Date，根据当前任务的 repeat_frequency 设置（格式：YYYY-MM-DD）
+  // Compute default Due Date based on task type and inspection_date
+  // SMOKE_ALARM: inspection_date + 1 year
+  // GAS_&_ELECTRICITY: inspection_date + 2 years
+  // Fallback to repeat_frequency if type doesn't match
   const computeDefaultDueDate = () => {
-    if (task && task.repeat_frequency && task.repeat_frequency !== "none") {
-      const defaultDueDate = new Date();
+    if (!task) return "";
+
+    // Use inspection_date as base if available, otherwise use current date
+    const baseDate = task.inspection_date
+      ? new Date(task.inspection_date)
+      : new Date();
+
+    // Calculate based on task type first
+    if (task.type === "SMOKE_ALARM") {
+      baseDate.setFullYear(baseDate.getFullYear() + 1); // 1 year
+      return baseDate.toISOString().split("T")[0];
+    }
+
+    if (task.type === "GAS_&_ELECTRICITY") {
+      baseDate.setFullYear(baseDate.getFullYear() + 2); // 2 years
+      return baseDate.toISOString().split("T")[0];
+    }
+
+    // Fallback to repeat_frequency logic for other types
+    if (task.repeat_frequency && task.repeat_frequency !== "none") {
+      const defaultDueDate = task.inspection_date
+        ? new Date(task.inspection_date)
+        : new Date();
+
       switch (task.repeat_frequency) {
         case "1 month":
           defaultDueDate.setMonth(defaultDueDate.getMonth() + 1);
@@ -180,9 +205,9 @@ export default function TaskDetailPage() {
         default:
           break;
       }
-      // 返回格式化后的字符串 YYYY-MM-DD
       return defaultDueDate.toISOString().split("T")[0];
     }
+
     return "";
   };
 

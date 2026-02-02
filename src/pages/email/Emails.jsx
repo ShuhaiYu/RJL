@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuthContext } from "@/auth";
 import EmailsDataTable from "./blocks/EmailsDataTable";
-import { Box, CircularProgress } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import { KeenIcon } from "@/components";
 import { toast } from "sonner";
 import StatsCards from "@/components/common/StatsCards";
@@ -19,16 +19,21 @@ export default function Emails() {
     total: 0,
     today: 0,
     thisWeek: 0,
-    pending: 0
+    pending: 0,
+    received: 0,
+    sent: 0
   });
   const { auth, baseApi } = useAuthContext();
   const token = auth?.accessToken;
   const navigate = useNavigate();
-  
+
+  // Tab state for direction filter
+  const [activeTab, setActiveTab] = useState("all"); // "all" | "inbound" | "outbound"
+
   // Step indicator state
   const [currentStep, setCurrentStep] = useState(1);
   const [stepProgress, setStepProgress] = useState(33);
-  
+
   // Steps: 1. Data Loading, 2. Statistics, 3. View Ready
   const steps = [
     { id: 1, name: "Data Loading", icon: "loading" },
@@ -36,51 +41,63 @@ export default function Emails() {
     { id: 3, name: "View Ready", icon: "check-circle" }
   ];
 
-  const fetchEmails = async () => {
+  const fetchEmails = async (direction = null) => {
     if (!token) return;
     setLoading(true);
     setCurrentStep(1);
     setStepProgress(33);
-    
+
     try {
-      const response = await axios.get(`${baseApi}/emails`, {
+      // Build query params
+      const params = new URLSearchParams();
+      if (direction) {
+        params.append('direction', direction);
+      }
+      const queryString = params.toString();
+      const url = queryString ? `${baseApi}/emails?${queryString}` : `${baseApi}/emails`;
+
+      const response = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const emailData = response.data || [];
       setEmails(emailData);
-      
+
       // Step 2: Processing statistics
       setCurrentStep(2);
       setStepProgress(66);
-      
-      // 计算统计信息
+
+      // Calculate statistics
       const now = new Date();
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-      
+
       const todayCount = emailData.filter(email => {
         const emailDate = new Date(email.created_at);
         return emailDate >= today;
       }).length;
-      
+
       const weekCount = emailData.filter(email => {
         const emailDate = new Date(email.created_at);
         return emailDate >= weekAgo;
       }).length;
-      
+
       const pendingCount = emailData.filter(email => !email.is_processed).length;
+      const receivedCount = emailData.filter(email => email.direction !== 'outbound').length;
+      const sentCount = emailData.filter(email => email.direction === 'outbound').length;
 
       setEmailStats({
         total: emailData.length,
         today: todayCount,
         thisWeek: weekCount,
-        pending: pendingCount
+        pending: pendingCount,
+        received: receivedCount,
+        sent: sentCount
       });
-      
+
       // Step 3: View ready
       setCurrentStep(3);
       setStepProgress(100);
-      
+
       setLoading(false);
       toast.success(`Loaded ${emailData.length} emails successfully`);
     } catch (err) {
@@ -94,9 +111,11 @@ export default function Emails() {
 
   useEffect(() => {
     if (token) {
-      fetchEmails();
+      // Map tab to direction filter
+      const direction = activeTab === "all" ? null : activeTab;
+      fetchEmails(direction);
     }
-  }, [token]);
+  }, [token, activeTab]);
 
   // Handle manual email processing
   const handleProcessEmail = async (emailId) => {
@@ -110,7 +129,9 @@ export default function Emails() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success("Email processed successfully");
-      fetchEmails(); // Refresh list
+      // Refresh list with current tab filter
+      const direction = activeTab === "all" ? null : activeTab;
+      fetchEmails(direction);
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to process email");
     } finally {
@@ -224,20 +245,20 @@ export default function Emails() {
               route: null
             },
             {
-              key: 'today',
-              title: "Today's Emails",
-              value: emailStats.today,
-              icon: "calendar",
+              key: 'received',
+              title: "Received",
+              value: emailStats.received,
+              icon: "entrance-left",
               color: "text-green-600",
               bgColor: "bg-green-50",
               borderColor: "border-green-200",
               route: null
             },
             {
-              key: 'week',
-              title: "This Week",
-              value: emailStats.thisWeek,
-              icon: "chart-line",
+              key: 'sent',
+              title: "Sent",
+              value: emailStats.sent,
+              icon: "exit-right",
               color: "text-purple-600",
               bgColor: "bg-purple-50",
               borderColor: "border-purple-200",
@@ -256,6 +277,45 @@ export default function Emails() {
           ]}
           loading={loading}
         />
+      </div>
+
+      {/* Direction Filter Tabs */}
+      <div className="mb-6">
+        <div className="flex gap-2 border-b border-gray-200">
+          <button
+            onClick={() => setActiveTab("all")}
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === "all"
+                ? "border-blue-600 text-blue-600"
+                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+            }`}
+          >
+            <KeenIcon icon="sms" className="mr-2 text-sm" />
+            All
+          </button>
+          <button
+            onClick={() => setActiveTab("inbound")}
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === "inbound"
+                ? "border-green-600 text-green-600"
+                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+            }`}
+          >
+            <KeenIcon icon="entrance-left" className="mr-2 text-sm" />
+            Received
+          </button>
+          <button
+            onClick={() => setActiveTab("outbound")}
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === "outbound"
+                ? "border-purple-600 text-purple-600"
+                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+            }`}
+          >
+            <KeenIcon icon="exit-right" className="mr-2 text-sm" />
+            Sent
+          </button>
+        </div>
       </div>
       
       {/* Email List Section */}
