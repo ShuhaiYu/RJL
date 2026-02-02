@@ -462,26 +462,23 @@ export default function TaskDetailPage() {
               </p>
             </div>
 
-            {/* 动态日期显示 */}
+            {/* Inspection Date - 只要有数据就显示 */}
+            {task.inspection_date && (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <KeenIcon icon="calendar" className="text-lg text-gray-500" />
+                  <span className="text-sm font-medium text-gray-500">Inspection Date</span>
+                </div>
+                <p className="text-lg text-gray-900 ml-7">
+                  {new Date(task.inspection_date).toLocaleString()}
+                </p>
+              </div>
+            )}
+
+            {/* Due Date - 在特定状态下显示 */}
             {(() => {
               const normalizedStatus = task.status?.toLowerCase().replace(/_/g, ' ');
-              if (normalizedStatus === "processing") {
-                return (
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <KeenIcon icon="calendar" className="text-lg text-gray-500" />
-                      <span className="text-sm font-medium text-gray-500">Inspection Date</span>
-                    </div>
-                    <p className="text-lg text-gray-900 ml-7">
-                      {task.inspection_date
-                        ? new Date(task.inspection_date).toLocaleString()
-                        : "N/A"}
-                    </p>
-                  </div>
-                );
-              } else if (
-                ["completed", "due soon", "expired", "history"].includes(normalizedStatus)
-              ) {
+              if (["completed", "due soon", "expired", "history"].includes(normalizedStatus)) {
                 return (
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
