@@ -49,7 +49,7 @@ export default function SystemSettingPage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success("Settings updated successfully");
-      setSettings(res.data.data);
+      setSettings(res.data);
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to update settings");
     }

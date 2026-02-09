@@ -190,7 +190,7 @@ export default function CreateTaskPage() {
 
       toast.success("Task created successfully!");
       // 跳转到新创建任务的详情页面（例如 /task/123）
-      navigate(`/property/tasks/${response.data.data.id}`);
+      navigate(`/property/tasks/${response.data.id}`);
     } catch (error) {
       console.error("Create task error:", error);
       toast.error(error.response?.data?.message || "Failed to create task.");

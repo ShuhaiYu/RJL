@@ -152,7 +152,7 @@ export default function CreatePropertyPage() {
         { address, user_id: selectedUserId, region: region || null },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      const property = response.data?.data;
+      const property = response.data;
       toast.success("Property created successfully!");
 
       // 2) If VEU card is shown, update the two VEU projects (created automatically on backend)

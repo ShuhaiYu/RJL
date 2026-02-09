@@ -95,12 +95,16 @@ export function setupAxios(axios) {
         }
       }
 
-      // 错误处理
-      if (error.response?.data?.message) {
-        toast.error(error.response.data.message);
-      } else {
-        toast.error("An error occurred");
+      // 把后端 { error: { message } } 中的真实错误提升到 data.message
+      // 这样所有下游 catch 块读 err.response?.data?.message 就能拿到真实错误
+      if (error.response?.data && !error.response.data.message) {
+        const errField = error.response.data.error;
+        if (errField) {
+          error.response.data.message =
+            typeof errField === 'string' ? errField : errField.message;
+        }
       }
+      // 不在拦截器弹 toast，由各页面自行处理（避免重复）
       return Promise.reject(error);
     }
   );

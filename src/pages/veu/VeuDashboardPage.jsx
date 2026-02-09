@@ -36,8 +36,8 @@ export default function VeuDashboardPage() {
     axios
       .get(`${baseApi}/veu-projects/overview`, { headers: authHeader })
       .then((res) => {
-        // Backend returns { success: true, data: [...agencies] }
-        const rawData = res.data?.data || res.data || [];
+        // Interceptor unwraps { success, data } → data
+        const rawData = res.data || [];
         const agencies = Array.isArray(rawData) ? rawData : [];
 
         // Transform backend data to frontend expected format

@@ -22,8 +22,7 @@ export default function AddressInput({ value, onChange, onCoordinatesChange }) {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
-        // Handle different response formats
-        const key = res.data.key || res.data.data?.key || res.data.google_map_key || "";
+        const key = res.data.key || res.data.google_map_key || "";
         setApiKey(key);
       })
       .catch((err) => {

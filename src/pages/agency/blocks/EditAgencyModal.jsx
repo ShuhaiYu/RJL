@@ -34,7 +34,7 @@ export default function EditAgencyModal({ agency, onClose, onUpdated }) {
         headers: { Authorization: `Bearer ${token}` },
       });
       toast.success("Agency updated successfully");
-      onUpdated && onUpdated(res.data.data);
+      onUpdated && onUpdated(res.data);
       onClose();
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to update agency");
