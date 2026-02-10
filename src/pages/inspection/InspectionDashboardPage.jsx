@@ -982,52 +982,31 @@ export default function InspectionDashboardPage() {
                   )}
                 </div>
 
-                <div className="flex gap-2">
-                  <Button
-                    onClick={handlePreview}
-                    disabled={loadingPreview || creating || !createFormData.region || createFormData.selectedDates.length === 0}
-                    variant="outline"
-                    className="flex-1"
-                    size="lg"
-                  >
-                    {loadingPreview ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mr-2" />
-                        Loading...
-                      </>
-                    ) : (
-                      <>
-                        <KeenIcon icon="eye" className="text-base mr-2" />
-                        Preview
-                      </>
-                    )}
-                  </Button>
-                  <Button
-                    onClick={handleCreateSchedule}
-                    disabled={creating || loadingPreview || !createFormData.region || createFormData.selectedDates.length === 0}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700"
-                    size="lg"
-                  >
-                    {creating ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                        Creating...
-                      </>
-                    ) : (
-                      <>
-                        <KeenIcon icon="plus" className="text-base mr-2" />
-                        Create
-                      </>
-                    )}
-                  </Button>
-                </div>
+                <Button
+                  onClick={handlePreview}
+                  disabled={loadingPreview || !createFormData.region || createFormData.selectedDates.length === 0}
+                  className="w-full bg-blue-600 hover:bg-blue-700"
+                  size="lg"
+                >
+                  {loadingPreview ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                      Loading...
+                    </>
+                  ) : (
+                    <>
+                      <KeenIcon icon="eye" className="text-base mr-2" />
+                      Preview & Create
+                    </>
+                  )}
+                </Button>
               </div>
 
               {/* Quick tip */}
               <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
                 <p className="text-sm text-blue-800">
-                  <strong>Tip:</strong> Click "Preview" to see which properties and
-                  contacts will receive booking invitation emails before creating.
+                  <strong>Tip:</strong> Click "Preview & Create" to review which properties and
+                  contacts will receive booking invitation emails.
                 </p>
               </div>
             </div>
