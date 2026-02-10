@@ -172,16 +172,14 @@ export default function CreateTaskPage() {
     setLoading(true);
     try {
       const payload = {
-        property_id: selectedPropertyId,
+        property_id: Number(selectedPropertyId),
         task_name: taskName,
-        task_description: taskDescription,
-        due_date: dueDate || null,
+        task_description: taskDescription || null,
+        due_date: dueDate ? new Date(dueDate).toISOString() : null,
         repeat_frequency: repeatFrequency,
-        // 新增
         type: taskType,
         status: status,
         email_id: emailId,
-        agency_id: selectedAgencyId,
       };
 
       const response = await axios.post(`${baseApi}/tasks`, payload, {
