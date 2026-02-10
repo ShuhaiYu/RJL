@@ -6,8 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
-
 function LoadingState() {
   return (
     <div className="min-h-screen w-full bg-gray-50 flex items-center justify-center">
@@ -184,7 +182,7 @@ export default function PublicBookingPage() {
 
   const fetchBookingData = async () => {
     try {
-      const res = await axios.get(`${API_URL}/public/booking/${token}`);
+      const res = await axios.get(`/public/booking/${token}`);
       // Note: axios interceptor already unwraps response.data.data to response.data
       setData(res.data);
 
@@ -226,7 +224,7 @@ export default function PublicBookingPage() {
 
     setSubmitting(true);
     try {
-      const res = await axios.post(`${API_URL}/public/booking/${token}`, {
+      const res = await axios.post(`/public/booking/${token}`, {
         slot_id: selectedSlot,
         contact_name: formData.contact_name,
         contact_phone: formData.contact_phone || undefined,
