@@ -81,6 +81,11 @@ function BookingRow({ booking, onConfirm, onReject, canManage }) {
         </span>
       </td>
       <td className="px-6 py-4">
+        <p className="text-sm text-gray-500 truncate max-w-[200px]" title={booking.note}>
+          {booking.note || "-"}
+        </p>
+      </td>
+      <td className="px-6 py-4">
         <p className="text-sm text-gray-500">{formatDate(booking.created_at)}</p>
       </td>
       {canManage && (
@@ -283,6 +288,9 @@ export default function BookingsListPage() {
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Status
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Notes
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Submitted
