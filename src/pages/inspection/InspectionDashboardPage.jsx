@@ -515,13 +515,12 @@ export default function InspectionDashboardPage() {
         for (const recipient of property.recipients || []) {
           allRecipients.push({
             property_id: property.id,
-            contact_id: recipient.type === 'contact' ? recipient.id : null,
-            user_id: recipient.type === 'agencyUser' ? recipient.id : null,
-            type: recipient.type,
+            contact_id: recipient.id,
+            type: 'contact',
             email: recipient.email,
             name: recipient.name,
             // For UI tracking
-            _key: `${property.id}:${recipient.email}`,
+            _key: `${property.id}:contact:${recipient.id}`,
           });
         }
       }
@@ -627,13 +626,13 @@ export default function InspectionDashboardPage() {
   };
 
   // ==================== Recipient Selection Functions ====================
-  const isRecipientSelected = (propertyId, email) => {
-    const key = `${propertyId}:${email}`;
+  const isRecipientSelected = (propertyId, id) => {
+    const key = `${propertyId}:contact:${id}`;
     return selectedRecipients.some((r) => r._key === key);
   };
 
   const toggleRecipient = (property, recipient) => {
-    const key = `${property.id}:${recipient.email}`;
+    const key = `${property.id}:contact:${recipient.id}`;
     const isSelected = selectedRecipients.some((r) => r._key === key);
 
     if (isSelected) {
@@ -643,9 +642,8 @@ export default function InspectionDashboardPage() {
         ...prev,
         {
           property_id: property.id,
-          contact_id: recipient.type === 'contact' ? recipient.id : null,
-          user_id: recipient.type === 'agencyUser' ? recipient.id : null,
-          type: recipient.type,
+          contact_id: recipient.id,
+          type: 'contact',
           email: recipient.email,
           name: recipient.name,
           _key: key,
@@ -660,12 +658,11 @@ export default function InspectionDashboardPage() {
       for (const recipient of property.recipients || []) {
         allRecipients.push({
           property_id: property.id,
-          contact_id: recipient.type === 'contact' ? recipient.id : null,
-          user_id: recipient.type === 'agencyUser' ? recipient.id : null,
-          type: recipient.type,
+          contact_id: recipient.id,
+          type: 'contact',
           email: recipient.email,
           name: recipient.name,
-          _key: `${property.id}:${recipient.email}`,
+          _key: `${property.id}:contact:${recipient.id}`,
         });
       }
     }
@@ -1368,15 +1365,13 @@ export default function InspectionDashboardPage() {
                         {property.recipients?.length > 0 && (
                           <div className="mt-2 space-y-1">
                             {property.recipients.map((recipient, idx) => {
-                              const isSelected = isRecipientSelected(property.id, recipient.email);
+                              const isSelected = isRecipientSelected(property.id, recipient.id);
                               return (
                                 <label
                                   key={idx}
                                   className={`flex items-center gap-2 px-2 py-1.5 rounded cursor-pointer transition-colors ${
                                     isSelected
-                                      ? recipient.type === "contact"
-                                        ? "bg-blue-100 hover:bg-blue-150"
-                                        : "bg-purple-100 hover:bg-purple-150"
+                                      ? "bg-blue-100 hover:bg-blue-150"
                                       : "bg-gray-50 hover:bg-gray-100"
                                   }`}
                                 >
@@ -1386,22 +1381,11 @@ export default function InspectionDashboardPage() {
                                     className="h-4 w-4"
                                   />
                                   <KeenIcon
-                                    icon={recipient.type === "contact" ? "profile-circle" : "security-user"}
-                                    className={`text-xs ${
-                                      recipient.type === "contact" ? "text-blue-600" : "text-purple-600"
-                                    }`}
+                                    icon="profile-circle"
+                                    className="text-xs text-blue-600"
                                   />
                                   <span className="text-sm text-gray-900">{recipient.name}</span>
                                   <span className="text-xs text-gray-400">({recipient.email})</span>
-                                  <span
-                                    className={`ml-auto text-[10px] px-1.5 py-0.5 rounded ${
-                                      recipient.type === "contact"
-                                        ? "bg-blue-50 text-blue-600"
-                                        : "bg-purple-50 text-purple-600"
-                                    }`}
-                                  >
-                                    {recipient.type === "contact" ? "Contact" : "Agency"}
-                                  </span>
                                 </label>
                               );
                             })}
@@ -1409,7 +1393,7 @@ export default function InspectionDashboardPage() {
                         )}
                         {!property.has_recipients && (
                           <p className="mt-1 text-xs text-yellow-600">
-                            No contacts or agency users with email
+                            No contacts with email
                           </p>
                         )}
                       </div>
