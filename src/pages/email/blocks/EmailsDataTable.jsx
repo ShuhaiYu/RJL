@@ -110,6 +110,38 @@ export default function EmailsDataTable({ emails, onProcessEmail, processingId }
           if (!email.is_processed || !email.property_id) {
             return <span className="text-gray-400">-</span>;
           }
+
+          const properties = email.properties || [];
+          // Multi-property: show badge with tooltip listing all properties
+          if (properties.length > 1) {
+            return (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 cursor-help">
+                      <KeenIcon icon="home-2" className="text-xs" />
+                      {properties.length} properties
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" className="max-w-md">
+                    <div className="flex flex-col gap-1 p-1">
+                      {properties.map((prop) => (
+                        <Link
+                          key={prop.id}
+                          className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
+                          to={`/property/${prop.id}`}
+                        >
+                          {prop.address || `Property #${prop.id}`}
+                        </Link>
+                      ))}
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            );
+          }
+
+          // Single property: show as before
           return (
             <Link
               className="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium"
@@ -252,21 +284,28 @@ export default function EmailsDataTable({ emails, onProcessEmail, processingId }
           if (!email.is_processed || tasks.length === 0) {
             return <span className="text-gray-400">-</span>;
           }
+          const isMultiProperty = (email.properties || []).length > 1;
           // Display multiple tasks
           return (
             <div className="flex flex-col gap-1">
-              {tasks.map((task) => (
-                <Link
-                  key={task.id}
-                  className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 font-medium"
-                  to={`/property/tasks/${task.id}`}
-                >
-                  <KeenIcon icon="note-2" className="text-xs" />
-                  <span className="truncate max-w-[120px]" title={task.task_name}>
-                    {task.type || task.task_name || 'View Task'}
-                  </span>
-                </Link>
-              ))}
+              {tasks.map((task) => {
+                const shortAddress = isMultiProperty && task.property_address
+                  ? ` (${task.property_address.split(',')[0]})`
+                  : '';
+                const label = (task.type || task.task_name || 'View Task') + shortAddress;
+                return (
+                  <Link
+                    key={task.id}
+                    className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 font-medium"
+                    to={`/property/tasks/${task.id}`}
+                  >
+                    <KeenIcon icon="note-2" className="text-xs" />
+                    <span className="truncate max-w-[200px]" title={label}>
+                      {label}
+                    </span>
+                  </Link>
+                );
+              })}
             </div>
           );
         },
