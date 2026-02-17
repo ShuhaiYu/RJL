@@ -154,7 +154,7 @@ export default function CreateTaskPage() {
       }
 
       setRepeatFrequency(originalTask.repeat_frequency || "none");
-      setTaskType(originalTask.type || "");
+      setTaskType(originalTask.type ?? "GAS_&_ELECTRICITY");
       setStatus(originalTask.status || "INCOMPLETE");
 
       // 收集邮件ID
@@ -177,7 +177,7 @@ export default function CreateTaskPage() {
         task_description: taskDescription || null,
         due_date: dueDate ? new Date(dueDate).toISOString() : null,
         repeat_frequency: repeatFrequency,
-        type: taskType,
+        type: taskType || "GAS_&_ELECTRICITY",
         status: status,
         email_id: emailId,
       };
