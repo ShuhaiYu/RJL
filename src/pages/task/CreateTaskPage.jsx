@@ -52,14 +52,46 @@ export default function CreateTaskPage() {
   const [emailId, setEmailId] = useState(null);
 
   const [selectedAgencyId, setSelectedAgencyId] = useState("");
+  const [selectedProperty, setSelectedProperty] = useState(null);
+  const [propertyUserAgencyId, setPropertyUserAgencyId] = useState(null);
 
   const isAgencyUser = currentUser?.agency_id ? true : false;
 
+  // 如果是中介用户，初始化其中介ID
   useEffect(() => {
     if (isAgencyUser && currentUser.agency_id) {
       setSelectedAgencyId(String(currentUser.agency_id));
     }
   }, [isAgencyUser, currentUser]);
+
+  // 当选择房产时，获取房产用户的中介ID（用于自动选择）
+  useEffect(() => {
+    const fetchPropertyUserAgency = async () => {
+      if (!selectedProperty || !token) {
+        setPropertyUserAgencyId(null);
+        return;
+      }
+
+      try {
+        // 如果房产对象中有用户信息和中介ID
+        if (selectedProperty.user_id) {
+          const userResponse = await axios.get(
+            `${baseApi}/users/${selectedProperty.user_id}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          const user = userResponse.data;
+          setPropertyUserAgencyId(user.agency_id || null);
+        } else {
+          setPropertyUserAgencyId(null);
+        }
+      } catch (error) {
+        console.error("Failed to fetch property user agency:", error);
+        setPropertyUserAgencyId(null);
+      }
+    };
+
+    fetchPropertyUserAgency();
+  }, [selectedProperty, token, baseApi]);
   
   // Fetch statistics data
   useEffect(() => {
@@ -127,7 +159,8 @@ export default function CreateTaskPage() {
       }
       
       // Assignment information (15%)
-      if (selectedAgencyId) {
+      const hasAgency = isAgencyUser ? currentUser.agency_id : selectedAgencyId;
+      if (hasAgency) {
         progress += 15;
         step = 3;
       }
@@ -137,7 +170,7 @@ export default function CreateTaskPage() {
     };
     
     calculateProgress();
-  }, [selectedPropertyId, taskName, taskType, taskDescription, dueDate, selectedAgencyId]);
+  }, [selectedPropertyId, taskName, taskType, taskDescription, dueDate, selectedAgencyId, isAgencyUser, currentUser]);
 
   useEffect(() => {
     if (originalTask) {
@@ -159,8 +192,13 @@ export default function CreateTaskPage() {
 
       // 收集邮件ID
       setEmailId(originalTask.email_id || null);
+      
+      // 设置 agency_id（如果存在且用户不是 agency 用户）
+      if (originalTask.agency_id && !isAgencyUser) {
+        setSelectedAgencyId(String(originalTask.agency_id));
+      }
     }
-  }, [originalTask]);
+  }, [originalTask, isAgencyUser]);
 
   // 3) 提交
   const handleSubmit = async (e) => {
@@ -169,6 +207,17 @@ export default function CreateTaskPage() {
       toast.error("Please select a property and enter a task name.");
       return;
     }
+    
+    // 确定最终的 agency_id
+    const finalAgencyId = isAgencyUser 
+      ? currentUser.agency_id  // 中介用户强制使用自己的中介
+      : selectedAgencyId;       // 非中介用户使用选择的中介
+    
+    if (!finalAgencyId) {
+      toast.error("Please select an agency.");
+      return;
+    }
+    
     setLoading(true);
     try {
       const payload = {
@@ -180,6 +229,7 @@ export default function CreateTaskPage() {
         type: taskType || "GAS_&_ELECTRICITY",
         status: status,
         email_id: emailId,
+        agency_id: Number(finalAgencyId),
       };
 
       const response = await axios.post(`${baseApi}/tasks`, payload, {
@@ -358,7 +408,14 @@ export default function CreateTaskPage() {
               <div className="relative">
                 <AsyncPropertySelect
                   defaultPropertyId={originalTask?.property_id}
-                  onChange={(option) => setSelectedPropertyId(option.value)}
+                  onChange={(option) => {
+                    setSelectedPropertyId(option.value);
+                    setSelectedProperty(option.property);
+                    // 清空之前选择的中介（如果不是中介用户）
+                    if (!isAgencyUser) {
+                      setSelectedAgencyId("");
+                    }
+                  }}
                 />
               </div>
             </div>
@@ -449,22 +506,36 @@ export default function CreateTaskPage() {
               <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
                 <KeenIcon icon="office-bag" className="text-lg text-gray-500" />
                 Job Order Agency *
+                {isAgencyUser && (
+                  <span className="text-xs text-gray-500 font-normal">
+                    (Fixed to your agency)
+                  </span>
+                )}
+                {!isAgencyUser && propertyUserAgencyId && (
+                  <span className="text-xs text-blue-600 font-normal">
+                    (Auto-selected from property owner)
+                  </span>
+                )}
               </label>
-              <div className="relative">
-                <AsyncAgencySelect
-                  onChange={(option) => setSelectedAgencyId(option)}
-                  placeholder="Select agency..."
-                  isDisabled={isAgencyUser}
-                  defaultValue={
-                    isAgencyUser
-                      ? {
-                          value: currentUser.agency_id,
-                          label: currentUser.agency.agency_name,
-                        }
-                      : undefined
-                  }
-                />
-              </div>
+              {isAgencyUser ? (
+                <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700">
+                  <div className="flex items-center gap-2">
+                    <KeenIcon icon="office-bag" className="text-gray-500" />
+                    <span>{currentUser.agency.agency_name}</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="relative">
+                  <AsyncAgencySelect
+                    onChange={(option) => setSelectedAgencyId(option)}
+                    placeholder="Select agency..."
+                    isDisabled={false}
+                    restrictToAgencyId={propertyUserAgencyId}
+                    defaultAgencyId={propertyUserAgencyId}
+                    key={`agency-select-${propertyUserAgencyId || 'none'}`} // 强制重新渲染
+                  />
+                </div>
+              )}
             </div>
 
             {/* Form Completion Status */}
@@ -500,9 +571,9 @@ export default function CreateTaskPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <div className={`w-2 h-2 rounded-full ${
-                    selectedAgencyId ? 'bg-blue-500' : 'bg-gray-300'
+                    (isAgencyUser ? currentUser.agency_id : selectedAgencyId) ? 'bg-blue-500' : 'bg-gray-300'
                   }`}></div>
-                  <span className={selectedAgencyId ? 'text-blue-700' : 'text-gray-500'}>
+                  <span className={(isAgencyUser ? currentUser.agency_id : selectedAgencyId) ? 'text-blue-700' : 'text-gray-500'}>
                     Assignment
                   </span>
                 </div>
