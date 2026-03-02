@@ -217,7 +217,14 @@ export default function CreateTaskPage() {
       toast.error("Please select an agency.");
       return;
     }
-    
+
+    // Ensure agency_id is a valid positive integer after Number() conversion
+    const agencyIdNum = Number(finalAgencyId);
+    if (!Number.isInteger(agencyIdNum) || agencyIdNum <= 0) {
+      toast.error("Invalid agency selection. Please re-select an agency.");
+      return;
+    }
+
     setLoading(true);
     try {
       const payload = {
@@ -229,7 +236,7 @@ export default function CreateTaskPage() {
         type: taskType || "GAS_&_ELECTRICITY",
         status: status,
         email_id: emailId,
-        agency_id: Number(finalAgencyId),
+        agency_id: agencyIdNum,
       };
 
       const response = await axios.post(`${baseApi}/tasks`, payload, {
