@@ -139,6 +139,25 @@ export default function Emails() {
     }
   };
 
+  // Handle re-processing an already processed email
+  const handleReprocessEmail = async (emailId) => {
+    if (processingId) return;
+    setProcessingId(emailId);
+    try {
+      await axios.post(
+        `${baseApi}/emails/${emailId}/process`,
+        { force: true },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success("Email re-processed successfully");
+      const direction = activeTab === "all" ? null : activeTab;
+      fetchEmails(direction);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to re-process email");
+    } finally {
+      setProcessingId(null);
+    }
+  };
 
   if (error)
     return (
@@ -377,6 +396,7 @@ export default function Emails() {
             <EmailsDataTable
               emails={emails}
               onProcessEmail={handleProcessEmail}
+              onReprocessEmail={handleReprocessEmail}
               processingId={processingId}
             />
           )}

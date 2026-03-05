@@ -19,7 +19,7 @@ const handleViewEmail = (emailHtml) => {
   newWindow.document.close();
 };
 
-export default function EmailsDataTable({ emails, onProcessEmail, processingId }) {
+export default function EmailsDataTable({ emails, onProcessEmail, onReprocessEmail, processingId }) {
   const [filteredCount, setFilteredCount] = useState(emails.length);
 
   const ColumnInputFilter = ({ column }) => {
@@ -316,6 +316,31 @@ export default function EmailsDataTable({ emails, onProcessEmail, processingId }
                   )}
                 </Button>
               )}
+              {/* Re-process button - only for processed inbound emails */}
+              {email.is_processed && email.direction !== 'outbound' && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-1"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onReprocessEmail(email.id);
+                  }}
+                  disabled={isProcessing}
+                >
+                  {isProcessing ? (
+                    <>
+                      <KeenIcon icon="loading" className="text-sm animate-spin" />
+                      Re-processing...
+                    </>
+                  ) : (
+                    <>
+                      <KeenIcon icon="arrows-loop" className="text-sm" />
+                      Re-process
+                    </>
+                  )}
+                </Button>
+              )}
               {/* View HTML button */}
               {email.html && (
                 <Button
@@ -335,7 +360,7 @@ export default function EmailsDataTable({ emails, onProcessEmail, processingId }
         },
       },
     ],
-    [onProcessEmail, processingId]
+    [onProcessEmail, onReprocessEmail, processingId]
   );
 
   return (
