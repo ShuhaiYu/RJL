@@ -165,88 +165,59 @@ export default function EmailsDataTable({ emails, onProcessEmail, processingId }
         ),
         enableSorting: true,
       },
-      // Direction column - shows icon for inbound/outbound
       {
-        accessorKey: "direction",
+        accessorKey: "sender",
         header: ({ header }) => (
           <DataGridColumnHeader
             column={header.column}
-            title="Direction"
+            title="From / To"
+            filter={<ColumnInputFilter column={header.column} />}
           />
         ),
         cell: ({ row }) => {
           const email = row.original;
           const isOutbound = email.direction === 'outbound';
           return (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${
-                    isOutbound
-                      ? 'bg-purple-100 text-purple-800'
-                      : 'bg-green-100 text-green-800'
-                  }`}>
-                    <KeenIcon
-                      icon={isOutbound ? "exit-right" : "entrance-left"}
-                      className="text-xs"
-                    />
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  {isOutbound ? 'Sent' : 'Received'}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <div className="flex items-center gap-1.5">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className={`inline-flex items-center shrink-0 px-1.5 py-0.5 text-xs font-medium rounded-full ${
+                      isOutbound
+                        ? 'bg-purple-100 text-purple-800'
+                        : 'bg-green-100 text-green-800'
+                    }`}>
+                      <KeenIcon
+                        icon={isOutbound ? "exit-right" : "entrance-left"}
+                        className="text-xs"
+                      />
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {isOutbound ? 'Sent' : 'Received'}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <span className={`shrink-0 text-xs font-medium ${
+                isOutbound ? 'text-purple-700' : 'text-green-700'
+              }`}>
+                {isOutbound ? 'To' : 'From'}
+              </span>
+              <span className="truncate">
+                {isOutbound ? (email.recipient || '-') : (email.sender || '-')}
+              </span>
+            </div>
           );
         },
         enableSorting: true,
         filterFn: (row, columnId, filterValue) => {
-          const direction = row.getValue(columnId) || 'inbound';
+          const email = row.original;
           const lowerFilter = filterValue.toLowerCase();
-          if (lowerFilter === 'sent' || lowerFilter === 'outbound') return direction === 'outbound';
-          if (lowerFilter === 'received' || lowerFilter === 'inbound') return direction !== 'outbound';
-          return true;
+          if (lowerFilter === 'sent' || lowerFilter === 'outbound') return email.direction === 'outbound';
+          if (lowerFilter === 'received' || lowerFilter === 'inbound') return email.direction !== 'outbound';
+          const displayValue = email.direction === 'outbound' ? (email.recipient || '') : (email.sender || '');
+          return displayValue.toLowerCase().includes(lowerFilter);
         },
-      },
-      // Sender column - shown for all or inbound
-      {
-        accessorKey: "sender",
-        header: ({ header }) => (
-          <DataGridColumnHeader
-            column={header.column}
-            title="Sender"
-            filter={<ColumnInputFilter column={header.column} />}
-          />
-        ),
-        cell: ({ row }) => {
-          const email = row.original;
-          // For outbound emails, show "-" in sender column
-          if (email.direction === 'outbound') {
-            return <span className="text-gray-400">-</span>;
-          }
-          return email.sender || '-';
-        },
-        enableSorting: true,
-      },
-      // Recipient column - shown for outbound
-      {
-        accessorKey: "recipient",
-        header: ({ header }) => (
-          <DataGridColumnHeader
-            column={header.column}
-            title="Recipient"
-            filter={<ColumnInputFilter column={header.column} />}
-          />
-        ),
-        cell: ({ row }) => {
-          const email = row.original;
-          // For inbound emails, show "-" in recipient column
-          if (email.direction !== 'outbound') {
-            return <span className="text-gray-400">-</span>;
-          }
-          return email.recipient || '-';
-        },
-        enableSorting: true,
       },
       {
         accessorKey: "created_at",
